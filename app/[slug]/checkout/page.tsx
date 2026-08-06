@@ -118,6 +118,11 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
       return;
     }
 
+    if (metodoPago === 'transferencia' && !comprobanteUrl) {
+      toast.error('Es obligatorio adjuntar la foto o comprobante de la transferencia para confirmar el pedido.');
+      return;
+    }
+
     if (requiereFactura && (!datosFacturacion.num_doc || !datosFacturacion.razon_social || !datosFacturacion.email)) {
       alert('Por favor completa los datos obligatorios para la factura (Cédula/RUC, Razón Social y Email).');
       return;
@@ -662,18 +667,26 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
                   </div>
 
                   <div className="pt-2 border-t border-slate-800">
-                    <label className="block text-xs font-display font-semibold text-slate-300 mb-1.5">Adjuntar Comprobante (Opcional)</label>
+                    <label className="block text-xs font-display font-bold text-amber-400 mb-1.5 flex items-center justify-between">
+                      <span>Adjuntar Comprobante de Transferencia</span>
+                      <span className="text-[10px] text-rose-400 font-mono-tech font-bold uppercase">* Obligatorio</span>
+                    </label>
                     {comprobanteUrl ? (
                       <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/30">
                         <CheckCircle2 className="w-4 h-4" />
                         <span>Comprobante adjuntado correctamente.</span>
                       </div>
                     ) : (
-                      <label className="flex items-center justify-center gap-2 p-3.5 rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 text-xs text-slate-400 hover:text-white hover:border-amber-500 cursor-pointer transition-colors">
-                        <Upload className="w-4 h-4 text-amber-400" />
-                        <span>{isUploading ? 'Subiendo imagen...' : 'Seleccionar foto de comprobante'}</span>
-                        <input type="file" accept="image/*" onChange={handleUploadSimulated} className="hidden" />
-                      </label>
+                      <div className="space-y-1.5">
+                        <label className="flex items-center justify-center gap-2 p-3.5 rounded-2xl border border-dashed border-amber-500/50 bg-amber-500/5 text-xs text-amber-300 hover:text-white hover:border-amber-400 cursor-pointer transition-colors">
+                          <Upload className="w-4 h-4 text-amber-400" />
+                          <span>{isUploading ? 'Subiendo imagen...' : 'Seleccionar foto de comprobante *'}</span>
+                          <input type="file" accept="image/*" onChange={handleUploadSimulated} className="hidden" />
+                        </label>
+                        <p className="text-[10px] text-rose-400 font-medium">
+                          * Debes adjuntar la foto del comprobante bancario para poder procesar la orden.
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
