@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { Search, MapPin, ExternalLink, Truck, Clock, ShieldCheck, PhoneCall, AlertCircle } from 'lucide-react';
+import { Search, MapPin, ExternalLink, Truck, Clock, ShieldCheck, PhoneCall, AlertCircle, Flame } from 'lucide-react';
 import { HeaderCatalog } from '@/components/catalog/HeaderCatalog';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { CartDrawer } from '@/components/catalog/CartDrawer';
@@ -84,8 +84,15 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
     );
   }
 
+  const promoProductsCount = products.filter((p) => p.en_oferta && p.precio_oferta).length;
+
   const filteredProducts = products.filter((p) => {
-    const matchesCategory = selectedCategory ? p.category_id === selectedCategory : true;
+    let matchesCategory = true;
+    if (selectedCategory === 'promos') {
+      matchesCategory = !!(p.en_oferta && p.precio_oferta);
+    } else if (selectedCategory !== null) {
+      matchesCategory = p.category_id === selectedCategory;
+    }
     const matchesSearch =
       p.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.descripcion && p.descripcion.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -230,6 +237,20 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
               >
                 Menú Completo ({products.length})
               </button>
+
+              {promoProductsCount > 0 && (
+                <button
+                  onClick={() => setSelectedCategory('promos')}
+                  className={`px-4 py-2.5 rounded-2xl text-xs font-display font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                    selectedCategory === 'promos'
+                      ? 'bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 text-slate-950 font-black shadow-lg shadow-rose-500/20'
+                      : 'bg-rose-500/10 text-rose-300 hover:text-white border border-rose-500/30'
+                  }`}
+                >
+                  <Flame className="w-3.5 h-3.5 fill-rose-400 text-rose-400" />
+                  <span>Ofertas & Promos ({promoProductsCount})</span>
+                </button>
+              )}
 
               {categories.map((cat) => {
                 const count = products.filter((p) => p.category_id === cat.id).length;

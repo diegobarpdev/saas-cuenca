@@ -59,6 +59,9 @@ CREATE TABLE IF NOT EXISTS products (
   nombre TEXT NOT NULL,
   descripcion TEXT,
   precio NUMERIC(10,2) NOT NULL CHECK (precio >= 0),
+  en_oferta BOOLEAN DEFAULT false,
+  precio_oferta NUMERIC(10,2),
+  etiqueta_promo TEXT,
   stock INTEGER DEFAULT 0,
   imagen_url TEXT,
   disponible BOOLEAN DEFAULT true,
@@ -181,3 +184,6 @@ CREATE POLICY "Allow All Products" ON products FOR ALL USING (true) WITH CHECK (
 CREATE POLICY "Allow All Orders" ON orders FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow All Order Items" ON order_items FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow All Business Users" ON business_users FOR ALL USING (true) WITH CHECK (true);
+
+-- Habilitar Supabase Realtime para la tabla de pedidos
+ALTER PUBLICATION supabase_realtime ADD TABLE orders;

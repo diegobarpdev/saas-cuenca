@@ -1,10 +1,9 @@
-'use client';
-
 import React, { useState } from 'react';
-import { Plus, Check } from 'lucide-react';
+import { Plus, Check, Flame, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Product } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
+import { getProductPriceInfo } from '@/lib/utils/promo';
 
 interface ProductCardProps {
   product: Product;
@@ -13,12 +12,13 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const [added, setAdded] = useState(false);
+  const priceInfo = getProductPriceInfo(product);
 
   const handleAdd = () => {
     onAddToCart(product, 1, '');
     setAdded(true);
     toast.success(`¡${product.nombre} agregado!`, {
-      description: formatCurrency(product.precio),
+      description: formatCurrency(priceInfo.precioActual),
       duration: 2000,
     });
     setTimeout(() => setAdded(false), 1200);
@@ -49,9 +49,30 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         {/* Degradado sutil inferior para legibilidad */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F1420] via-transparent to-transparent opacity-80"></div>
 
+        {/* Badge de Promoción Flotante a la Izquierda */}
+        {product.disponible && priceInfo.tieneOferta && (
+          <div className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 text-slate-950 font-display font-extrabold text-xs shadow-lg flex items-center gap-1 animate-pulse">
+            <Flame className="w-3.5 h-3.5 fill-slate-950" />
+            <span>{product.etiqueta_promo || `${priceInfo.descuentoPorcentaje}% OFF`}</span>
+          </div>
+        )}
+
         {/* Precio Flotante Elegante */}
-        <div className="absolute top-3 right-3 px-3.5 py-1 rounded-full bg-slate-950/85 backdrop-blur-md text-amber-400 font-mono font-bold text-sm border border-amber-500/30 shadow-md">
-          {formatCurrency(product.precio)}
+        <div className="absolute top-3 right-3 z-10 px-3.5 py-1 rounded-full bg-slate-950/90 backdrop-blur-md border border-amber-500/30 shadow-md flex items-center gap-1.5 font-mono">
+          {priceInfo.tieneOferta ? (
+            <>
+              <span className="text-slate-400 text-xs line-through opacity-80">
+                {formatCurrency(priceInfo.precioOriginal)}
+              </span>
+              <span className="text-amber-400 font-bold text-sm">
+                {formatCurrency(priceInfo.precioActual)}
+              </span>
+            </>
+          ) : (
+            <span className="text-amber-400 font-bold text-sm">
+              {formatCurrency(priceInfo.precioOriginal)}
+            </span>
+          )}
         </div>
 
         {!product.disponible && (

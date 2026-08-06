@@ -10,6 +10,8 @@ import { TicketThermal } from '@/components/ticket/TicketThermal';
 import { useRealtimeOrders } from '@/hooks/useRealtimeOrders';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 
+import { createClient } from '@/lib/supabase/client';
+
 export default function AdminDashboardPage() {
   const { business, loading: loadingBusiness } = useAdminBusiness();
 
@@ -27,7 +29,7 @@ export default function AdminDashboardPage() {
     toast.success(`Pedido ${num} actualizado a: ${newStatus.toUpperCase()}`);
   };
 
-  const handleSimulateIncomingOrder = () => {
+  const handleSimulateIncomingOrder = async () => {
     if (!business) return;
     const randomOrderNumber = Math.floor(Math.random() * 900) + 50;
     const newMockOrder: Order = {
@@ -60,7 +62,22 @@ export default function AdminDashboardPage() {
       created_at: new Date().toISOString(),
     };
 
-    addOrderLocal(newMockOrder);
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase.from('orders').insert(newMockOrder).select().single();
+        if (data && !error) {
+          addOrderLocal(data as Order);
+        } else {
+          addOrderLocal(newMockOrder);
+        }
+      } catch (err) {
+        addOrderLocal(newMockOrder);
+      }
+    } else {
+      addOrderLocal(newMockOrder);
+    }
+
     toast.info(`¡Nuevo pedido entrante #${randomOrderNumber}!`, {
       description: 'Cliente: María Augusta Vega ($6.75)',
     });

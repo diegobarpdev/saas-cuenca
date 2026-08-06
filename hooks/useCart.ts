@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Product, CartItem } from '@/lib/types/database';
+import { getProductPriceInfo } from '@/lib/utils/promo';
 
 export function useCart(businessSlug: string) {
   const STORAGE_KEY = `cart_${businessSlug}`;
@@ -66,7 +67,16 @@ export function useCart(businessSlug: string) {
   };
 
   const totalItemsCount = items.reduce((sum, item) => sum + item.cantidad, 0);
-  const subtotal = items.reduce((sum, item) => sum + item.product.precio * item.cantidad, 0);
+
+  const subtotal = items.reduce((sum, item) => {
+    const { precioActual } = getProductPriceInfo(item.product);
+    return sum + precioActual * item.cantidad;
+  }, 0);
+
+  const ahorroTotal = items.reduce((sum, item) => {
+    const { ahorroMonto } = getProductPriceInfo(item.product);
+    return sum + ahorroMonto * item.cantidad;
+  }, 0);
 
   return {
     items,
@@ -77,5 +87,6 @@ export function useCart(businessSlug: string) {
     clearCart,
     totalItemsCount,
     subtotal,
+    ahorroTotal,
   };
 }

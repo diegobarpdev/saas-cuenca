@@ -5,12 +5,14 @@ export type OrderStatus = 'pendiente' | 'aceptado' | 'en_preparacion' | 'listo' 
 export type UserRole = 'dueño' | 'cajero';
 
 export interface BankDetails {
+  id?: string;
   banco: string;
   tipo_cuenta: string;
   numero_cuenta: string;
   titular: string;
-  ruc_ci: string;
-  email: string;
+  ruc_ci?: string;
+  email?: string;
+  activa?: boolean;
 }
 
 export interface ShippingZone {
@@ -58,6 +60,7 @@ export interface OperationalSettings {
   numero_cuenta?: string;
   titular?: string;
   ruc_ci?: string;
+  cuentas_bancarias?: BankDetails[];
 
   // PayPhone
   acepta_payphone?: boolean;
@@ -76,6 +79,7 @@ export interface Business {
   direccion: string | null;
   logo_url: string | null;
   datos_bancarios: BankDetails;
+  cuentas_bancarias?: BankDetails[];
   zonas_envio: ShippingZone[];
   payphone_token: string | null;
   plan: 'trial' | 'basico' | 'pro';
@@ -107,6 +111,9 @@ export interface Product {
   nombre: string;
   descripcion: string | null;
   precio: number;
+  en_oferta?: boolean;
+  precio_oferta?: number | null;
+  etiqueta_promo?: string | null;
   stock: number;
   imagen_url: string | null;
   disponible: boolean;

@@ -5,11 +5,12 @@ import { createClient } from '@/lib/supabase/client';
 import { Order, OrderStatus } from '@/lib/types/database';
 import { MOCK_INITIAL_ORDERS } from '@/lib/supabase/mock-data';
 
-export function useRealtimeOrders(businessId: string, initialOrders: Order[] = MOCK_INITIAL_ORDERS) {
+export function useRealtimeOrders(businessId: string, initialOrders: Order[] = []) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const broadcastRef = useRef<BroadcastChannel | null>(null);
+  const channelRef = useRef<any>(null);
 
   // Inicializar audio de notificación y BroadcastChannel para comunicación entre pestañas
   useEffect(() => {
@@ -49,6 +50,8 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = M
   };
 
   useEffect(() => {
+    if (!businessId) return;
+
     // Si hay cliente Supabase real en producción
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
       const supabase = createClient();
@@ -67,19 +70,30 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = M
 
       fetchOrders();
 
+      const channelName = `piku-orders-${businessId}`;
+      const existingChannel = supabase.getChannels().find((ch: any) => ch.topic === `realtime:${channelName}`);
+      if (existingChannel) {
+        supabase.removeChannel(existingChannel);
+      }
+
       const channel = supabase
-        .channel(`realtime-orders-${businessId}`)
+        .channel(channelName)
         .on(
           'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
             table: 'orders',
-            filter: `business_id=eq.${businessId}`,
           },
-          (payload) => {
+          (payload: any) => {
             const newOrder = payload.new as Order;
-            setOrders((prev) => [newOrder, ...prev]);
+            if (!newOrder) return;
+            if (businessId && newOrder.business_id && newOrder.business_id !== businessId) return;
+            setOrders((prev) => {
+              const exists = prev.some((o) => o.id === newOrder.id);
+              if (exists) return prev;
+              return [newOrder, ...prev];
+            });
             playNotificationSound();
           }
         )
@@ -89,19 +103,49 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = M
             event: 'UPDATE',
             schema: 'public',
             table: 'orders',
-            filter: `business_id=eq.${businessId}`,
           },
-          (payload) => {
+          (payload: any) => {
             const updatedOrder = payload.new as Order;
+            if (!updatedOrder) return;
             setOrders((prev) =>
               prev.map((order) => (order.id === updatedOrder.id ? updatedOrder : order))
             );
           }
         )
+        .on(
+          'broadcast',
+          { event: 'NEW_ORDER' },
+          (payload: any) => {
+            const newOrder = payload.payload as Order;
+            if (!newOrder) return;
+            if (businessId && newOrder.business_id && newOrder.business_id !== businessId) return;
+            setOrders((prev) => {
+              const exists = prev.some((o) => o.id === newOrder.id);
+              if (exists) return prev;
+              return [newOrder, ...prev];
+            });
+            playNotificationSound();
+          }
+        )
+        .on(
+          'broadcast',
+          { event: 'ORDER_STATUS_CHANGED' },
+          (payload: any) => {
+            const data = payload.payload;
+            if (data && data.orderId) {
+              setOrders((prev) =>
+                prev.map((order) => (order.id === data.orderId ? { ...order, estado: data.newStatus } : order))
+              );
+            }
+          }
+        )
         .subscribe();
+
+      channelRef.current = channel;
 
       return () => {
         supabase.removeChannel(channel);
+        channelRef.current = null;
       };
     }
   }, [businessId, soundEnabled]);
@@ -115,17 +159,39 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = M
     }
   };
 
-  // Actualizar estado localmente y emitir a todas las pestañas abiertas
-  const updateOrderStatusLocal = (orderId: string, status: OrderStatus) => {
+  // Actualizar estado localmente y en Supabase Realtime
+  const updateOrderStatusLocal = async (orderId: string, status: OrderStatus) => {
     setOrders((prev) =>
       prev.map((order) => (order.id === orderId ? { ...order, estado: status } : order))
     );
+
     if (broadcastRef.current) {
       broadcastRef.current.postMessage({
         type: 'ORDER_STATUS_CHANGED',
         orderId,
         newStatus: status,
       });
+    }
+
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+      try {
+        const supabase = createClient();
+        await supabase
+          .from('orders')
+          .update({ estado: status })
+          .eq('id', orderId);
+
+        // Emitir broadcast Supabase Realtime directamente sobre el canal activo
+        if (channelRef.current) {
+          await channelRef.current.send({
+            type: 'broadcast',
+            event: 'ORDER_STATUS_CHANGED',
+            payload: { orderId, newStatus: status },
+          });
+        }
+      } catch (err) {
+        console.error('Error actualizando estado en Supabase:', err);
+      }
     }
   };
 

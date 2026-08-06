@@ -1,10 +1,9 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Flame, Sparkles } from 'lucide-react';
 import { CartItem } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
+import { getProductPriceInfo } from '@/lib/utils/promo';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -28,6 +27,11 @@ export function CartDrawer({
   businessSlug,
 }: CartDrawerProps) {
   if (!isOpen) return null;
+
+  const ahorroTotal = items.reduce((sum, item) => {
+    const { ahorroMonto } = getProductPriceInfo(item.product);
+    return sum + ahorroMonto * item.cantidad;
+  }, 0);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden flex flex-col justify-end sm:justify-stretch">
@@ -70,53 +74,82 @@ export function CartDrawer({
               <p className="text-xs text-slate-500 max-w-xs">Agrega productos del catálogo para comenzar tu pedido directo.</p>
             </div>
           ) : (
-            items.map((item, idx) => (
-              <div
-                key={`${item.product.id}-${idx}`}
-                className="bg-slate-900/80 p-3.5 rounded-2xl border border-white/5 flex items-center justify-between gap-3 shadow-md"
-              >
-                {/* Nombre y Precio */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-display font-bold text-sm text-white truncate leading-snug">{item.product.nombre}</h4>
-                  <p className="text-xs text-emerald-400 font-mono-tech font-semibold mt-0.5">
-                    {formatCurrency(item.product.precio)} c/u
-                  </p>
-                  {item.notas && <p className="text-[11px] text-slate-400 italic mt-0.5 truncate">Nota: {item.notas}</p>}
-                </div>
-
-                {/* Controles de Cantidad (+ / -) */}
-                <div className="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex-shrink-0">
-                  <button
-                    onClick={() => onUpdateQuantity(item.product.id, item.cantidad - 1, item.notas)}
-                    className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-                  >
-                    <Minus className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="w-6 text-center font-mono-tech font-bold text-xs text-white">{item.cantidad}</span>
-                  <button
-                    onClick={() => onUpdateQuantity(item.product.id, item.cantidad + 1, item.notas)}
-                    className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                {/* Botón Eliminar */}
-                <button
-                  onClick={() => onRemoveItem(item.product.id, item.notas)}
-                  className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors flex-shrink-0"
-                  title="Eliminar"
+            items.map((item, idx) => {
+              const priceInfo = getProductPriceInfo(item.product);
+              return (
+                <div
+                  key={`${item.product.id}-${idx}`}
+                  className="bg-slate-900/80 p-3.5 rounded-2xl border border-white/5 flex items-center justify-between gap-3 shadow-md"
                 >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))
+                  {/* Nombre y Precio */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-display font-bold text-sm text-white truncate leading-snug">{item.product.nombre}</h4>
+                    <div className="flex items-center gap-1.5 mt-0.5 font-mono-tech">
+                      {priceInfo.tieneOferta ? (
+                        <>
+                          <span className="text-[11px] text-slate-500 line-through">
+                            {formatCurrency(priceInfo.precioOriginal)}
+                          </span>
+                          <span className="text-xs text-amber-400 font-bold">
+                            {formatCurrency(priceInfo.precioActual)} c/u
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 font-sans font-bold border border-rose-500/30">
+                            {priceInfo.descuentoPorcentaje}% OFF
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-xs text-emerald-400 font-semibold">
+                          {formatCurrency(priceInfo.precioOriginal)} c/u
+                        </span>
+                      )}
+                    </div>
+                    {item.notas && <p className="text-[11px] text-slate-400 italic mt-0.5 truncate">Nota: {item.notas}</p>}
+                  </div>
+
+                  {/* Controles de Cantidad (+ / -) */}
+                  <div className="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex-shrink-0">
+                    <button
+                      onClick={() => onUpdateQuantity(item.product.id, item.cantidad - 1, item.notas)}
+                      className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="w-6 text-center font-mono-tech font-bold text-xs text-white">{item.cantidad}</span>
+                    <button
+                      onClick={() => onUpdateQuantity(item.product.id, item.cantidad + 1, item.notas)}
+                      className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Botón Eliminar */}
+                  <button
+                    onClick={() => onRemoveItem(item.product.id, item.notas)}
+                    className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors flex-shrink-0"
+                    title="Eliminar"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              );
+            })
           )}
         </div>
 
         {/* Footer del Carrito (Subtotal & Checkout CTA) */}
         {items.length > 0 && (
           <div className="p-4 border-t border-white/10 bg-slate-950/90 flex-shrink-0 space-y-3">
+            {ahorroTotal > 0 && (
+              <div className="p-2.5 rounded-xl bg-gradient-to-r from-emerald-500/15 via-amber-500/15 to-rose-500/15 border border-emerald-500/30 flex items-center justify-between text-xs text-emerald-300 font-display font-semibold">
+                <span className="flex items-center gap-1.5">
+                  <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  ¡Estás ahorrando con tus promociones!
+                </span>
+                <span className="font-mono-tech font-bold text-amber-400">-{formatCurrency(ahorroTotal)}</span>
+              </div>
+            )}
+
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-400 font-medium">Subtotal a pagar</span>
               <span className="font-mono-tech font-black text-xl text-emerald-400">{formatCurrency(subtotal)}</span>

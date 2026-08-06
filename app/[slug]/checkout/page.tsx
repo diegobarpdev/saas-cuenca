@@ -3,12 +3,13 @@
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, CheckCircle2, Upload, Sparkles } from 'lucide-react';
+import { ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, CheckCircle2, Upload, Sparkles, Copy, Check, Landmark } from 'lucide-react';
+import { toast } from 'sonner';
 import { MOCK_BUSINESS } from '@/lib/supabase/mock-data';
 import { useCart } from '@/hooks/useCart';
 import { useCustomerOrders } from '@/hooks/useCustomerOrders';
 import { formatCurrency } from '@/lib/utils/currency';
-import { DeliveryType, PaymentMethod, BillingData } from '@/lib/types/database';
+import { DeliveryType, PaymentMethod, BillingData, BankDetails, Business, ShippingZone } from '@/lib/types/database';
 import { createClient } from '@/lib/supabase/client';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 import { CustomCheckbox } from '@/components/ui/CustomCheckbox';
@@ -19,7 +20,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   const slug = resolvedParams.slug;
   const router = useRouter();
 
-  const business = MOCK_BUSINESS;
+  const [business, setBusiness] = useState<Business>(MOCK_BUSINESS);
   const { items, subtotal, clearCart } = useCart(slug);
   const { profile, saveCustomerProfile, addOrderIdToHistory } = useCustomerOrders(slug);
 
@@ -28,12 +29,39 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   const [clienteTelefono, setClienteTelefono] = useState('');
   const [clienteDireccion, setClienteDireccion] = useState('');
   const [tipoEntrega, setTipoEntrega] = useState<DeliveryType>('domicilio');
-  const [selectedZonaId, setSelectedZonaId] = useState<string>(business.zonas_envio[0]?.id || '');
+  const [selectedZonaId, setSelectedZonaId] = useState<string>(MOCK_BUSINESS.zonas_envio[0]?.id || '');
   const [numeroMesa, setNumeroMesa] = useState('');
   const [metodoPago, setMetodoPago] = useState<PaymentMethod>('payphone');
   const [comprobanteUrl, setComprobanteUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copiedAccNumber, setCopiedAccNumber] = useState<string | null>(null);
+
+  // Cargar Negocio Real desde Supabase por slug
+  useEffect(() => {
+    async function loadBusinessData() {
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+        try {
+          const supabase = createClient();
+          const { data } = await supabase
+            .from('businesses')
+            .select('*')
+            .eq('slug', slug)
+            .single();
+
+          if (data) {
+            setBusiness(data as Business);
+            if (data.zonas_envio && data.zonas_envio.length > 0) {
+              setSelectedZonaId(data.zonas_envio[0].id);
+            }
+          }
+        } catch (err) {
+          console.error('Error cargando negocio en checkout:', err);
+        }
+      }
+    }
+    loadBusinessData();
+  }, [slug]);
 
   // Facturación State (Ecuador)
   const [requiereFactura, setRequiereFactura] = useState(false);
@@ -58,7 +86,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
     }
   }, [profile]);
 
-  const selectedZona = business.zonas_envio.find((z) => z.id === selectedZonaId);
+  const selectedZona = business.zonas_envio?.find((z: ShippingZone) => z.id === selectedZonaId);
   const costoEnvio = tipoEntrega === 'domicilio' ? selectedZona?.costo || 1.50 : 0;
   const total = subtotal + costoEnvio;
 
@@ -71,6 +99,10 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
       }, 800);
     }
   };
+
+  // Helper para verificar UUID válido
+  const isUuid = (str: string) =>
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(str);
 
   // Enviar Pedido a Supabase Real / Fallback Local
   const handleSubmitOrder = async (e: React.FormEvent) => {
@@ -109,10 +141,13 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
       try {
         const supabase = createClient();
         
+        const randomOrderNum = Math.floor(Math.random() * 899) + 100;
+        
         const { data: orderData, error: orderError } = await supabase
           .from('orders')
           .insert({
             business_id: business.id,
+            numero_pedido: randomOrderNum,
             cliente_nombre: clienteNombre,
             cliente_telefono: clienteTelefono,
             cliente_direccion: clienteDireccion || null,
@@ -133,22 +168,51 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
           .single();
 
         if (orderError) {
-          console.error('Error guardando en Supabase:', orderError);
+          const errMsg = orderError.message || orderError.details || JSON.stringify(orderError);
+          console.error('Error guardando en Supabase:', errMsg);
+          toast.error(`Aviso: Se registró pedido local. (${errMsg})`);
         } else if (orderData) {
           createdOrderId = orderData.id;
 
           const orderItemsToInsert = items.map((item) => ({
             order_id: orderData.id,
-            product_id: item.product.id,
+            product_id: isUuid(item.product.id) ? item.product.id : null,
             cantidad: item.cantidad,
-            precio_unitario: item.product.precio,
+            precio_unitario: item.product.precio_oferta && item.product.en_oferta ? item.product.precio_oferta : item.product.precio,
             notas: item.notas || null,
           }));
 
-          await supabase.from('order_items').insert(orderItemsToInsert);
+          const { error: itemsErr } = await supabase.from('order_items').insert(orderItemsToInsert);
+          if (itemsErr) {
+            console.error('Error guardando order_items:', itemsErr.message || itemsErr.details);
+          }
+
+          // Emitir evento Supabase Realtime Broadcast para notificación instantánea en cualquier navegador
+          try {
+            const channelName = `piku-orders-${business.id}`;
+            const rtChannel = supabase.channel(channelName);
+            await new Promise<void>((resolve) => {
+              rtChannel.subscribe(async (status: string) => {
+                if (status === 'SUBSCRIBED') {
+                  await rtChannel.send({
+                    type: 'broadcast',
+                    event: 'NEW_ORDER',
+                    payload: orderData,
+                  });
+                  setTimeout(() => {
+                    supabase.removeChannel(rtChannel);
+                  }, 300);
+                  resolve();
+                }
+              });
+              setTimeout(resolve, 800);
+            });
+          } catch (e) {
+            console.log('Error emitiendo broadcast Supabase:', e);
+          }
         }
-      } catch (err) {
-        console.error('Excepción al conectar con Supabase:', err);
+      } catch (err: any) {
+        console.error('Excepción al conectar con Supabase:', err?.message || err);
       }
     }
 
@@ -182,7 +246,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
     );
   }
 
-  const zonaOptions = business.zonas_envio.map((z) => ({
+  const zonaOptions = (business.zonas_envio || []).map((z: ShippingZone) => ({
     value: z.id,
     label: `${z.zona} (${formatCurrency(z.costo)})`,
   }));
@@ -416,115 +480,195 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
             )}
           </div>
 
-          {/* 4. Método de Pago (PayPhone / Deuna / Efectivo) */}
+          {/* 4. Método de Pago (PayPhone / Transferencia / Efectivo) */}
           <div className="glass-card p-5 md:p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl">
             <h2 className="font-display font-black text-base text-white flex items-center gap-2.5">
               <span className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 text-xs flex items-center justify-center font-mono-tech border border-amber-500/30">4</span>
               Método de Pago
             </h2>
 
-            <div className="space-y-2.5">
-              <label
-                className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
-                  metodoPago === 'payphone'
-                    ? 'bg-amber-500/10 border-amber-500 text-white shadow-md'
-                    : 'bg-slate-950 border-slate-800 text-slate-400'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <input
-                    type="radio"
-                    name="pago"
-                    checked={metodoPago === 'payphone'}
-                    onChange={() => setMetodoPago('payphone')}
-                    className="text-amber-500 focus:ring-amber-500"
-                  />
-                  <div>
-                    <span className="font-display font-bold text-sm flex items-center gap-2 text-white">
-                      <CreditCard className="w-4 h-4 text-amber-400" /> PayPhone (Tarjeta Crédito / Débito / App)
-                    </span>
-                    <p className="text-xs text-slate-400 mt-0.5">Pago seguro con Visa, Mastercard o App PayPhone.</p>
+            <div className="space-y-2">
+              {business.configuracion_operativa?.acepta_payphone !== false && (
+                <label
+                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
+                    metodoPago === 'payphone'
+                      ? 'bg-amber-500/10 border-amber-500 text-white shadow-md'
+                      : 'bg-slate-950 border-slate-800 text-slate-400'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="pago"
+                      checked={metodoPago === 'payphone'}
+                      onChange={() => setMetodoPago('payphone')}
+                      className="text-amber-500 focus:ring-amber-500"
+                    />
+                    <div>
+                      <span className="font-display font-bold text-sm flex items-center gap-2 text-white">
+                        <CreditCard className="w-4 h-4 text-amber-400" /> PayPhone (Tarjeta Crédito / Débito / App)
+                      </span>
+                      <p className="text-xs text-slate-400 mt-0.5">Pago seguro con Visa, Mastercard o App PayPhone.</p>
+                    </div>
                   </div>
-                </div>
-                <span className="px-2.5 py-1 rounded-full bg-orange-500/20 text-orange-400 text-[10px] font-mono-tech font-bold border border-orange-500/30">ECUADOR</span>
-              </label>
+                  <span className="px-2.5 py-1 rounded-full bg-orange-500/20 text-orange-400 text-[10px] font-mono-tech font-bold border border-orange-500/30">ECUADOR</span>
+                </label>
+              )}
 
-              <label
-                className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
-                  metodoPago === 'transferencia'
-                    ? 'bg-amber-500/10 border-amber-500 text-white shadow-md'
-                    : 'bg-slate-950 border-slate-800 text-slate-400'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <input
-                    type="radio"
-                    name="pago"
-                    checked={metodoPago === 'transferencia'}
-                    onChange={() => setMetodoPago('transferencia')}
-                    className="text-amber-500 focus:ring-amber-500"
-                  />
-                  <div>
-                    <span className="font-display font-bold text-sm flex items-center gap-2 text-white">
-                      <Building2 className="w-4 h-4 text-amber-400" /> Transferencia / Deuna! (Pichincha)
-                    </span>
-                    <p className="text-xs text-slate-400 mt-0.5">Adjunta tu foto de comprobante para verificación rápida.</p>
+              {business.configuracion_operativa?.acepta_transferencia !== false && (
+                <label
+                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
+                    metodoPago === 'transferencia'
+                      ? 'bg-amber-500/10 border-amber-500 text-white shadow-md'
+                      : 'bg-slate-950 border-slate-800 text-slate-400'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="pago"
+                      checked={metodoPago === 'transferencia'}
+                      onChange={() => setMetodoPago('transferencia')}
+                      className="text-amber-500 focus:ring-amber-500"
+                    />
+                    <div>
+                      <span className="font-display font-bold text-sm flex items-center gap-2 text-white">
+                        <Building2 className="w-4 h-4 text-amber-400" /> Transferencia Bancaria Directa
+                      </span>
+                      <p className="text-xs text-slate-400 mt-0.5">Banco Pichincha, Banco Guayaquil, JEP y más con comprobante adjunto.</p>
+                    </div>
                   </div>
-                </div>
-              </label>
+                </label>
+              )}
 
-              <label
-                className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
-                  metodoPago === 'efectivo'
-                    ? 'bg-amber-500/10 border-amber-500 text-white shadow-md'
-                    : 'bg-slate-950 border-slate-800 text-slate-400'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <input
-                    type="radio"
-                    name="pago"
-                    checked={metodoPago === 'efectivo'}
-                    onChange={() => setMetodoPago('efectivo')}
-                    className="text-amber-500 focus:ring-amber-500"
-                  />
-                  <div>
-                    <span className="font-display font-bold text-sm flex items-center gap-2 text-white">
-                      <Banknote className="w-4 h-4 text-amber-400" /> Efectivo / Pago Contra Entrega
-                    </span>
-                    <p className="text-xs text-slate-400 mt-0.5">Entregas el valor directo al repartidor.</p>
+              {business.configuracion_operativa?.acepta_efectivo !== false && (
+                <label
+                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
+                    metodoPago === 'efectivo'
+                      ? 'bg-amber-500/10 border-amber-500 text-white shadow-md'
+                      : 'bg-slate-950 border-slate-800 text-slate-400'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="pago"
+                      checked={metodoPago === 'efectivo'}
+                      onChange={() => setMetodoPago('efectivo')}
+                      className="text-amber-500 focus:ring-amber-500"
+                    />
+                    <div>
+                      <span className="font-display font-bold text-sm flex items-center gap-2 text-white">
+                        <Banknote className="w-4 h-4 text-amber-400" /> Efectivo / Pago Contra Entrega
+                      </span>
+                      <p className="text-xs text-slate-400 mt-0.5">Entregas el valor directo al repartidor.</p>
+                    </div>
                   </div>
-                </div>
-              </label>
+                </label>
+              )}
             </div>
 
-            {metodoPago === 'transferencia' && (
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-                <div className="text-xs space-y-1 text-slate-300">
-                  <p className="font-display font-bold text-amber-400 text-sm">Datos para Transferir / Deuna!:</p>
-                  <p><span className="text-slate-400">Banco:</span> {business.datos_bancarios.banco}</p>
-                  <p><span className="text-slate-400">Tipo de Cuenta:</span> {business.datos_bancarios.tipo_cuenta}</p>
-                  <p><span className="text-slate-400">Nro. Cuenta:</span> <strong className="text-white font-mono-tech">{business.datos_bancarios.numero_cuenta}</strong></p>
-                  <p><span className="text-slate-400">Titular:</span> {business.datos_bancarios.titular}</p>
-                </div>
+            {metodoPago === 'transferencia' && (() => {
+              const bankAccountsList: BankDetails[] = business.cuentas_bancarias || business.configuracion_operativa?.cuentas_bancarias || [business.datos_bancarios];
+              return (
+                <div className="p-4.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
+                  <div>
+                    <h4 className="font-display font-bold text-amber-400 text-sm flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Landmark className="w-4 h-4 text-amber-400" /> Cuentas Bancarias Habilitadas:
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-normal">
+                        {bankAccountsList.length} {bankAccountsList.length === 1 ? 'opción' : 'opciones'}
+                      </span>
+                    </h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Realiza tu transferencia a cualquiera de estas cuentas y adjunta tu comprobante:
+                    </p>
+                  </div>
 
-                <div className="pt-2 border-t border-slate-800">
-                  <label className="block text-xs font-display font-semibold text-slate-300 mb-1.5">Adjuntar Comprobante (Opcional)</label>
-                  {comprobanteUrl ? (
-                    <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/30">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Comprobante adjuntado correctamente.</span>
-                    </div>
-                  ) : (
-                    <label className="flex items-center justify-center gap-2 p-3.5 rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 text-xs text-slate-400 hover:text-white hover:border-amber-500 cursor-pointer transition-colors">
-                      <Upload className="w-4 h-4 text-amber-400" />
-                      <span>{isUploading ? 'Subiendo imagen...' : 'Seleccionar foto de comprobante'}</span>
-                      <input type="file" accept="image/*" onChange={handleUploadSimulated} className="hidden" />
-                    </label>
-                  )}
+                  <div className="space-y-3">
+                    {bankAccountsList.map((acc, index) => (
+                      <div
+                        key={acc.id || index}
+                        className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2 hover:border-amber-500/40 transition-colors"
+                      >
+                        <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                          <span className="font-display font-bold text-xs text-white flex items-center gap-1.5">
+                            <Building2 className="w-3.5 h-3.5 text-amber-400" />
+                            {acc.banco}
+                          </span>
+                          <span className="text-[10px] font-mono font-medium text-slate-300 px-2 py-0.5 bg-slate-800/80 rounded-md border border-slate-700/50">
+                            {acc.tipo_cuenta}
+                          </span>
+                        </div>
+
+                        <div className="text-xs space-y-1 text-slate-300">
+                          <div className="flex items-center justify-between">
+                            <span className="text-slate-400">Nro. Cuenta:</span>
+                            <div className="flex items-center gap-2">
+                              <strong className="text-white font-mono-tech tracking-wider">{acc.numero_cuenta}</strong>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (typeof window !== 'undefined' && navigator.clipboard) {
+                                    navigator.clipboard.writeText(acc.numero_cuenta);
+                                  }
+                                  setCopiedAccNumber(acc.numero_cuenta);
+                                  toast.success(`Número de cuenta ${acc.banco} copiado`);
+                                  setTimeout(() => setCopiedAccNumber(null), 2000);
+                                }}
+                                className="px-2 py-0.5 text-slate-300 hover:text-amber-400 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 rounded-md transition-colors text-[10px] flex items-center gap-1 font-sans"
+                                title="Copiar número de cuenta"
+                              >
+                                {copiedAccNumber === acc.numero_cuenta ? (
+                                  <>
+                                    <Check className="w-3 h-3 text-emerald-400" />
+                                    <span className="text-emerald-400">Copiado</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-3 h-3" />
+                                    <span>Copiar</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">Titular:</span>
+                            <span className="text-white font-medium">{acc.titular}</span>
+                          </div>
+
+                          {acc.ruc_ci && (
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">RUC / Cédula:</span>
+                              <span className="font-mono text-slate-300">{acc.ruc_ci}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-800">
+                    <label className="block text-xs font-display font-semibold text-slate-300 mb-1.5">Adjuntar Comprobante (Opcional)</label>
+                    {comprobanteUrl ? (
+                      <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/30">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Comprobante adjuntado correctamente.</span>
+                      </div>
+                    ) : (
+                      <label className="flex items-center justify-center gap-2 p-3.5 rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 text-xs text-slate-400 hover:text-white hover:border-amber-500 cursor-pointer transition-colors">
+                        <Upload className="w-4 h-4 text-amber-400" />
+                        <span>{isUploading ? 'Subiendo imagen...' : 'Seleccionar foto de comprobante'}</span>
+                        <input type="file" accept="image/*" onChange={handleUploadSimulated} className="hidden" />
+                      </label>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
 
           {/* Resumen Final de Compra */}

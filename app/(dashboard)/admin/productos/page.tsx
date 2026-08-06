@@ -1,14 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Check, X, Package, Tag, RefreshCw, FolderPlus, Save, UploadCloud, Link as LinkIcon, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Check, X, Package, Tag, RefreshCw, FolderPlus, Save, UploadCloud, Link as LinkIcon, Loader2, Flame } from 'lucide-react';
 import { toast } from 'sonner';
 import { Product, Category } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { createClient } from '@/lib/supabase/client';
 import { CustomSelect } from '@/components/ui/CustomSelect';
+import { CustomCheckbox } from '@/components/ui/CustomCheckbox';
 import { compressImage } from '@/lib/utils/imageCompressor';
+import { getProductPriceInfo } from '@/lib/utils/promo';
 
 export default function AdminProductsPage() {
   const { business, loading: loadingBusiness } = useAdminBusiness();
@@ -28,6 +30,9 @@ export default function AdminProductsPage() {
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [precio, setPrecio] = useState('');
+  const [enOferta, setEnOferta] = useState(false);
+  const [precioOferta, setPrecioOferta] = useState('');
+  const [etiquetaPromo, setEtiquetaPromo] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [stock, setStock] = useState('20');
   const [imagenUrl, setImagenUrl] = useState('');
@@ -123,6 +128,9 @@ export default function AdminProductsPage() {
     setNombre('');
     setDescripcion('');
     setPrecio('');
+    setEnOferta(false);
+    setPrecioOferta('');
+    setEtiquetaPromo('');
     setCategoryId(categories[0]?.id || '');
     setStock('25');
     setImagenUrl('');
@@ -137,6 +145,9 @@ export default function AdminProductsPage() {
     setNombre(p.nombre);
     setDescripcion(p.descripcion || '');
     setPrecio(p.precio.toString());
+    setEnOferta(p.en_oferta || false);
+    setPrecioOferta(p.precio_oferta ? p.precio_oferta.toString() : '');
+    setEtiquetaPromo(p.etiqueta_promo || '');
     setCategoryId(p.category_id || '');
     setStock(p.stock.toString());
     setImagenUrl(p.imagen_url || '');
@@ -152,23 +163,29 @@ export default function AdminProductsPage() {
 
     setIsSaving(true);
     const numPrecio = parseFloat(precio);
+    const numPrecioOferta = enOferta && precioOferta ? parseFloat(precioOferta) : null;
     const numStock = parseInt(stock) || 0;
 
     try {
       const supabase = createClient();
 
+      const productPayload = {
+        nombre,
+        descripcion,
+        precio: numPrecio,
+        en_oferta: enOferta,
+        precio_oferta: numPrecioOferta,
+        etiqueta_promo: enOferta ? etiquetaPromo || null : null,
+        category_id: categoryId || null,
+        stock: numStock,
+        imagen_url: imagenUrl || null,
+        disponible,
+      };
+
       if (editingProduct) {
         const { data, error } = await supabase
           .from('products')
-          .update({
-            nombre,
-            descripcion,
-            precio: numPrecio,
-            category_id: categoryId || null,
-            stock: numStock,
-            imagen_url: imagenUrl || null,
-            disponible,
-          })
+          .update(productPayload)
           .eq('id', editingProduct.id)
           .select()
           .single();
@@ -184,13 +201,7 @@ export default function AdminProductsPage() {
           .from('products')
           .insert({
             business_id: business.id,
-            category_id: categoryId || null,
-            nombre,
-            descripcion,
-            precio: numPrecio,
-            stock: numStock,
-            imagen_url: imagenUrl || null,
-            disponible,
+            ...productPayload,
           })
           .select()
           .single();
@@ -465,8 +476,28 @@ export default function AdminProductsPage() {
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="font-semibold text-sm text-zinc-100 leading-snug truncate">{p.nombre}</h3>
-                      <span className="font-mono font-semibold text-sm text-zinc-200">{formatCurrency(p.precio)}</span>
+                      <div className="text-right flex-shrink-0 font-mono">
+                        {p.en_oferta && p.precio_oferta && p.precio_oferta < p.precio ? (
+                          <div className="flex flex-col items-end">
+                            <span className="text-[10px] text-zinc-500 line-through">
+                              {formatCurrency(p.precio)}
+                            </span>
+                            <span className="font-bold text-sm text-amber-400">
+                              {formatCurrency(p.precio_oferta)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="font-semibold text-sm text-zinc-200">{formatCurrency(p.precio)}</span>
+                        )}
+                      </div>
                     </div>
+
+                    {p.en_oferta && p.precio_oferta && (
+                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30">
+                        <Flame className="w-3 h-3 fill-amber-400" />
+                        <span>{p.etiqueta_promo || 'OFERTA'}</span>
+                      </div>
+                    )}
 
                     {catObj && (
                       <span className="inline-block text-[10px] font-mono text-zinc-300 bg-zinc-800 px-1.5 py-0.2 rounded border border-zinc-700">
@@ -687,7 +718,7 @@ export default function AdminProductsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-300 mb-1">Precio ($ USD) *</label>
+                  <label className="block text-xs font-medium text-zinc-300 mb-1">Precio Normal ($ USD) *</label>
                   <input
                     type="number"
                     step="0.01"
@@ -707,6 +738,72 @@ export default function AdminProductsPage() {
                     accentColor="emerald"
                   />
                 </div>
+              </div>
+
+              {/* Sección de Ofertas & Promociones */}
+              <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-amber-500/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-display font-bold text-amber-400 flex items-center gap-1.5">
+                    <Flame className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+                    ¿Activar Precio de Oferta / Promo?
+                  </span>
+                  <CustomCheckbox
+                    checked={enOferta}
+                    onChange={setEnOferta}
+                    label=""
+                    accentColor="amber"
+                  />
+                </div>
+
+                {enOferta && (
+                  <div className="space-y-3 pt-2 border-t border-zinc-800 animate-in fade-in">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-display font-medium text-zinc-300 mb-1">
+                          Precio Oferta ($ USD) *
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          placeholder="Ej: 1.75"
+                          value={precioOferta}
+                          onChange={(e) => setPrecioOferta(e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-display font-medium text-zinc-300 mb-1">
+                          Badge / Etiqueta Promo
+                        </label>
+                        <input
+                          type="text"
+                          list="promo-labels-list"
+                          placeholder="Ej: 20% OFF / PROMO"
+                          value={etiquetaPromo}
+                          onChange={(e) => setEtiquetaPromo(e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100"
+                        />
+                        <datalist id="promo-labels-list">
+                          <option value="⚡ 20% OFF" />
+                          <option value="🔥 PROMO DEL DÍA" />
+                          <option value="🎉 2X1 ESPECIAL" />
+                          <option value="⭐ MÁS VENDIDO" />
+                          <option value="🎁 COMBO DESTACADO" />
+                        </datalist>
+                      </div>
+                    </div>
+
+                    {precio && precioOferta && parseFloat(precio) > parseFloat(precioOferta) && (
+                      <p className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
+                        <span>
+                          ¡Tu cliente ahorrará ${(parseFloat(precio) - parseFloat(precioOferta)).toFixed(2)} (
+                          {Math.round(((parseFloat(precio) - parseFloat(precioOferta)) / parseFloat(precio)) * 100)}% OFF)!
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div>

@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, Building2, CreditCard, Clock, ShieldCheck, RefreshCw, QrCode, Banknote, Landmark, Smartphone } from 'lucide-react';
+import { Settings, Save, Building2, CreditCard, Clock, ShieldCheck, RefreshCw, QrCode, Banknote, Landmark, Smartphone, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { createClient } from '@/lib/supabase/client';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 import { CustomCheckbox } from '@/components/ui/CustomCheckbox';
+import { BankDetails } from '@/lib/types/database';
 
 const prepTimeOptions = [
   { value: '10 - 15 min', label: '10 - 15 min (Express / Comida Rápida)' },
@@ -14,6 +15,19 @@ const prepTimeOptions = [
   { value: '25 - 40 min', label: '25 - 40 min (Platos Fuertes / Gourmet)' },
   { value: '40 - 60 min', label: '40 - 60 min (Especialidades / Horneados)' },
   { value: 'Inmediato / Listo', label: 'Inmediato / Listo (Empaquetados)' },
+];
+
+const ECUADOR_BANKS = [
+  'Banco Pichincha',
+  'Banco Guayaquil',
+  'Produbanco',
+  'Cooperativa JEP',
+  'Banco del Pacífico',
+  'Cooperativa Jardín Azuayo',
+  'Banco Internacional',
+  'Banco del Austro',
+  'Cooperativa Policía Nacional',
+  'Otro / Institución Financiera',
 ];
 
 export default function AdminSettingsPage() {
@@ -36,12 +50,9 @@ export default function AdminSettingsPage() {
   const [deunaNumero, setDeunaNumero] = useState('');
   const [deunaTitular, setDeunaTitular] = useState('');
 
-  // Transferencia Bancaria Directa
+  // Transferencia Bancaria Directa (Soporte Múltiples Bancos)
   const [aceptaTransferencia, setAceptaTransferencia] = useState(true);
-  const [banco, setBanco] = useState('Banco Pichincha');
-  const [tipoCuenta, setTipoCuenta] = useState('Ahorros');
-  const [numeroCuenta, setNumeroCuenta] = useState('');
-  const [titular, setTitular] = useState('');
+  const [cuentasBancarias, setCuentasBancarias] = useState<BankDetails[]>([]);
 
   // PayPhone
   const [aceptaPayphone, setAceptaPayphone] = useState(true);
@@ -61,11 +72,34 @@ export default function AdminSettingsPage() {
       setDireccion(business.direccion || '');
       setPayphoneToken(business.payphone_token || '');
 
-      if (business.datos_bancarios) {
-        setBanco(business.datos_bancarios.banco || 'Banco Pichincha');
-        setTipoCuenta(business.datos_bancarios.tipo_cuenta || 'Ahorros');
-        setNumeroCuenta(business.datos_bancarios.numero_cuenta || '');
-        setTitular(business.datos_bancarios.titular || '');
+      // Cargar Cuentas Bancarias
+      const cuentas = business.cuentas_bancarias || business.configuracion_operativa?.cuentas_bancarias;
+      if (cuentas && cuentas.length > 0) {
+        setCuentasBancarias(cuentas);
+      } else if (business.datos_bancarios && business.datos_bancarios.banco) {
+        setCuentasBancarias([
+          {
+            id: 'bank-1',
+            banco: business.datos_bancarios.banco || 'Banco Pichincha',
+            tipo_cuenta: business.datos_bancarios.tipo_cuenta || 'Ahorros',
+            numero_cuenta: business.datos_bancarios.numero_cuenta || '',
+            titular: business.datos_bancarios.titular || business.nombre,
+            ruc_ci: business.datos_bancarios.ruc_ci || business.ruc || '',
+            activa: true,
+          },
+        ]);
+      } else {
+        setCuentasBancarias([
+          {
+            id: 'bank-1',
+            banco: 'Banco Pichincha',
+            tipo_cuenta: 'Ahorros',
+            numero_cuenta: '',
+            titular: business.nombre,
+            ruc_ci: business.ruc || '',
+            activa: true,
+          },
+        ]);
       }
 
       if (business.configuracion_operativa) {
@@ -79,11 +113,6 @@ export default function AdminSettingsPage() {
         if (op.deuna_titular) setDeunaTitular(op.deuna_titular);
 
         if (op.acepta_transferencia !== undefined) setAceptaTransferencia(op.acepta_transferencia);
-        if (op.banco) setBanco(op.banco);
-        if (op.tipo_cuenta) setTipoCuenta(op.tipo_cuenta);
-        if (op.numero_cuenta) setNumeroCuenta(op.numero_cuenta);
-        if (op.titular) setTitular(op.titular);
-
         if (op.acepta_payphone !== undefined) setAceptaPayphone(op.acepta_payphone);
         if (op.acepta_efectivo !== undefined) setAceptaEfectivo(op.acepta_efectivo);
         if (op.instrucciones_efectivo) setInstruccionesEfectivo(op.instrucciones_efectivo);
@@ -91,11 +120,53 @@ export default function AdminSettingsPage() {
     }
   }, [business]);
 
+  const handleAddAccount = () => {
+    const newAcc: BankDetails = {
+      id: `bank-${Date.now()}`,
+      banco: 'Banco Pichincha',
+      tipo_cuenta: 'Ahorros',
+      numero_cuenta: '',
+      titular: nombre || '',
+      ruc_ci: ruc || '',
+      activa: true,
+    };
+    setCuentasBancarias((prev) => [...prev, newAcc]);
+    toast.info('Nueva cuenta bancaria agregada');
+  };
+
+  const handleUpdateAccount = (index: number, field: keyof BankDetails, value: any) => {
+    setCuentasBancarias((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleRemoveAccount = (index: number) => {
+    setCuentasBancarias((prev) => {
+      const updated = prev.filter((_, i) => i !== index);
+      if (updated.length === 0) {
+        setAceptaTransferencia(false);
+        toast.info('Se desactivó la transferencia bancaria automáticamente al no tener cuentas.');
+      }
+      return updated;
+    });
+    toast.success('Cuenta eliminada');
+  };
+
   const handleSaveSettings = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!business) return;
 
     setIsSaving(true);
+
+    const primaryBank = cuentasBancarias[0] || {
+      banco: 'Banco Pichincha',
+      tipo_cuenta: 'Ahorros',
+      numero_cuenta: '',
+      titular: nombre,
+      ruc_ci: ruc,
+    };
 
     try {
       const supabase = createClient();
@@ -108,13 +179,14 @@ export default function AdminSettingsPage() {
           direccion,
           payphone_token: payphoneToken || null,
           datos_bancarios: {
-            banco,
-            tipo_cuenta: tipoCuenta,
-            numero_cuenta: numeroCuenta,
-            titular,
-            ruc_ci: ruc,
-            email: '',
+            banco: primaryBank.banco,
+            tipo_cuenta: primaryBank.tipo_cuenta,
+            numero_cuenta: primaryBank.numero_cuenta,
+            titular: primaryBank.titular,
+            ruc_ci: primaryBank.ruc_ci || ruc,
+            email: primaryBank.email || '',
           },
+          cuentas_bancarias: cuentasBancarias,
           configuracion_operativa: {
             tiempo_preparacion: tiempoPreparacion,
             permite_domicilio: permiteDomicilio,
@@ -125,11 +197,12 @@ export default function AdminSettingsPage() {
             deuna_titular: deunaTitular,
 
             acepta_transferencia: aceptaTransferencia,
-            banco,
-            tipo_cuenta: tipoCuenta,
-            numero_cuenta: numeroCuenta,
-            titular,
-            ruc_ci: ruc,
+            banco: primaryBank.banco,
+            tipo_cuenta: primaryBank.tipo_cuenta,
+            numero_cuenta: primaryBank.numero_cuenta,
+            titular: primaryBank.titular,
+            ruc_ci: primaryBank.ruc_ci || ruc,
+            cuentas_bancarias: cuentasBancarias,
 
             acepta_payphone: aceptaPayphone,
 
@@ -140,7 +213,7 @@ export default function AdminSettingsPage() {
         .eq('id', business.id);
 
       if (!error) {
-        toast.success('Configuración guardada exitosamente en Supabase');
+        toast.success('Configuración guardada exitosamente');
       } else {
         toast.error(`Error guardando datos: ${error.message}`);
       }
@@ -343,7 +416,7 @@ export default function AdminSettingsPage() {
               )}
             </div>
 
-            {/* B. Transferencia Bancaria Directa */}
+            {/* B. Transferencia Bancaria Directa (Múltiples Cuentas Bancarias) */}
             <div className="p-5 rounded-2xl bg-slate-950/80 border border-white/10 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -351,68 +424,126 @@ export default function AdminSettingsPage() {
                     <Landmark className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-xs font-display font-bold text-white">Transferencia Bancaria Directa</h3>
-                    <p className="text-[11px] text-slate-400">Datos bancarios para recibir transferencias con comprobante adjunto</p>
+                    <h3 className="text-xs font-display font-bold text-white flex items-center gap-2">
+                      <span>Transferencia Bancaria Directa</span>
+                      <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-mono font-semibold border border-sky-500/30">
+                        {cuentasBancarias.length} {cuentasBancarias.length === 1 ? 'cuenta' : 'cuentas'}
+                      </span>
+                    </h3>
+                    <p className="text-[11px] text-slate-400">Configura una o varias cuentas bancarias para que tus clientes puedan elegir dónde transferir.</p>
                   </div>
                 </div>
 
                 <CustomCheckbox
                   checked={aceptaTransferencia}
-                  onChange={setAceptaTransferencia}
+                  onChange={(val) => {
+                    setAceptaTransferencia(val);
+                    if (val && cuentasBancarias.length === 0) {
+                      handleAddAccount();
+                    }
+                  }}
                   label=""
                   accentColor="sky"
                 />
               </div>
 
               {aceptaTransferencia && (
-                <div className="space-y-3 pt-3 border-t border-slate-800/80 animate-in fade-in duration-200">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">Banco Institución</label>
-                      <input
-                        type="text"
-                        placeholder="Ej: Banco Pichincha / Produbanco"
-                        value={banco}
-                        onChange={(e) => setBanco(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white"
-                      />
-                    </div>
+                <div className="space-y-4 pt-3 border-t border-slate-800/80 animate-in fade-in duration-200">
+                  {cuentasBancarias.map((acc, index) => (
+                    <div key={acc.id || index} className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3 relative group">
+                      <div className="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                        <span className="text-xs font-display font-bold text-sky-400 flex items-center gap-1.5">
+                          <Landmark className="w-3.5 h-3.5" /> Cuenta Bancaria #{index + 1}
+                        </span>
 
-                    <div>
-                      <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">Tipo de Cuenta</label>
-                      <input
-                        type="text"
-                        placeholder="Ej: Ahorros / Corriente"
-                        value={tipoCuenta}
-                        onChange={(e) => setTipoCuenta(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white"
-                      />
-                    </div>
-                  </div>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveAccount(index)}
+                            title="Eliminar cuenta bancaria"
+                            className="text-slate-500 hover:text-red-400 text-xs flex items-center gap-1 transition-colors p-1"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span className="text-[11px]">Eliminar</span>
+                          </button>
+                        </div>
+                      </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">Número de Cuenta</label>
-                      <input
-                        type="text"
-                        placeholder="Ej: 2200123456"
-                        value={numeroCuenta}
-                        onChange={(e) => setNumeroCuenta(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white font-mono"
-                      />
-                    </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">Banco / Institución</label>
+                          <input
+                            type="text"
+                            list="ecuador-banks-list"
+                            placeholder="Ej: Banco Pichincha, Produbanco, JEP"
+                            value={acc.banco}
+                            onChange={(e) => handleUpdateAccount(index, 'banco', e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                          />
+                          <datalist id="ecuador-banks-list">
+                            {ECUADOR_BANKS.map((b) => (
+                              <option key={b} value={b} />
+                            ))}
+                          </datalist>
+                        </div>
 
-                    <div>
-                      <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">Titular de la Cuenta</label>
-                      <input
-                        type="text"
-                        placeholder="Nombre completo o Razón Social"
-                        value={titular}
-                        onChange={(e) => setTitular(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white"
-                      />
+                        <div>
+                          <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">Tipo de Cuenta</label>
+                          <input
+                            type="text"
+                            placeholder="Ej: Cuenta de Ahorros / Corriente"
+                            value={acc.tipo_cuenta}
+                            onChange={(e) => handleUpdateAccount(index, 'tipo_cuenta', e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">Número de Cuenta</label>
+                          <input
+                            type="text"
+                            placeholder="Ej: 2200123456"
+                            value={acc.numero_cuenta}
+                            onChange={(e) => handleUpdateAccount(index, 'numero_cuenta', e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">Titular de la Cuenta</label>
+                          <input
+                            type="text"
+                            placeholder="Nombre completo o Razón Social"
+                            value={acc.titular}
+                            onChange={(e) => handleUpdateAccount(index, 'titular', e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">RUC / Cédula Identificación</label>
+                          <input
+                            type="text"
+                            placeholder="Ej: 0104598123001"
+                            value={acc.ruc_ci || ''}
+                            onChange={(e) => handleUpdateAccount(index, 'ruc_ci', e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono"
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={handleAddAccount}
+                    className="w-full py-2.5 px-4 rounded-xl border border-dashed border-sky-500/40 bg-sky-500/5 text-sky-400 text-xs font-display font-semibold hover:bg-sky-500/10 hover:border-sky-500 flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>+ Agregar Otra Cuenta Bancaria</span>
+                  </button>
                 </div>
               )}
             </div>

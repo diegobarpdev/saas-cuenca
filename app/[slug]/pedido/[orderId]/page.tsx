@@ -3,39 +3,122 @@
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Clock, CheckCircle2, Package, Truck, PhoneCall, Receipt, Sparkles } from 'lucide-react';
-import { MOCK_BUSINESS, MOCK_INITIAL_ORDERS } from '@/lib/supabase/mock-data';
+import { createClient } from '@/lib/supabase/client';
+import { MOCK_BUSINESS } from '@/lib/supabase/mock-data';
 import { formatCurrency } from '@/lib/utils/currency';
 import { OrderBadge, PaymentBadge } from '@/components/ui/Badge';
-import { OrderStatus } from '@/lib/types/database';
+import { Business, Order, OrderStatus } from '@/lib/types/database';
 
 export default function OrderTrackingPage({ params }: { params: Promise<{ slug: string; orderId: string }> }) {
   const resolvedParams = use(params);
   const { slug, orderId } = resolvedParams;
 
-  const business = MOCK_BUSINESS;
-  
-  // Estado local del pedido
-  const [order, setOrder] = useState(() => MOCK_INITIAL_ORDERS[0]);
+  const [business, setBusiness] = useState<Business>(MOCK_BUSINESS);
+  const [order, setOrder] = useState<Order | null>(null);
 
-  // Escuchar eventos en Tiempo Real entre pestañas (BroadcastChannel)
+  // Cargar datos del Negocio Real por slug
   useEffect(() => {
+    async function fetchBusinessData() {
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+        try {
+          const supabase = createClient();
+          const { data } = await supabase
+            .from('businesses')
+            .select('*')
+            .eq('slug', slug)
+            .single();
+
+          if (data) {
+            setBusiness(data as Business);
+          }
+        } catch (e) {
+          console.error('Error cargando negocio en seguimiento:', e);
+        }
+      }
+    }
+    fetchBusinessData();
+  }, [slug]);
+
+  // Cargar datos del pedido real desde Supabase
+  useEffect(() => {
+    async function fetchOrder() {
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+        try {
+          const supabase = createClient();
+          const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('id', orderId)
+            .single();
+
+          if (!error && data) {
+            setOrder(data as Order);
+          }
+        } catch (e) {
+          console.error('Error cargando pedido desde Supabase:', e);
+        }
+      }
+    }
+    fetchOrder();
+  }, [orderId]);
+
+  // Escuchar eventos en Tiempo Real WebSockets (Supabase + BroadcastChannel)
+  useEffect(() => {
+    if (!order?.business_id) return;
+
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+      const supabase = createClient();
+      const channelName = `piku-orders-${order.business_id}`;
+      const existingChannel = supabase.getChannels().find((ch: any) => ch.topic === `realtime:${channelName}`);
+      if (existingChannel) {
+        supabase.removeChannel(existingChannel);
+      }
+
+      const rtChannel = supabase
+        .channel(channelName)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'orders',
+          },
+          (payload: any) => {
+            const updated = payload.new as Order;
+            if (updated && updated.id === orderId && updated.estado) {
+              setOrder((prev) => (prev ? { ...prev, estado: updated.estado } : prev));
+            }
+          }
+        )
+        .on(
+          'broadcast',
+          { event: 'ORDER_STATUS_CHANGED' },
+          (payload: any) => {
+            const data = payload.payload;
+            if (data && data.orderId === orderId) {
+              setOrder((prev) => (prev ? { ...prev, estado: data.newStatus as OrderStatus } : prev));
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(rtChannel);
+      };
+    }
+
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       const channel = new BroadcastChannel('saas-cuenca-orders-channel');
-
       channel.onmessage = (event) => {
-        if (event.data?.type === 'ORDER_STATUS_CHANGED') {
-          setOrder((prev) => ({
-            ...prev,
-            estado: event.data.newStatus as OrderStatus,
-          }));
+        if (event.data?.type === 'ORDER_STATUS_CHANGED' && event.data?.orderId === orderId) {
+          setOrder((prev) => (prev ? { ...prev, estado: event.data.newStatus as OrderStatus } : prev));
         }
       };
-
       return () => {
         channel.close();
       };
     }
-  }, []);
+  }, [order?.business_id, orderId]);
 
   const steps = [
     { key: 'pendiente', label: 'Recibido', icon: Clock },
@@ -45,6 +128,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
   ];
 
   const getCurrentStepIndex = () => {
+    if (!order) return 0;
     switch (order.estado) {
       case 'pendiente':
         return 0;
@@ -59,6 +143,15 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
         return 0;
     }
   };
+
+  if (!order) {
+    return (
+      <div className="min-h-screen bg-[#070A11] text-white flex flex-col items-center justify-center p-6 text-center space-y-4">
+        <Clock className="w-8 h-8 text-amber-400 animate-spin" />
+        <h2 className="text-sm font-display font-bold text-slate-300">Cargando detalles de tu pedido en tiempo real...</h2>
+      </div>
+    );
+  }
 
   const currentStep = getCurrentStepIndex();
 

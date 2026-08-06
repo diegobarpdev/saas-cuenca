@@ -25,7 +25,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased bg-[#080B11] text-slate-100 selection:bg-amber-500 selection:text-slate-950">
         {children}
-        <Toaster position="bottom-right" theme="dark" closeButton richColors />
+        <Toaster position="top-left" theme="dark" closeButton richColors />
       </body>
     </html>
   );
