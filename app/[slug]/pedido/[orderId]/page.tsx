@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Clock, CheckCircle2, Package, Truck, PhoneCall, Receipt, Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { MOCK_BUSINESS } from '@/lib/supabase/mock-data';
-import { formatCurrency } from '@/lib/utils/currency';
+import { formatCurrency, formatDeliveryType } from '@/lib/utils/currency';
 import { OrderBadge, PaymentBadge } from '@/components/ui/Badge';
 import { Business, Order, OrderStatus } from '@/lib/types/database';
 
@@ -238,7 +238,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
             </div>
             <div className="flex justify-between">
               <span className="text-slate-400">Entrega:</span>
-              <span className="capitalize font-semibold text-emerald-400">{order.tipo_entrega}</span>
+              <span className="font-semibold text-emerald-400">{formatDeliveryType(order.tipo_entrega)}</span>
             </div>
             {order.cliente_direccion && (
               <div className="flex justify-between">

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Order, OrderItem, Business } from '@/lib/types/database';
-import { formatCurrency } from '@/lib/utils/currency';
+import { formatCurrency, formatDeliveryType, formatPaymentMethod } from '@/lib/utils/currency';
 
 interface TicketThermalProps {
   order: Order & { items?: OrderItem[] };
@@ -29,7 +29,7 @@ export function TicketThermal({ order, business }: TicketThermalProps) {
       <div className="py-2 border-b border-dashed border-black">
         <div className="flex justify-between items-center text-sm font-bold">
           <span>PEDIDO #{String(order.numero_pedido).padStart(4, '0')}</span>
-          <span className="uppercase text-xs">{order.tipo_entrega}</span>
+          <span className="uppercase text-xs font-bold">{formatDeliveryType(order.tipo_entrega)}</span>
         </div>
         <p className="text-[10px] text-gray-700">Fecha: {formattedDate}</p>
         {order.numero_mesa && (
@@ -114,7 +114,7 @@ export function TicketThermal({ order, business }: TicketThermalProps) {
 
       {/* Método de Pago */}
       <div className="py-2 text-center">
-        <p className="font-bold text-xs uppercase">PAGO: {order.metodo_pago}</p>
+        <p className="font-bold text-xs uppercase">PAGO: {formatPaymentMethod(order.metodo_pago)}</p>
         <p className="text-[10px] uppercase">ESTADO PAGO: {order.estado_pago}</p>
         {order.payphone_transaction_id && (
           <p className="text-[9px]">ID PayPhone: {order.payphone_transaction_id}</p>

@@ -5,7 +5,7 @@ import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus } from 'l
 import { toast } from 'sonner';
 import { Order, OrderStatus } from '@/lib/types/database';
 import { OrderBadge, PaymentBadge } from '@/components/ui/Badge';
-import { formatCurrency } from '@/lib/utils/currency';
+import { formatCurrency, formatDeliveryType } from '@/lib/utils/currency';
 import { TicketThermal } from '@/components/ticket/TicketThermal';
 import { useRealtimeOrders } from '@/hooks/useRealtimeOrders';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
@@ -206,7 +206,7 @@ export default function AdminDashboardPage() {
                   </div>
                   <p className="text-xs text-zinc-400 mt-0.5 flex items-center gap-1">
                     <Clock className="w-3 h-3 text-zinc-500" />
-                    <span>Entrega: <strong className="text-zinc-200 uppercase font-mono">{order.tipo_entrega}</strong></span>
+                    <span>Entrega: <strong className="text-zinc-200 font-semibold">{formatDeliveryType(order.tipo_entrega)}</strong></span>
                   </p>
                 </div>
 
