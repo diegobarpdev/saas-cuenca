@@ -1,9 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@500;700;900&display=swap');
 @import "tailwindcss";
 
 :root {
   --font-jakarta: 'Plus Jakarta Sans', sans-serif;
   --font-outfit: 'Outfit', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-playfair: 'Playfair Display', serif;
+  --font-cinzel: 'Cinzel', serif;
   --font-space: 'Space Grotesk', monospace;
 }
 
@@ -18,63 +21,39 @@ body {
 }
 
 /* ============================================================================
-   PIKU LUXE BISTRO DESIGN SYSTEM - FUENTES & TIPOGRAFÍA DE ALTA FIDELIDAD
+   PIKU BRANDING & TYPOGRAPHY SYSTEM
    ============================================================================ */
 @layer utilities {
-  .font-display {
+  .font-outfit {
     font-family: 'Outfit', sans-serif !important;
   }
-  .font-mono-tech {
-    font-family: 'Space Grotesk', monospace !important;
+
+  .font-inter {
+    font-family: 'Inter', sans-serif !important;
   }
-  .font-body {
+
+  .font-jakarta {
     font-family: 'Plus Jakarta Sans', sans-serif !important;
   }
 
-  /* Paneles Glassmorphic Premium */
-  .luxe-header {
-    background: rgba(9, 12, 21, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(244, 191, 56, 0.12);
+  .font-playfair {
+    font-family: 'Playfair Display', Georgia, serif !important;
   }
 
-  .luxe-card {
-    background: linear-gradient(145deg, rgba(18, 24, 38, 0.9) 0%, rgba(11, 15, 25, 0.95) 100%);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
+  .font-cinzel {
+    font-family: 'Cinzel', Georgia, serif !important;
   }
 
-  .luxe-card-interactive {
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .luxe-card-interactive:hover {
-    border-color: rgba(244, 191, 56, 0.35);
-    box-shadow: 0 20px 40px -15px rgba(244, 191, 56, 0.15);
-    transform: translateY(-4px);
+  .font-display {
+    font-family: 'Outfit', sans-serif !important;
   }
 
-  /* Badges de Contraste Elevado */
-  .badge-gold {
-    background: linear-gradient(135deg, rgba(244, 191, 56, 0.18) 0%, rgba(224, 122, 95, 0.18) 100%);
-    color: #F4BF38;
-    border: 1px solid rgba(244, 191, 56, 0.35);
+  .font-mono-tech {
+    font-family: 'Space Grotesk', monospace !important;
   }
 
-  .badge-emerald {
-    background: rgba(16, 185, 129, 0.15);
-    color: #34D399;
-    border: 1px solid rgba(16, 185, 129, 0.3);
-  }
-
-  /* Brillos Ambientales Cálidos */
-  .glow-ambient-gold {
-    background: radial-gradient(circle at 50% 0%, rgba(244, 191, 56, 0.12) 0%, rgba(9, 12, 21, 0) 70%);
-  }
-
-  .glow-ambient-terracotta {
-    background: radial-gradient(circle at 85% 30%, rgba(224, 122, 95, 0.1) 0%, rgba(9, 12, 21, 0) 60%);
+  .font-body {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
   }
 
   .scrollbar-none::-webkit-scrollbar {

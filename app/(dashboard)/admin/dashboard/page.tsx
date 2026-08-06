@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { Order, OrderStatus } from '@/lib/types/database';
 import { OrderBadge, PaymentBadge } from '@/components/ui/Badge';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -12,7 +13,6 @@ import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 export default function AdminDashboardPage() {
   const { business, loading: loadingBusiness } = useAdminBusiness();
 
-  // Hook de Tiempo Real (Suscrito a Supabase Realtime Websockets)
   const { orders, soundEnabled, setSoundEnabled, addOrderLocal, updateOrderStatusLocal } =
     useRealtimeOrders(business?.id || '');
 
@@ -20,12 +20,13 @@ export default function AdminDashboardPage() {
   const [selectedOrderForTicket, setSelectedOrderForTicket] = useState<Order | null>(null);
   const [selectedComprobanteUrl, setSelectedComprobanteUrl] = useState<string | null>(null);
 
-  // Cambiar estado de pedido (se propaga en tiempo real)
   const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
     updateOrderStatusLocal(orderId, newStatus);
+    const orderObj = orders.find((o) => o.id === orderId);
+    const num = orderObj ? `#${orderObj.numero_pedido}` : '';
+    toast.success(`Pedido ${num} actualizado a: ${newStatus.toUpperCase()}`);
   };
 
-  // Simular la llegada de un pedido entrante en tiempo real (para pruebas locales)
   const handleSimulateIncomingOrder = () => {
     if (!business) return;
     const randomOrderNumber = Math.floor(Math.random() * 900) + 50;
@@ -60,75 +61,71 @@ export default function AdminDashboardPage() {
     };
 
     addOrderLocal(newMockOrder);
+    toast.info(`¡Nuevo pedido entrante #${randomOrderNumber}!`, {
+      description: 'Cliente: María Augusta Vega ($6.75)',
+    });
   };
 
-  // Filtrado de pedidos
   const filteredOrders = orders.filter((o) => {
     if (activeFilter === 'todos') return true;
     return o.estado === activeFilter;
   });
 
-  // Imprimir ticket
   const handlePrint = () => {
     window.print();
   };
 
   if (loadingBusiness || !business) {
     return (
-      <div className="p-12 text-center text-slate-400 font-display text-sm">
-        Cargando datos en tiempo real desde Supabase Postgres...
+      <div className="p-12 text-center text-zinc-400 text-xs">
+        Cargando pedidos en tiempo real...
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header del Panel */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0D1322] p-5 rounded-3xl border border-white/10 glass-panel">
+    <div className="space-y-5 max-w-6xl mx-auto">
+      {/* Header Producción */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
         <div>
-          <h1 className="text-xl font-display font-extrabold text-white tracking-tight flex items-center gap-2.5">
-            <span>Pedidos en Tiempo Real — {business.nombre}</span>
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          <h1 className="text-xl font-bold text-zinc-100 tracking-tight flex items-center gap-2">
+            <span>Pedidos en Tiempo Real</span>
+            <span className="text-xs font-mono font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              {business.nombre}
             </span>
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Canal de Websockets activo. Notificaciones sonoras e impresión térmica de comandas en vivo.
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Monitoreo continuo via Websockets con avisos sonoros e impresión térmica POS.
           </p>
         </div>
 
-        {/* Acciones Header */}
         <div className="flex items-center gap-2">
-          {/* Botón Simular Pedido Entrante */}
           <button
             onClick={handleSimulateIncomingOrder}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-display font-bold flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 active:scale-95 transition-all border border-emerald-400/30"
-            title="Simula que un cliente envió un pedido por la web"
+            className="px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
           >
-            <Plus className="w-4 h-4" />
-            <span>Simular Pedido Entrante 🔔</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span>Simular Pedido</span>
           </button>
 
-          {/* Control de Sonido */}
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
               soundEnabled
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                : 'bg-slate-950 border-slate-800 text-slate-500'
+                ? 'bg-zinc-800 border-zinc-700 text-emerald-400'
+                : 'bg-zinc-950 border-zinc-800 text-zinc-500'
             }`}
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4" />}
+            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-emerald-400" /> : <VolumeX className="w-3.5 h-3.5" />}
             <span className="hidden sm:inline">{soundEnabled ? 'Sonido Activo' : 'Silenciado'}</span>
           </button>
         </div>
       </div>
 
       {/* Filtros por Estado */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
         {[
-          { id: 'todos', label: 'Todos los Pedidos' },
+          { id: 'todos', label: 'Todos' },
           { id: 'pendiente', label: 'Pendientes' },
           { id: 'aceptado', label: 'Aceptados' },
           { id: 'en_preparacion', label: 'En Preparación' },
@@ -139,10 +136,10 @@ export default function AdminDashboardPage() {
             <button
               key={tab.id}
               onClick={() => setActiveFilter(tab.id)}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-display font-extrabold whitespace-nowrap transition-all ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
                 activeFilter === tab.id
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25 border border-emerald-400/30'
-                  : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+                  ? 'bg-zinc-100 text-zinc-950 font-semibold'
+                  : 'bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 border border-zinc-800/80'
               }`}
             >
               {tab.label} ({count})
@@ -153,33 +150,33 @@ export default function AdminDashboardPage() {
 
       {/* Grid de Pedidos */}
       {filteredOrders.length === 0 ? (
-        <div className="p-12 text-center glass-card rounded-3xl border border-slate-800 text-slate-500">
-          <p className="font-display font-semibold text-sm">No hay pedidos recibidos en este filtro aún.</p>
+        <div className="p-12 text-center rounded-2xl border border-zinc-800/80 bg-zinc-900/30 text-zinc-500 text-xs font-medium">
+          No hay pedidos registrados en este estado.
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filteredOrders.map((order) => (
             <div
               key={order.id}
-              className="glass-card rounded-3xl p-5 space-y-4 shadow-xl border border-white/5 hover:border-emerald-500/30 transition-all flex flex-col justify-between"
+              className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all flex flex-col justify-between gap-3"
             >
               {/* Header de Tarjeta */}
-              <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
+              <div className="flex items-start justify-between gap-3 border-b border-zinc-800 pb-3">
                 <div>
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-mono-tech font-black text-xl text-white">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-base text-zinc-100">
                       #{String(order.numero_pedido).padStart(4, '0')}
                     </span>
                     <OrderBadge status={order.estado} />
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Tipo: <strong className="text-emerald-400 uppercase font-display">{order.tipo_entrega}</strong></span>
+                  <p className="text-xs text-zinc-400 mt-0.5 flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-zinc-500" />
+                    <span>Entrega: <strong className="text-zinc-200 uppercase font-mono">{order.tipo_entrega}</strong></span>
                   </p>
                 </div>
 
                 <div className="text-right">
-                  <span className="font-mono-tech font-black text-lg text-emerald-400">{formatCurrency(order.total)}</span>
+                  <span className="font-mono font-bold text-base text-zinc-100">{formatCurrency(order.total)}</span>
                   <div className="mt-0.5">
                     <PaymentBadge status={order.estado_pago} method={order.metodo_pago} />
                   </div>
@@ -187,35 +184,35 @@ export default function AdminDashboardPage() {
               </div>
 
               {/* Datos de Cliente */}
-              <div className="space-y-1.5 text-xs text-slate-300">
-                <p><strong className="text-white font-display">Cliente:</strong> {order.cliente_nombre} ({order.cliente_telefono})</p>
+              <div className="space-y-1 text-xs text-zinc-300">
+                <p><strong className="text-zinc-200">Cliente:</strong> {order.cliente_nombre} ({order.cliente_telefono})</p>
                 {order.cliente_direccion && (
-                  <p><strong className="text-white font-display">Dirección Cuenca:</strong> {order.cliente_direccion}</p>
+                  <p><strong className="text-zinc-200">Dirección:</strong> {order.cliente_direccion}</p>
                 )}
                 {order.numero_mesa && (
-                  <p><strong className="text-white font-display">Mesa:</strong> {order.numero_mesa}</p>
+                  <p><strong className="text-zinc-200">Mesa:</strong> {order.numero_mesa}</p>
                 )}
               </div>
 
               {/* Facturación ECUADOR */}
-              <div className="p-3 rounded-2xl bg-slate-950/80 border border-white/5 text-[11px] space-y-1">
-                <p className="font-display font-bold text-slate-200">Datos Facturación Ecuador:</p>
+              <div className="p-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] space-y-0.5">
+                <p className="font-semibold text-zinc-300">Datos Facturación Ecuador:</p>
                 {order.requiere_factura && order.datos_facturacion ? (
-                  <div className="text-slate-400 space-y-0.5">
-                    <p><span className="text-slate-200 font-semibold">{order.datos_facturacion.tipo_doc}:</span> {order.datos_facturacion.num_doc}</p>
-                    <p><span className="text-slate-200 font-semibold">Razón Social:</span> {order.datos_facturacion.razon_social}</p>
-                    <p><span className="text-slate-200 font-semibold">Email:</span> {order.datos_facturacion.email}</p>
+                  <div className="text-zinc-400 space-y-0.5">
+                    <p><span className="text-zinc-200">{order.datos_facturacion.tipo_doc}:</span> {order.datos_facturacion.num_doc}</p>
+                    <p><span className="text-zinc-200">Razón Social:</span> {order.datos_facturacion.razon_social}</p>
+                    <p><span className="text-zinc-200">Email:</span> {order.datos_facturacion.email}</p>
                   </div>
                 ) : (
-                  <p className="text-slate-500 italic">Consumidor Final</p>
+                  <p className="text-zinc-500 italic">Consumidor Final</p>
                 )}
               </div>
 
-              {/* Botón Comprobante */}
+              {/* Comprobante */}
               {order.comprobante_pago_url && (
                 <button
                   onClick={() => setSelectedComprobanteUrl(order.comprobante_pago_url)}
-                  className="w-full py-2 px-3 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs font-display font-semibold border border-sky-500/30 flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full py-1.5 px-3 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-sky-400 text-xs font-medium border border-zinc-800 flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <Eye className="w-3.5 h-3.5" />
                   <span>Ver Comprobante Transferencia / Deuna!</span>
@@ -223,33 +220,31 @@ export default function AdminDashboardPage() {
               )}
 
               {/* Acciones del Pedido */}
-              <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
-                {/* Botón Imprimir Ticket Thermal */}
+              <div className="pt-2 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-2">
                 <button
                   onClick={() => setSelectedOrderForTicket(order)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-display font-bold border border-slate-700 flex items-center gap-1.5 transition-colors"
+                  className="px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-800 flex items-center gap-1.5 transition-colors"
                 >
-                  <Printer className="w-4 h-4 text-emerald-400" />
+                  <Printer className="w-3.5 h-3.5 text-zinc-400" />
                   <span>Imprimir Ticket</span>
                 </button>
 
-                {/* Notificación WA */}
                 <a
                   href={`https://wa.me/${order.cliente_telefono}?text=Hola%20${encodeURIComponent(order.cliente_nombre)},%20tu%20pedido%20%23${order.numero_pedido}%20en%20${encodeURIComponent(business.nombre)}%20ha%20cambiado%20a:%20${order.estado}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-display font-semibold border border-emerald-500/30 flex items-center gap-1.5 transition-colors"
+                  className="px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-emerald-400 text-xs font-medium border border-zinc-800 flex items-center gap-1.5 transition-colors"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
                   <span>Avisar WA</span>
                 </a>
 
-                {/* Cambiador de Estado */}
+                {/* Transición de Estado */}
                 <div className="flex items-center gap-1 ml-auto">
                   {order.estado === 'pendiente' && (
                     <button
                       onClick={() => handleUpdateStatus(order.id, 'aceptado')}
-                      className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all"
+                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-sm transition-colors"
                     >
                       Aceptar Pedido
                     </button>
@@ -257,7 +252,7 @@ export default function AdminDashboardPage() {
                   {order.estado === 'aceptado' && (
                     <button
                       onClick={() => handleUpdateStatus(order.id, 'en_preparacion')}
-                      className="px-3.5 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-display font-bold text-xs shadow-lg shadow-indigo-500/20 transition-all"
+                      className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-sm transition-colors"
                     >
                       En Preparación
                     </button>
@@ -265,7 +260,7 @@ export default function AdminDashboardPage() {
                   {order.estado === 'en_preparacion' && (
                     <button
                       onClick={() => handleUpdateStatus(order.id, 'listo')}
-                      className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all"
+                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-sm transition-colors"
                     >
                       Marcar Listo
                     </button>
@@ -279,38 +274,35 @@ export default function AdminDashboardPage() {
 
       {/* Modal Impresión Ticket Thermal */}
       {selectedOrderForTicket && (
-        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 p-6 rounded-3xl border border-white/10 max-w-md w-full space-y-4 shadow-2xl">
-            <div className="flex justify-between items-center pb-2 border-b border-white/10">
-              <h3 className="font-display font-extrabold text-white text-base">Vista Previa Ticket POS (58/80mm)</h3>
+        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 max-w-md w-full space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center pb-2 border-b border-zinc-800">
+              <h3 className="font-semibold text-zinc-100 text-sm">Vista Previa Ticket POS (58/80mm)</h3>
               <button
                 onClick={() => setSelectedOrderForTicket(null)}
-                className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white"
+                className="p-1 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="bg-white p-2 rounded-xl overflow-hidden shadow-inner">
-              <TicketThermal
-                order={selectedOrderForTicket}
-                business={business}
-              />
+            <div className="bg-white p-2 rounded-lg overflow-hidden">
+              <TicketThermal order={selectedOrderForTicket} business={business} />
             </div>
 
-            <div className="flex gap-2.5 pt-2">
+            <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setSelectedOrderForTicket(null)}
-                className="flex-1 py-3 rounded-2xl border border-slate-700 text-slate-300 text-xs font-display font-bold"
+                className="flex-1 py-2 rounded-lg border border-zinc-700 text-zinc-300 text-xs font-medium hover:bg-zinc-800 transition-colors"
               >
                 Cerrar
               </button>
               <button
                 onClick={handlePrint}
-                className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-display font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+                className="flex-1 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors"
               >
                 <Printer className="w-4 h-4" />
-                <span>Imprimir Ticket POS</span>
+                <span>Imprimir Ticket</span>
               </button>
             </div>
           </div>
@@ -319,29 +311,29 @@ export default function AdminDashboardPage() {
 
       {/* Modal Ver Comprobante */}
       {selectedComprobanteUrl && (
-        <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 p-5 rounded-3xl border border-white/10 max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex justify-between items-center pb-2 border-b border-white/10">
-              <h3 className="font-display font-bold text-white text-sm">Comprobante de Pago Subido por Cliente</h3>
+        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 max-w-lg w-full space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center pb-2 border-b border-zinc-800">
+              <h3 className="font-semibold text-zinc-100 text-sm">Comprobante de Pago Subido por Cliente</h3>
               <button
                 onClick={() => setSelectedComprobanteUrl(null)}
-                className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white"
+                className="p-1 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="relative w-full h-80 rounded-2xl overflow-hidden border border-slate-800">
+            <div className="relative w-full h-80 rounded-lg overflow-hidden border border-zinc-800 bg-zinc-950">
               <img
                 src={selectedComprobanteUrl}
                 alt="Comprobante"
-                className="w-full h-full object-contain bg-slate-950"
+                className="w-full h-full object-contain"
               />
             </div>
 
             <button
               onClick={() => setSelectedComprobanteUrl(null)}
-              className="w-full py-3 rounded-2xl bg-slate-800 text-slate-200 text-xs font-display font-bold"
+              className="w-full py-2 rounded-lg bg-zinc-800 text-zinc-200 text-xs font-medium hover:bg-zinc-700 transition-colors"
             >
               Cerrar Vista
             </button>

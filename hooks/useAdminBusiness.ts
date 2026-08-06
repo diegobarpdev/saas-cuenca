@@ -12,13 +12,39 @@ export function useAdminBusiness() {
     async function loadBusiness() {
       try {
         const supabase = createClient();
-        const { data, error } = await supabase
-          .from('businesses')
-          .select('*')
-          .limit(1)
-          .single();
+        const activeBusinessId = typeof window !== 'undefined' ? localStorage.getItem('piku_admin_business_id') : null;
 
-        if (!error && data) {
+        let data: Business | null = null;
+        let error: any = null;
+
+        if (activeBusinessId) {
+          const res = await supabase
+            .from('businesses')
+            .select('*')
+            .eq('id', activeBusinessId)
+            .single();
+          data = res.data;
+          error = res.error;
+        }
+
+        // Si no hay ID guardado o falló la búsqueda con ese ID, cargar la primera empresa disponible
+        if (!data || error) {
+          const fallbackRes = await supabase
+            .from('businesses')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (!fallbackRes.error && fallbackRes.data) {
+            data = fallbackRes.data as Business;
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('piku_admin_business_id', data.id);
+            }
+          }
+        }
+
+        if (data) {
           setBusiness(data as Business);
         }
       } catch (err) {

@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Building2, Plus, ExternalLink, Edit3, Trash2, X, Save, Search, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Building2, Plus, ExternalLink, Edit3, Trash2, X, Save, Search, RefreshCw, LogIn } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Business } from '@/lib/types/database';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 
 export default function SuperAdminDashboardPage() {
+  const router = useRouter();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,7 +25,6 @@ export default function SuperAdminDashboardPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Cargar lista de negocios REALES desde Supabase Postgres DB
   const loadBusinesses = async () => {
     setLoading(true);
     try {
@@ -37,7 +38,7 @@ export default function SuperAdminDashboardPage() {
         setBusinesses(data as Business[]);
       }
     } catch (err) {
-      console.error('Error en consulta de negocios:', err);
+      console.error('Error cargando empresas:', err);
     } finally {
       setLoading(false);
     }
@@ -46,6 +47,13 @@ export default function SuperAdminDashboardPage() {
   useEffect(() => {
     loadBusinesses();
   }, []);
+
+  const handleEnterAsAdmin = (businessId: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('piku_admin_business_id', businessId);
+    }
+    router.push('/admin/dashboard');
+  };
 
   const handleOpenEditModal = (b: Business) => {
     setErrorMsg(null);
@@ -141,12 +149,6 @@ export default function SuperAdminDashboardPage() {
       b.slug.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const planBadges: Record<string, string> = {
-    trial: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-    basico: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-    pro: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-  };
-
   const planOptions = [
     { value: 'trial', label: 'Trial (Prueba Gratuita 15 días)' },
     { value: 'basico', label: 'Plan Básico ($15/mes)' },
@@ -154,45 +156,45 @@ export default function SuperAdminDashboardPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 rounded-3xl border border-purple-500/20 shadow-xl">
+    <div className="space-y-6 max-w-6xl mx-auto">
+      {/* Header Producción */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
         <div>
-          <h1 className="text-2xl font-display font-black text-white tracking-tight flex items-center gap-2.5">
-            <Building2 className="w-6 h-6 text-purple-400" />
-            <span>Gestión Master de Empresas (Tenants)</span>
+          <h1 className="text-xl font-bold text-zinc-100 tracking-tight flex items-center gap-2">
+            <Building2 className="w-5 h-5 text-zinc-400" />
+            <span>Gestión de Empresas (Tenants)</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Administra los negocios registrados en Supabase, edita sus datos, planes de suscripción y accesos.
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Administra los negocios registrados en la plataforma, edita sus configuraciones y accede a sus paneles.
           </p>
         </div>
 
         <Link
           href="/super-admin/negocios/nuevo"
-          className="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-display font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-purple-500/20 active:scale-95 transition-all border border-purple-400/30 self-start sm:self-auto"
+          className="px-4 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs flex items-center gap-1.5 shadow-sm transition-colors self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          <span>Registrar Nueva Empresa</span>
+          <span>Registrar Empresa</span>
         </Link>
       </div>
 
-      {/* Tarjetas de Métricas Globales del SaaS */}
+      {/* Métricas limpias */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="glass-card p-5 rounded-3xl border border-white/10 space-y-1">
-          <span className="text-xs text-slate-400 font-display">Total Empresas Activas</span>
-          <p className="text-3xl font-mono-tech font-black text-white">{businesses.length}</p>
+        <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 space-y-1">
+          <span className="text-xs text-zinc-400 font-medium">Total Empresas Activas</span>
+          <p className="text-2xl font-mono font-bold text-zinc-100">{businesses.length}</p>
         </div>
 
-        <div className="glass-card p-5 rounded-3xl border border-white/10 space-y-1">
-          <span className="text-xs text-slate-400 font-display">Negocios en Plan PRO</span>
-          <p className="text-3xl font-mono-tech font-black text-purple-400">
+        <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 space-y-1">
+          <span className="text-xs text-zinc-400 font-medium">Empresas Plan PRO</span>
+          <p className="text-2xl font-mono font-bold text-purple-400">
             {businesses.filter((b) => b.plan === 'pro').length}
           </p>
         </div>
 
-        <div className="glass-card p-5 rounded-3xl border border-white/10 space-y-1">
-          <span className="text-xs text-slate-400 font-display">Negocios en Trial / Básico</span>
-          <p className="text-3xl font-mono-tech font-black text-emerald-400">
+        <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 space-y-1">
+          <span className="text-xs text-zinc-400 font-medium">Empresas Trial / Básico</span>
+          <p className="text-2xl font-mono font-bold text-emerald-400">
             {businesses.filter((b) => b.plan !== 'pro').length}
           </p>
         </div>
@@ -200,81 +202,86 @@ export default function SuperAdminDashboardPage() {
 
       {/* Buscador */}
       <div className="relative max-w-md">
-        <Search className="w-4 h-4 text-slate-500 absolute left-4 top-3.5" />
+        <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
         <input
           type="text"
-          placeholder="Buscar por nombre o slug (ej. panaderia-cuenca)..."
+          placeholder="Buscar por nombre o slug..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
+          className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-600 transition-colors"
         />
       </div>
 
       {/* Lista de Empresas */}
       {loading ? (
-        <div className="p-12 text-center text-slate-400 font-display text-sm flex items-center justify-center gap-2">
-          <RefreshCw className="w-5 h-5 animate-spin text-purple-400" />
-          <span>Cargando lista de empresas en tiempo real desde Supabase...</span>
+        <div className="p-12 text-center text-zinc-400 text-xs flex items-center justify-center gap-2">
+          <RefreshCw className="w-4 h-4 animate-spin" />
+          <span>Cargando empresas...</span>
         </div>
       ) : filteredBusinesses.length === 0 ? (
-        <div className="p-12 text-center glass-card rounded-3xl border border-slate-800 text-slate-400 font-display text-sm">
-          No hay empresas registradas en este momento.
+        <div className="p-12 text-center rounded-2xl border border-zinc-800/80 bg-zinc-900/30 text-zinc-400 text-xs">
+          No hay empresas registradas.
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredBusinesses.map((b) => (
             <div
               key={b.id}
-              className="glass-card p-5 rounded-3xl border border-white/10 hover:border-purple-500/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl"
+              className="p-4 rounded-xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
-              {/* Info Negocio */}
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 font-display font-black text-lg flex-shrink-0">
+              {/* Información */}
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-lg bg-zinc-800 border border-zinc-700/60 flex items-center justify-center text-zinc-200 font-bold text-sm flex-shrink-0">
                   {b.nombre.charAt(0)}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-display font-extrabold text-base text-white">{b.nombre}</h3>
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono-tech font-bold uppercase border ${
-                        planBadges[b.plan] || planBadges.trial
-                      }`}
-                    >
+                    <h3 className="font-semibold text-sm text-zinc-100">{b.nombre}</h3>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">
                       PLAN {b.plan}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 font-mono-tech mt-0.5">
-                    Slug: <span className="text-purple-300">/{b.slug}</span> • Telf: {b.telefono_whatsapp}
+                  <p className="text-xs text-zinc-400 font-mono mt-0.5">
+                    /{b.slug} • Telf: {b.telefono_whatsapp}
                   </p>
-                  {b.direccion && <p className="text-[11px] text-slate-500 mt-0.5">Dir: {b.direccion}</p>}
+                  {b.direccion && <p className="text-[11px] text-zinc-500 mt-0.5">Dir: {b.direccion}</p>}
                 </div>
               </div>
 
-              {/* Acciones Rápidas del Super Admin */}
-              <div className="flex items-center gap-2 self-end md:self-auto pt-2 md:pt-0 border-t md:border-t-0 border-slate-800">
+              {/* Botones de Acción Estándar */}
+              <div className="flex flex-wrap items-center gap-2 self-end md:self-auto pt-2 md:pt-0 border-t md:border-t-0 border-zinc-800">
+                <button
+                  onClick={() => handleEnterAsAdmin(b.id)}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
+                  title="Entrar al panel de control de esta empresa"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Entrar con Admin</span>
+                </button>
+
                 <button
                   onClick={() => handleOpenEditModal(b)}
-                  className="px-3.5 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 text-xs font-display font-bold border border-purple-500/30 flex items-center gap-1.5 transition-colors"
+                  className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium border border-zinc-700 flex items-center gap-1.5 transition-colors"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
-                  <span>Editar Empresa</span>
+                  <span>Editar</span>
                 </button>
 
                 <Link
                   href={`/${b.slug}`}
                   target="_blank"
-                  className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-display font-bold border border-slate-800 flex items-center gap-1.5 transition-colors"
+                  className="px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-medium border border-zinc-800 flex items-center gap-1.5 transition-colors"
                 >
-                  <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />
+                  <ExternalLink className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Ver Catálogo</span>
                 </Link>
 
                 <button
                   onClick={() => handleDeleteBusiness(b.id, b.nombre)}
-                  className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
+                  className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
                   title="Eliminar Empresa"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -284,111 +291,111 @@ export default function SuperAdminDashboardPage() {
 
       {/* Modal Editar Empresa */}
       {editingBusiness && (
-        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 p-6 rounded-3xl border border-purple-500/30 max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex justify-between items-center pb-2 border-b border-white/10">
-              <h3 className="font-display font-black text-white text-base flex items-center gap-2">
-                <Edit3 className="w-4 h-4 text-purple-400" />
+        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 max-w-lg w-full space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center pb-2 border-b border-zinc-800">
+              <h3 className="font-semibold text-zinc-100 text-sm flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-zinc-400" />
                 <span>Editar Empresa: {editingBusiness.nombre}</span>
               </h3>
               <button
                 onClick={() => setEditingBusiness(null)}
-                className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white"
+                className="p-1 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {errorMsg && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
                 {errorMsg}
               </div>
             )}
 
-            <form onSubmit={handleSaveEditBusiness} className="space-y-4">
+            <form onSubmit={handleSaveEditBusiness} className="space-y-3.5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Nombre Comercial *</label>
+                  <label className="block text-xs font-medium text-zinc-300 mb-1">Nombre Comercial *</label>
                   <input
                     type="text"
                     required
                     value={editNombre}
                     onChange={(e) => setEditNombre(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Slug URL *</label>
+                  <label className="block text-xs font-medium text-zinc-300 mb-1">Slug URL *</label>
                   <input
                     type="text"
                     required
                     value={editSlug}
                     onChange={(e) => setEditSlug(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono-tech"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-display font-semibold text-slate-300 mb-1">WhatsApp Notificaciones *</label>
+                  <label className="block text-xs font-medium text-zinc-300 mb-1">WhatsApp Notificaciones *</label>
                   <input
                     type="text"
                     required
                     value={editWhatsapp}
                     onChange={(e) => setEditWhatsapp(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono-tech"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Plan de Suscripción</label>
+                  <label className="block text-xs font-medium text-zinc-300 mb-1">Plan de Suscripción</label>
                   <CustomSelect
                     options={planOptions}
                     value={editPlan}
                     onChange={(val) => setEditPlan(val as any)}
-                    accentColor="purple"
+                    accentColor="emerald"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-display font-semibold text-slate-300 mb-1">RUC del Negocio</label>
+                  <label className="block text-xs font-medium text-zinc-300 mb-1">RUC del Negocio</label>
                   <input
                     type="text"
                     value={editRuc}
                     onChange={(e) => setEditRuc(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono-tech"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Dirección en Cuenca</label>
+                  <label className="block text-xs font-medium text-zinc-300 mb-1">Dirección en Cuenca</label>
                   <input
                     type="text"
                     value={editDireccion}
                     onChange={(e) => setEditDireccion(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-2.5 pt-2">
+              <div className="flex gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setEditingBusiness(null)}
-                  className="flex-1 py-3 rounded-2xl border border-slate-700 text-slate-300 text-xs font-display font-bold"
+                  className="flex-1 py-2 rounded-lg border border-zinc-700 text-zinc-300 text-xs font-medium hover:bg-zinc-800 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-display font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20"
+                  className="flex-1 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-colors"
                 >
-                  <Save className="w-4 h-4" />
+                  <Save className="w-3.5 h-3.5" />
                   <span>{isSaving ? 'Guardando...' : 'Guardar Cambios'}</span>
                 </button>
               </div>

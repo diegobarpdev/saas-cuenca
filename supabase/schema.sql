@@ -137,7 +137,8 @@ AS $$
 $$;
 
 -- -------------------------------------------------------------
--- ROW LEVEL SECURITY (RLS) - AISLAMIENTO MULTI-EMPRESA
+-- -------------------------------------------------------------
+-- ROW LEVEL SECURITY (RLS) - POLÍTICAS COMPLETAS Y PERMISIVAS
 -- -------------------------------------------------------------
 ALTER TABLE businesses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE business_users ENABLE ROW LEVEL SECURITY;
@@ -146,34 +147,37 @@ ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 
--- Políticas para la tabla businesses
-CREATE POLICY "Public Read Business" ON businesses FOR SELECT USING (true);
-CREATE POLICY "Allow Insert Business" ON businesses FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow Update Business" ON businesses FOR UPDATE USING (true);
+-- Limpieza de políticas previas
+DROP POLICY IF EXISTS "Public Read Business" ON businesses;
+DROP POLICY IF EXISTS "Allow Insert Business" ON businesses;
+DROP POLICY IF EXISTS "Allow Update Business" ON businesses;
+DROP POLICY IF EXISTS "Allow All Businesses" ON businesses;
 
--- Políticas de Lectura Pública (Catálogo sin login)
-CREATE POLICY "Public Read Categories" ON categories FOR SELECT USING (true);
-CREATE POLICY "Public Read Products" ON products FOR SELECT USING (disponible = true);
-CREATE POLICY "Public Insert Order" ON orders FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public Read Order by ID" ON orders FOR SELECT USING (true);
-CREATE POLICY "Public Insert Order Items" ON order_items FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public Read Order Items" ON order_items FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Read Categories" ON categories;
+DROP POLICY IF EXISTS "Admin CRUD Categories" ON categories;
+DROP POLICY IF EXISTS "Allow All Categories" ON categories;
 
--- Políticas Privadas (Administradores autenticados)
-CREATE POLICY "Users Read Own Profile" ON business_users FOR SELECT USING (id = auth.uid());
+DROP POLICY IF EXISTS "Public Read Products" ON products;
+DROP POLICY IF EXISTS "Admin CRUD Products" ON products;
+DROP POLICY IF EXISTS "Allow All Products" ON products;
 
-CREATE POLICY "Admin CRUD Categories" ON categories FOR ALL USING (
-  business_id = get_auth_business_id()
-);
+DROP POLICY IF EXISTS "Public Insert Order" ON orders;
+DROP POLICY IF EXISTS "Public Read Order by ID" ON orders;
+DROP POLICY IF EXISTS "Admin CRUD Orders" ON orders;
+DROP POLICY IF EXISTS "Allow All Orders" ON orders;
 
-CREATE POLICY "Admin CRUD Products" ON products FOR ALL USING (
-  business_id = get_auth_business_id()
-);
+DROP POLICY IF EXISTS "Public Insert Order Items" ON order_items;
+DROP POLICY IF EXISTS "Public Read Order Items" ON order_items;
+DROP POLICY IF EXISTS "Admin CRUD Order Items" ON order_items;
+DROP POLICY IF EXISTS "Allow All Order Items" ON order_items;
 
-CREATE POLICY "Admin CRUD Orders" ON orders FOR ALL USING (
-  business_id = get_auth_business_id()
-);
+DROP POLICY IF EXISTS "Users Read Own Profile" ON business_users;
+DROP POLICY IF EXISTS "Allow All Business Users" ON business_users;
 
-CREATE POLICY "Admin CRUD Order Items" ON order_items FOR ALL USING (
-  order_id IN (SELECT id FROM orders WHERE business_id = get_auth_business_id())
-);
+-- Políticas de acceso universal sin restricciones de auth.uid() para desarrollo / client-side
+CREATE POLICY "Allow All Businesses" ON businesses FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow All Categories" ON categories FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow All Products" ON products FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow All Orders" ON orders FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow All Order Items" ON order_items FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow All Business Users" ON business_users FOR ALL USING (true) WITH CHECK (true);

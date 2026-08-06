@@ -27,6 +27,46 @@ export interface BillingData {
   direccion: string;
 }
 
+export interface BusinessBranding {
+  slogan?: string;
+  banner_url?: string;
+  favicon_url?: string;
+  color_primario?: string;
+  color_secundario?: string;
+  color_acento?: string;
+  color_fondo?: string;
+  color_texto?: string;
+  tipografia?: 'Outfit' | 'Inter' | 'Playfair' | 'Plus Jakarta Sans';
+  estilo_botones?: 'redondeado' | 'semi-redondeado' | 'pill' | 'recto';
+  tema_defecto?: 'oscuro' | 'claro';
+}
+
+export interface OperationalSettings {
+  tiempo_preparacion?: string;
+  permite_domicilio?: boolean;
+  permite_retiro?: boolean;
+
+  // Deuna!
+  acepta_deuna?: boolean;
+  deuna_numero?: string;
+  deuna_titular?: string;
+
+  // Transferencia Bancaria
+  acepta_transferencia?: boolean;
+  banco?: string;
+  tipo_cuenta?: string;
+  numero_cuenta?: string;
+  titular?: string;
+  ruc_ci?: string;
+
+  // PayPhone
+  acepta_payphone?: boolean;
+
+  // Efectivo
+  acepta_efectivo?: boolean;
+  instrucciones_efectivo?: string;
+}
+
 export interface Business {
   id: string;
   slug: string;
@@ -39,6 +79,8 @@ export interface Business {
   zonas_envio: ShippingZone[];
   payphone_token: string | null;
   plan: 'trial' | 'basico' | 'pro';
+  branding?: BusinessBranding;
+  configuracion_operativa?: OperationalSettings;
   created_at: string;
 }
 

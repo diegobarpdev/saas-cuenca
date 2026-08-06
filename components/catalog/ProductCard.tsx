@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
-import { Plus, Check, Flame, Sparkles } from 'lucide-react';
+import { Plus, Check } from 'lucide-react';
+import { toast } from 'sonner';
 import { Product } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
 
@@ -17,69 +17,82 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const handleAdd = () => {
     onAddToCart(product, 1, '');
     setAdded(true);
+    toast.success(`¡${product.nombre} agregado!`, {
+      description: formatCurrency(product.precio),
+      duration: 2000,
+    });
     setTimeout(() => setAdded(false), 1200);
   };
 
   return (
-    <div className="group relative rounded-3xl bg-slate-900/60 hover:bg-slate-900/90 border border-white/10 hover:border-amber-500/40 transition-all duration-300 overflow-hidden flex flex-col justify-between shadow-xl hover:shadow-2xl hover:shadow-amber-500/10 backdrop-blur-sm">
-      {/* Media & Overlay Section */}
-      <div className="relative w-full h-56 bg-slate-950 overflow-hidden">
+    <div
+      className={`group relative rounded-3xl bg-[#0F1420]/80 hover:bg-[#131929] border transition-all duration-300 overflow-hidden flex flex-col justify-between shadow-lg hover:shadow-2xl ${
+        product.disponible
+          ? 'border-white/10 hover:border-amber-500/30'
+          : 'border-rose-500/20 opacity-65 bg-[#0F1420]/40'
+      }`}
+    >
+      {/* Fotografía de Gran Tamaño (Estilo Airbnb / Apple) */}
+      <div className="relative w-full h-56 bg-[#080B11] overflow-hidden">
         {product.imagen_url ? (
-          <Image
+          <img
             src={product.imagen_url}
             alt={product.nombre}
-            fill
-            className="object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-600 bg-slate-900 font-display font-medium text-xs">
-            Sin Imagen
+          <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 bg-[#0A0D16] font-display font-medium text-xs gap-1">
+            <span>Fotografía de producto</span>
           </div>
         )}
-        
-        {/* Dark Editorial Gradient Vignette */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050811] via-[#050811]/40 to-transparent"></div>
 
-        {/* Asymmetric Recommendation Tag */}
-        <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/85 backdrop-blur-md text-[10px] font-mono-tech font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1.5 shadow-lg">
-          <Flame className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-          <span>Especialidad</span>
-        </div>
+        {/* Degradado sutil inferior para legibilidad */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F1420] via-transparent to-transparent opacity-80"></div>
 
-        {/* High Contrast Floating Price Badge */}
-        <div className="absolute top-3 right-3 px-3.5 py-1 rounded-full bg-[#050811]/90 backdrop-blur-md text-amber-300 font-mono-tech font-black text-sm border border-amber-500/50 shadow-2xl shadow-amber-500/20">
+        {/* Precio Flotante Elegante */}
+        <div className="absolute top-3 right-3 px-3.5 py-1 rounded-full bg-slate-950/85 backdrop-blur-md text-amber-400 font-mono font-bold text-sm border border-amber-500/30 shadow-md">
           {formatCurrency(product.precio)}
         </div>
+
+        {!product.disponible && (
+          <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-rose-950/90 backdrop-blur-md text-rose-300 font-medium text-xs border border-rose-500/30">
+            Agotado hoy
+          </div>
+        )}
       </div>
 
-      {/* Product Content */}
-      <div className="p-5 flex-1 flex flex-col justify-between gap-4 relative z-10">
+      {/* Contenido & Tipografía */}
+      <div className="p-5 flex-1 flex flex-col justify-between gap-4">
         <div className="space-y-1.5">
-          <h3 className="font-display font-extrabold text-white text-base md:text-lg group-hover:text-amber-300 transition-colors leading-tight">
+          <h3 className="font-display font-bold text-white text-base md:text-lg group-hover:text-amber-300 transition-colors leading-snug">
             {product.nombre}
           </h3>
           {product.descripcion && (
-            <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed font-normal">
+            <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
               {product.descripcion}
             </p>
           )}
         </div>
 
-        {/* Tactile Action Button */}
+        {/* Botón de Acción Táctil (Apple / Shopify Microinteraction) */}
         <button
           onClick={handleAdd}
           disabled={!product.disponible}
-          className={`w-full py-3.5 px-4 rounded-2xl font-display font-black text-xs md:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 border shadow-lg ${
-            added
-              ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-emerald-400 shadow-emerald-500/40 scale-102'
-              : 'bg-slate-950/80 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-500 text-slate-200 hover:text-slate-950 border-slate-800 hover:border-amber-400/50 shadow-black/40'
+          className={`w-full py-3 px-4 rounded-2xl font-display font-bold text-xs md:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 border ${
+            !product.disponible
+              ? 'bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed'
+              : added
+              ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/20'
+              : 'bg-slate-950/90 hover:bg-amber-500 text-slate-200 hover:text-slate-950 border-slate-800 hover:border-amber-400 shadow-md'
           }`}
         >
           {added ? (
             <>
               <Check className="w-4 h-4 text-white" />
-              <span>¡Agregado a tu Pedido!</span>
+              <span>¡Agregado al Pedido!</span>
             </>
+          ) : !product.disponible ? (
+            <span>No Disponible</span>
           ) : (
             <>
               <Plus className="w-4 h-4 text-amber-400 group-hover:text-slate-950 transition-colors" />

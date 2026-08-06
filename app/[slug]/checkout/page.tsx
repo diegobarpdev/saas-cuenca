@@ -11,6 +11,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { DeliveryType, PaymentMethod, BillingData } from '@/lib/types/database';
 import { createClient } from '@/lib/supabase/client';
 import { CustomSelect } from '@/components/ui/CustomSelect';
+import { CustomCheckbox } from '@/components/ui/CustomCheckbox';
 import confetti from 'canvas-confetti';
 
 export default function CheckoutPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -342,15 +343,13 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
               Datos de Facturación (Ecuador)
             </h2>
 
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={requiereFactura}
-                onChange={(e) => setRequiereFactura(e.target.checked)}
-                className="w-4 h-4 rounded text-amber-500 focus:ring-amber-500 bg-slate-950 border-slate-700"
-              />
-              <span className="text-xs text-slate-200 font-display font-semibold">¿Requieres Factura con Datos (RUC / Cédula)?</span>
-            </label>
+            <CustomCheckbox
+              checked={requiereFactura}
+              onChange={setRequiereFactura}
+              label="¿Requieres Factura con Datos (RUC / Cédula)?"
+              description="Genera tu comprobante electrónico de venta válido en Ecuador"
+              accentColor="amber"
+            />
 
             {requiereFactura && (
               <div className="space-y-3.5 pt-3 border-t border-white/10">
