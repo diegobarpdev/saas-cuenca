@@ -785,11 +785,11 @@ export default function AdminProductsPage() {
                           className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100"
                         />
                         <datalist id="promo-labels-list">
-                          <option value="⚡ 20% OFF" />
-                          <option value="🔥 PROMO DEL DÍA" />
-                          <option value="🎉 2X1 ESPECIAL" />
-                          <option value="⭐ MÁS VENDIDO" />
-                          <option value="🎁 COMBO DESTACADO" />
+                          <option value="20% OFF" />
+                          <option value="PROMO DEL DÍA" />
+                          <option value="2X1 ESPECIAL" />
+                          <option value="MÁS VENDIDO" />
+                          <option value="COMBO DESTACADO" />
                         </datalist>
                       </div>
                     </div>

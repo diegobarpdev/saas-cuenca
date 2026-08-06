@@ -11,11 +11,11 @@ export function formatDeliveryType(type?: string): string {
   if (!type) return '';
   switch (type) {
     case 'domicilio':
-      return '🛵 Entrega a Domicilio';
+      return 'Entrega a Domicilio';
     case 'retiro_local':
-      return '🛍️ Retiro en Local';
+      return 'Retiro en Local';
     case 'mesa':
-      return '🍽️ Consumo en Mesa';
+      return 'Consumo en Mesa';
     default:
       return type.replace('_', ' ');
   }

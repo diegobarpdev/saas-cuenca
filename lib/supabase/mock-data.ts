@@ -59,10 +59,10 @@ export const MOCK_BUSINESS: Business = {
 };
 
 export const MOCK_CATEGORIES: Category[] = [
-  { id: 'c1', business_id: MOCK_BUSINESS.id, nombre: '🔥 Tradición Cuencana', orden: 1, created_at: new Date().toISOString() },
-  { id: 'c2', business_id: MOCK_BUSINESS.id, nombre: '☕ Cafetería Artesanal', orden: 2, created_at: new Date().toISOString() },
-  { id: 'c3', business_id: MOCK_BUSINESS.id, nombre: '🥖 Pan horneado hoy', orden: 3, created_at: new Date().toISOString() },
-  { id: 'c4', business_id: MOCK_BUSINESS.id, nombre: '🍰 Dulces & Postres', orden: 4, created_at: new Date().toISOString() },
+  { id: 'c1', business_id: MOCK_BUSINESS.id, nombre: 'Tradición Cuencana', orden: 1, created_at: new Date().toISOString() },
+  { id: 'c2', business_id: MOCK_BUSINESS.id, nombre: 'Cafetería Artesanal', orden: 2, created_at: new Date().toISOString() },
+  { id: 'c3', business_id: MOCK_BUSINESS.id, nombre: 'Pan horneado hoy', orden: 3, created_at: new Date().toISOString() },
+  { id: 'c4', business_id: MOCK_BUSINESS.id, nombre: 'Dulces & Postres', orden: 4, created_at: new Date().toISOString() },
 ];
 
 export const MOCK_PRODUCTS: Product[] = [
@@ -75,7 +75,7 @@ export const MOCK_PRODUCTS: Product[] = [
     precio: 2.25,
     en_oferta: true,
     precio_oferta: 1.75,
-    etiqueta_promo: '⚡ 22% OFF',
+    etiqueta_promo: '22% OFF',
     stock: 25,
     imagen_url: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=500&q=80',
     disponible: true,
@@ -114,7 +114,7 @@ export const MOCK_PRODUCTS: Product[] = [
     precio: 3.00,
     en_oferta: true,
     precio_oferta: 2.25,
-    etiqueta_promo: '🔥 PROMO DEL DÍA',
+    etiqueta_promo: 'PROMO DEL DÍA',
     stock: 50,
     imagen_url: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=500&q=80',
     disponible: true,
@@ -141,7 +141,7 @@ export const MOCK_PRODUCTS: Product[] = [
     precio: 2.50,
     en_oferta: true,
     precio_oferta: 1.80,
-    etiqueta_promo: '🎉 28% OFF',
+    etiqueta_promo: '28% OFF',
     stock: 15,
     imagen_url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&q=80',
     disponible: true,

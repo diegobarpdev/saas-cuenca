@@ -50,7 +50,7 @@ export default function LandingPage() {
         </div>
 
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-black text-white leading-tight max-w-4xl tracking-tight">
-          Transforma tu negocio con <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">Piku</span> 🚀
+          Transforma tu negocio con <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">Piku</span>
         </h1>
 
         <p className="text-base md:text-xl text-slate-300 max-w-2xl font-medium leading-relaxed">
