@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Order, OrderStatus } from '@/lib/types/database';
+import { Order, OrderStatus, PaymentStatus } from '@/lib/types/database';
 import { MOCK_INITIAL_ORDERS } from '@/lib/supabase/mock-data';
 
 export function useRealtimeOrders(businessId: string, initialOrders: Order[] = []) {
@@ -26,6 +26,12 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
             setOrders((prev) =>
               prev.map((order) =>
                 order.id === event.data.orderId ? { ...order, estado: event.data.newStatus } : order
+              )
+            );
+          } else if (event.data?.type === 'ORDER_PAYMENT_STATUS_CHANGED') {
+            setOrders((prev) =>
+              prev.map((order) =>
+                order.id === event.data.orderId ? { ...order, estado_pago: event.data.newPaymentStatus } : order
               )
             );
           } else if (event.data?.type === 'NEW_ORDER_CREATED') {
@@ -108,7 +114,7 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
             const updatedOrder = payload.new as Order;
             if (!updatedOrder) return;
             setOrders((prev) =>
-              prev.map((order) => (order.id === updatedOrder.id ? updatedOrder : order))
+              prev.map((order) => (order.id === updatedOrder.id ? { ...order, ...updatedOrder } : order))
             );
           }
         )
@@ -135,6 +141,18 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
             if (data && data.orderId) {
               setOrders((prev) =>
                 prev.map((order) => (order.id === data.orderId ? { ...order, estado: data.newStatus } : order))
+              );
+            }
+          }
+        )
+        .on(
+          'broadcast',
+          { event: 'ORDER_PAYMENT_STATUS_CHANGED' },
+          (payload: any) => {
+            const data = payload.payload;
+            if (data && data.orderId) {
+              setOrders((prev) =>
+                prev.map((order) => (order.id === data.orderId ? { ...order, estado_pago: data.newPaymentStatus } : order))
               );
             }
           }
@@ -195,11 +213,47 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
     }
   };
 
+  // Actualizar estado de pago localmente y en Supabase Realtime
+  const updatePaymentStatusLocal = async (orderId: string, paymentStatus: PaymentStatus) => {
+    setOrders((prev) =>
+      prev.map((order) => (order.id === orderId ? { ...order, estado_pago: paymentStatus } : order))
+    );
+
+    if (broadcastRef.current) {
+      broadcastRef.current.postMessage({
+        type: 'ORDER_PAYMENT_STATUS_CHANGED',
+        orderId,
+        newPaymentStatus: paymentStatus,
+      });
+    }
+
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+      try {
+        const supabase = createClient();
+        await supabase
+          .from('orders')
+          .update({ estado_pago: paymentStatus })
+          .eq('id', orderId);
+
+        if (channelRef.current) {
+          await channelRef.current.send({
+            type: 'broadcast',
+            event: 'ORDER_PAYMENT_STATUS_CHANGED',
+            payload: { orderId, newPaymentStatus: paymentStatus },
+          });
+        }
+      } catch (err) {
+        console.error('Error actualizando estado de pago en Supabase:', err);
+      }
+    }
+  };
+
   return {
     orders,
     soundEnabled,
     setSoundEnabled,
     addOrderLocal,
     updateOrderStatusLocal,
+    updatePaymentStatusLocal,
   };
 }

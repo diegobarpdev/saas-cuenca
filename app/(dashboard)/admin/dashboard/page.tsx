@@ -15,7 +15,7 @@ import { createClient } from '@/lib/supabase/client';
 export default function AdminDashboardPage() {
   const { business, loading: loadingBusiness } = useAdminBusiness();
 
-  const { orders, soundEnabled, setSoundEnabled, addOrderLocal, updateOrderStatusLocal } =
+  const { orders, soundEnabled, setSoundEnabled, addOrderLocal, updateOrderStatusLocal, updatePaymentStatusLocal } =
     useRealtimeOrders(business?.id || '');
 
   const [activeFilter, setActiveFilter] = useState<string>('todos');
@@ -56,6 +56,17 @@ export default function AdminDashboardPage() {
     const orderObj = orders.find((o) => o.id === orderId);
     const num = orderObj ? `#${orderObj.numero_pedido}` : '';
     toast.success(`Pedido ${num} actualizado a: ${newStatus.toUpperCase()}`);
+  };
+
+  const handleUpdatePaymentStatus = (orderId: string, newPaymentStatus: any) => {
+    updatePaymentStatusLocal(orderId, newPaymentStatus);
+    const orderObj = orders.find((o) => o.id === orderId);
+    const num = orderObj ? `#${orderObj.numero_pedido}` : '';
+    if (newPaymentStatus === 'pagado') {
+      toast.success(`¡Pago del pedido ${num} marcado como PAGADO!`);
+    } else {
+      toast.info(`Pago del pedido ${num} marcado como PENDIENTE`);
+    }
   };
 
   const handleSimulateIncomingOrder = async () => {
@@ -210,10 +221,27 @@ export default function AdminDashboardPage() {
                   </p>
                 </div>
 
-                <div className="text-right">
+                <div className="text-right flex flex-col items-end gap-1">
                   <span className="font-mono font-bold text-base text-zinc-100">{formatCurrency(order.total)}</span>
-                  <div className="mt-0.5">
+                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
                     <PaymentBadge status={order.estado_pago} method={order.metodo_pago} />
+                    {order.estado_pago === 'pendiente' ? (
+                      <button
+                        onClick={() => handleUpdatePaymentStatus(order.id, 'pagado')}
+                        className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 transition-colors shadow-sm"
+                        title="Marcar como Pagado"
+                      >
+                        ✓ Marcar Pagado
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleUpdatePaymentStatus(order.id, 'pendiente')}
+                        className="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-400 border border-zinc-700 transition-colors"
+                        title="Marcar como Pendiente"
+                      >
+                        ↩ Marcar Pendiente
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
