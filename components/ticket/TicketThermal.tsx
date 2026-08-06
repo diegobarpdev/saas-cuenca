@@ -77,7 +77,7 @@ export function TicketThermal({ order, business }: TicketThermalProps) {
                 <tr key={item.id} className="align-top">
                   <td className="py-1 font-bold">{item.cantidad}x</td>
                   <td className="py-1 pr-1">
-                    {item.product?.nombre || 'Producto'}
+                    {item.product?.nombre || (item as any).product_name || (item as any).nombre || 'Producto'}
                     {item.notas && <p className="text-[9px] italic text-gray-700">({item.notas})</p>}
                   </td>
                   <td className="py-1 text-right font-semibold">

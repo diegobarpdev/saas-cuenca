@@ -19,8 +19,37 @@ export default function AdminDashboardPage() {
     useRealtimeOrders(business?.id || '');
 
   const [activeFilter, setActiveFilter] = useState<string>('todos');
-  const [selectedOrderForTicket, setSelectedOrderForTicket] = useState<Order | null>(null);
+  const [selectedOrderForTicket, setSelectedOrderForTicket] = useState<(Order & { items?: any[] }) | null>(null);
   const [selectedComprobanteUrl, setSelectedComprobanteUrl] = useState<string | null>(null);
+
+  const handleOpenTicketModal = async (order: Order) => {
+    if ((order as any).items && (order as any).items.length > 0) {
+      setSelectedOrderForTicket(order);
+      return;
+    }
+
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+      try {
+        const supabase = createClient();
+        const { data: itemsData } = await supabase
+          .from('order_items')
+          .select('*, product:products(*)')
+          .eq('order_id', order.id);
+
+        if (itemsData && itemsData.length > 0) {
+          setSelectedOrderForTicket({
+            ...order,
+            items: itemsData as any,
+          });
+          return;
+        }
+      } catch (e) {
+        console.error('Error cargando items del pedido:', e);
+      }
+    }
+
+    setSelectedOrderForTicket(order);
+  };
 
   const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
     updateOrderStatusLocal(orderId, newStatus);
@@ -211,6 +240,25 @@ export default function AdminDashboardPage() {
                 )}
               </div>
 
+              {/* Productos del Pedido */}
+              {(order as any).items && (order as any).items.length > 0 && (
+                <div className="p-2.5 rounded-lg bg-zinc-950/80 border border-zinc-800/80 text-xs space-y-1">
+                  <p className="font-semibold text-zinc-300 text-[11px]">Detalle de Productos:</p>
+                  <ul className="divide-y divide-zinc-800/50">
+                    {(order as any).items.map((item: any, idx: number) => (
+                      <li key={item.id || idx} className="py-1 flex justify-between items-center text-zinc-300">
+                        <span>
+                          <span className="font-mono font-bold text-amber-400 mr-1.5">{item.cantidad}x</span>
+                          {item.product?.nombre || item.product_name || 'Producto'}
+                          {item.notas && <span className="text-zinc-400 text-[10px] block italic">({item.notas})</span>}
+                        </span>
+                        <span className="font-mono text-zinc-400 text-[11px]">{formatCurrency((item.precio_unitario || 0) * item.cantidad)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {/* Facturación ECUADOR */}
               <div className="p-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] space-y-0.5">
                 <p className="font-semibold text-zinc-300">Datos Facturación Ecuador:</p>
@@ -239,7 +287,7 @@ export default function AdminDashboardPage() {
               {/* Acciones del Pedido */}
               <div className="pt-2 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-2">
                 <button
-                  onClick={() => setSelectedOrderForTicket(order)}
+                  onClick={() => handleOpenTicketModal(order)}
                   className="px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-800 flex items-center gap-1.5 transition-colors"
                 >
                   <Printer className="w-3.5 h-3.5 text-zinc-400" />

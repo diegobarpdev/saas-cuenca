@@ -59,7 +59,7 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
       const fetchOrders = async () => {
         const { data, error } = await supabase
           .from('orders')
-          .select('*')
+          .select('*, items:order_items(*, product:products(*))')
           .eq('business_id', businessId)
           .order('created_at', { ascending: false });
 

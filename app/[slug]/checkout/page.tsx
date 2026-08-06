@@ -194,10 +194,20 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
             await new Promise<void>((resolve) => {
               rtChannel.subscribe(async (status: string) => {
                 if (status === 'SUBSCRIBED') {
+                  const fullOrderPayload = {
+                    ...orderData,
+                    items: orderItemsToInsert.map((item) => {
+                      const cartMatch = items.find((c: any) => c.product.id === item.product_id);
+                      return {
+                        ...item,
+                        product: cartMatch ? cartMatch.product : null,
+                      };
+                    }),
+                  };
                   await rtChannel.send({
                     type: 'broadcast',
                     event: 'NEW_ORDER',
-                    payload: orderData,
+                    payload: fullOrderPayload,
                   });
                   setTimeout(() => {
                     supabase.removeChannel(rtChannel);
