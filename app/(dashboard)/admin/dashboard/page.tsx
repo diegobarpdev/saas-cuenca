@@ -140,20 +140,9 @@ export default function AdminDashboardPage() {
               {business.nombre}
             </span>
           </h1>
-          <p className="text-xs text-zinc-400 mt-0.5">
-            Monitoreo continuo via Websockets con avisos sonoros e impresión térmica POS.
-          </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleSimulateIncomingOrder}
-            className="px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Simular Pedido</span>
-          </button>
-
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
