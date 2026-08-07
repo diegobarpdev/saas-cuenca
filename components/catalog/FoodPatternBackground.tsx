@@ -8,7 +8,10 @@ interface FoodPatternBackgroundProps {
   color?: string;
 }
 
-export const FoodPatternBackground = React.memo(function FoodPatternBackground({ pattern = 'ondas_fluidas', color = '#ffffff' }: FoodPatternBackgroundProps) {
+export const FoodPatternBackground = React.memo(function FoodPatternBackground({
+  pattern = 'ondas_fluidas',
+  color = '#ffffff',
+}: FoodPatternBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -44,7 +47,7 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
         step += 0.004;
         ctx.clearRect(0, 0, width, height);
 
-        // Dibujar Líneas Curvas Orgánicas Fluídas (Estilo Seda / Liquid Waves)
+        // Líneas Curvas Orgánicas Fluídas
         const waveConfigs = [
           {
             color: 'rgba(245, 158, 11, 0.12)',
@@ -85,7 +88,7 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
           ctx.lineWidth = wave.lineWidth;
           ctx.strokeStyle = wave.color;
 
-          for (let x = 0; x <= width; x += 20) {
+          for (let x = 0; x <= width; x += 25) {
             const y =
               wave.yOffset +
               Math.sin(x * wave.frequency + step * wave.speed) * wave.amplitude +
@@ -118,7 +121,6 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
     return null;
   }
 
-  // Verificar si es un patrón custom SVG de la base de datos
   const isCustomSvgPattern = ![
     'ondas_fluidas',
     'malla_aurora',
@@ -130,11 +132,14 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
   const patternUrl = isCustomSvgPattern ? getPatternSvgUrl(pattern, color) : '';
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden transform-gpu [transform:translateZ(0)] [contain:strict] [will-change:transform]"
+    >
       {/* 1. Opción: Ondas Curvas Orgánicas Animadas */}
       {pattern === 'ondas_fluidas' && (
         <>
-          <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-90" />
+          <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-90 hidden md:block" />
           <svg
             className="absolute inset-0 w-full h-full opacity-[0.07] mix-blend-screen"
             xmlns="http://www.w3.org/2000/svg"
@@ -160,17 +165,17 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
               </linearGradient>
             </defs>
           </svg>
-          <div className="absolute -top-24 left-1/4 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[150px]"></div>
-          <div className="absolute top-1/2 -right-24 w-[600px] h-[600px] bg-emerald-500/8 rounded-full blur-[180px]"></div>
+          <div className="absolute -top-24 left-1/4 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-amber-500/10 rounded-full blur-[100px] sm:blur-[150px] transform-gpu"></div>
+          <div className="absolute top-1/2 -right-24 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-emerald-500/8 rounded-full blur-[120px] sm:blur-[180px] transform-gpu"></div>
         </>
       )}
 
       {/* 2. Opción: Malla Aurora Resplandor Difuso */}
       {pattern === 'malla_aurora' && (
         <>
-          <div className="absolute -top-32 left-1/3 w-[600px] h-[600px] bg-amber-500/15 rounded-full blur-[160px] animate-pulse"></div>
-          <div className="absolute top-1/2 -right-32 w-[700px] h-[700px] bg-emerald-500/12 rounded-full blur-[200px]"></div>
-          <div className="absolute -bottom-32 left-10 w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[170px]"></div>
+          <div className="absolute -top-32 left-1/3 w-[450px] sm:w-[600px] h-[450px] sm:h-[600px] bg-amber-500/15 rounded-full blur-[120px] sm:blur-[160px] transform-gpu"></div>
+          <div className="absolute top-1/2 -right-32 w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] bg-emerald-500/12 rounded-full blur-[140px] sm:blur-[200px] transform-gpu"></div>
+          <div className="absolute -bottom-32 left-10 w-[400px] sm:w-[500px] h-[400px] sm:h-[500px] bg-rose-500/10 rounded-full blur-[120px] sm:blur-[170px] transform-gpu"></div>
         </>
       )}
 
@@ -178,39 +183,39 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
       {pattern === 'lineas_geomets' && (
         <>
           <div
-            className="absolute inset-0 opacity-[0.035]"
+            className="absolute inset-0 opacity-[0.035] transform-gpu"
             style={{
               backgroundImage: `linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(to right, #ffffff 1px, transparent 1px)`,
-              backgroundSize: '60px 60px',
+              backgroundSize: '80px 80px',
             }}
           ></div>
-          <div className="absolute top-0 right-1/4 w-[450px] h-[450px] bg-amber-500/10 rounded-full blur-[130px]"></div>
+          <div className="absolute top-0 right-1/4 w-[450px] h-[450px] bg-amber-500/10 rounded-full blur-[130px] transform-gpu"></div>
         </>
       )}
 
       {/* 4. Opción: Degradado Velvet Luxe */}
       {pattern === 'degradado_luxe' && (
         <>
-          <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 via-transparent to-emerald-500/10 opacity-70"></div>
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-amber-500/15 rounded-full blur-[180px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 via-transparent to-emerald-500/10 opacity-70 transform-gpu"></div>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-amber-500/15 rounded-full blur-[180px] transform-gpu"></div>
         </>
       )}
 
       {/* 5. Opción: Patrón Custom SVG Cargado desde el Registro */}
       {isCustomSvgPattern && patternUrl && (
         <>
-          {/* Fondo Texturizado con escala amplia optimizada (Escala ampliada para menor consumo de memoria GPU y textura elegante) */}
+          {/* Fondo Texturizado con Aislamiento GPU total */}
           <div
-            className="absolute inset-0 opacity-[0.05] transition-opacity duration-500"
+            className="absolute inset-0 opacity-[0.04] transform-gpu [transform:translateZ(0)] [contain:paint]"
             style={{
               backgroundImage: `url("${patternUrl}")`,
               backgroundRepeat: 'repeat',
-              backgroundSize: '140px auto',
+              backgroundSize: '180px auto',
             }}
           ></div>
           {/* Resplandores Ambientales de Acompañamiento */}
-          <div className="absolute -top-24 left-1/4 w-[450px] h-[450px] bg-amber-500/5 rounded-full blur-[130px]"></div>
-          <div className="absolute top-1/2 right-10 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[150px]"></div>
+          <div className="absolute -top-24 left-1/4 w-[350px] sm:w-[450px] h-[350px] sm:h-[450px] bg-amber-500/5 rounded-full blur-[100px] sm:blur-[130px] transform-gpu"></div>
+          <div className="absolute top-1/2 right-10 w-[400px] sm:w-[500px] h-[400px] sm:h-[500px] bg-emerald-500/5 rounded-full blur-[120px] sm:blur-[150px] transform-gpu"></div>
         </>
       )}
     </div>
