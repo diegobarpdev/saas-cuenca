@@ -8,7 +8,7 @@ interface FoodPatternBackgroundProps {
   color?: string;
 }
 
-export function FoodPatternBackground({ pattern = 'ondas_fluidas', color = '#ffffff' }: FoodPatternBackgroundProps) {
+export const FoodPatternBackground = React.memo(function FoodPatternBackground({ pattern = 'ondas_fluidas', color = '#ffffff' }: FoodPatternBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -206,4 +206,4 @@ export function FoodPatternBackground({ pattern = 'ondas_fluidas', color = '#fff
       )}
     </div>
   );
-}
+});

@@ -46,7 +46,7 @@ export function CustomerOrdersDrawer({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden font-sans">
       <div
-        className="absolute inset-0 bg-transparent"
+        className="absolute inset-0 bg-[#05070D]/80 transition-opacity animate-fade-in"
         onClick={onClose}
       />
 

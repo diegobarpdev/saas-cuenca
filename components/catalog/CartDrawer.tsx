@@ -48,7 +48,7 @@ export function CartDrawer({
     <div className="fixed inset-0 z-50 overflow-hidden flex flex-col justify-end sm:justify-stretch">
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-transparent"
+        className="fixed inset-0 bg-black/60 transition-opacity"
       />
 
       {/* Drawer Container: Bottom-Sheet en móvil, Side-Drawer en Desktop */}
