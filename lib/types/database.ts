@@ -49,8 +49,7 @@ export type PatternType =
   | 'cerveceria'
   | 'heladeria_postres'
   | 'geometria_moderna'
-  | 'lineas_organicas'
-  | 'hojas_ramas';
+  | 'lineas_organicas';
 
 export interface BusinessBranding {
   slogan?: string;
