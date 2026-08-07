@@ -68,7 +68,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
 
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
       const supabase = createClient();
-      const channelName = `piku-orders-${order.business_id}`;
+      const channelName = `yapi-orders-${order.business_id}`;
       const existingChannel = supabase.getChannels().find((ch: any) => ch.topic === `realtime:${channelName}`);
       if (existingChannel) {
         supabase.removeChannel(existingChannel);

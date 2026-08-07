@@ -3,9 +3,15 @@ import { Toaster } from 'sonner';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Piku - Sistema de Pedidos en Vivo & Catálogo Digital para Cuenca',
+  title: 'Yapi - Sistema de Pedidos en Vivo & Catálogo Digital para Cuenca',
   description: 'Plataforma SaaS multi-empresa de pedidos en tiempo real, cobros con PayPhone / Deuna y comanda térmica POS para comercios de Cuenca y Ecuador.',
-  keywords: ['Piku', 'Piku Ecuador', 'pedidos Cuenca', 'catálogo digital', 'comanda pos', 'payphone', 'deuna'],
+  keywords: ['Yapi', 'Yapi Ecuador', 'Yapi.ec', 'pedidos Cuenca', 'catálogo digital', 'comanda pos', 'payphone', 'deuna'],
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

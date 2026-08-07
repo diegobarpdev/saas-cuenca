@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { Search, MapPin, ExternalLink, Truck, Clock, ShieldCheck, PhoneCall, AlertCircle, Flame } from 'lucide-react';
-import { HeaderCatalog } from '@/components/catalog/HeaderCatalog';
+import { Search, MapPin, ExternalLink, Truck, Clock, ShieldCheck, PhoneCall, AlertCircle, Flame, ClipboardList, ShoppingBag } from 'lucide-react';
+import { FoodPatternBackground } from '@/components/catalog/FoodPatternBackground';
 import { ProductCard } from '@/components/catalog/ProductCard';
 import { CartDrawer } from '@/components/catalog/CartDrawer';
+import { CustomerOrdersDrawer } from '@/components/catalog/CustomerOrdersDrawer';
 import { SkeletonCatalog } from '@/components/ui/SkeletonCatalog';
 import { useCart } from '@/hooks/useCart';
+import { useCustomerOrders } from '@/hooks/useCustomerOrders';
 import { createClient } from '@/lib/supabase/client';
 import { Business, Category, Product } from '@/lib/types/database';
 
@@ -23,8 +25,10 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isOrdersOpen, setIsOrdersOpen] = useState(false);
 
   const { items, addItem, updateQuantity, removeItem, clearCart, totalItemsCount, subtotal } = useCart(slug);
+  const { orders: customerOrders, loading: loadingOrders, activeOrdersCount } = useCustomerOrders(slug);
 
   useEffect(() => {
     async function loadLiveData() {
@@ -72,13 +76,13 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
         </div>
         <h1 className="text-2xl font-display font-black">Local No Encontrado</h1>
         <p className="text-xs text-slate-400 max-w-sm">
-          El negocio con el enlace <strong className="text-white">/{slug}</strong> no se encuentra registrado en Piku.ec.
+          El negocio con el enlace <strong className="text-white">/{slug}</strong> no se encuentra registrado en Yapi.ec.
         </p>
         <Link
           href="/"
           className="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-display font-bold text-xs shadow-lg transition-colors"
         >
-          Volver a Piku Principal
+          Volver a Yapi Principal
         </Link>
       </div>
     );
@@ -114,41 +118,40 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
   };
 
   const activeFontFamily = getFontFamilyString(business.branding?.tipografia);
-  const activeBgColor = business.branding?.color_fondo || '#080B11';
+  const activeBgColor = business.branding?.color_fondo || '#07090E';
   const activeTextColor = business.branding?.color_texto || '#F8FAFC';
 
   return (
     <div
-      className="min-h-screen flex flex-col pb-28 transition-colors duration-300"
+      className="min-h-screen flex flex-col pb-28 transition-colors duration-300 relative overflow-hidden bg-[#07090E]"
       style={{
         fontFamily: activeFontFamily,
         backgroundColor: activeBgColor,
         color: activeTextColor,
       }}
     >
-      {/* Header Estilo Apple Store */}
-      <HeaderCatalog
-        business={business}
-        cartCount={totalItemsCount}
-        onOpenCart={() => setIsCartOpen(true)}
-      />
+      {/* Estampado & Luces Ambientales de Fondo Personalizable */}
+      <FoodPatternBackground pattern={business.branding?.patron_fondo} />
 
-      {/* Contenido Principal con Espaciado Generoso (Apple / Airbnb style) */}
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 flex-1 w-full space-y-8">
+      {/* Contenido Principal con Espaciado Generoso & Riqueza Visual */}
+      <main className="max-w-7xl mx-auto px-3 sm:px-8 py-4 sm:py-8 flex-1 w-full space-y-6 sm:space-y-8 relative z-10">
         
-        {/* Banner Compacto de Marca & Ubicación */}
+        {/* Encabezado Único e Impecable de Marca del Restaurante */}
         <div
-          className="relative p-4 md:p-5 rounded-2xl bg-[#0F1420]/80 border border-white/10 shadow-lg overflow-hidden backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-4"
+          className="relative p-4 sm:p-6 rounded-3xl bg-gradient-to-r from-[#0E1320]/95 via-[#0D121F]/90 to-[#121929]/95 border border-white/15 shadow-2xl overflow-hidden backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-5 group"
           style={
             business.branding?.banner_url
               ? {
-                  backgroundImage: `linear-gradient(to right, rgba(15, 21, 36, 0.92), rgba(11, 15, 27, 0.95)), url(${business.branding.banner_url})`,
+                  backgroundImage: `linear-gradient(to right, rgba(14, 19, 32, 0.94), rgba(11, 15, 27, 0.97)), url(${business.branding.banner_url})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }
               : undefined
           }
         >
+          {/* Destello de fondo sutil */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl group-hover:bg-amber-500/20 transition-all duration-700"></div>
+
           {(() => {
             const op = business.configuracion_operativa;
             const prepTimeText = op?.tiempo_preparacion || '15 - 25 min';
@@ -161,50 +164,98 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
 
             const paymentList: string[] = [];
             if (op?.acepta_deuna !== false) paymentList.push('Deuna!');
-            if (op?.acepta_payphone !== false) paymentList.push('PayPhone');
+            if (op?.acepta_payphone !== false && business.has_payphone) paymentList.push('PayPhone');
             if (op?.acepta_transferencia !== false) paymentList.push('Transferencia');
             if (op?.acepta_efectivo !== false) paymentList.push('Efectivo');
             const paymentsText = paymentList.length > 0 ? paymentList.join(' • ') : 'Efectivo • Deuna!';
 
             return (
-              <div className="space-y-1.5 min-w-0">
-                <h2 className="text-xl md:text-2xl font-display font-black text-white tracking-tight leading-snug truncate">
-                  {business.nombre}
-                </h2>
-                <p className="text-xs text-slate-300 line-clamp-1 font-normal">
-                  {business.branding?.slogan || 'Especialidades preparadas al instante. Pedidos directos a domicilio o retiro.'}
-                </p>
+              <div className="flex items-center gap-3.5 sm:gap-4 min-w-0 relative z-10">
+                {/* Logo Destacado del Local */}
+                {business.logo_url ? (
+                  <img
+                    src={business.logo_url}
+                    alt={business.nombre}
+                    className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-white/20 shadow-2xl flex-shrink-0 ring-2 sm:ring-4 ring-black/40"
+                  />
+                ) : (
+                  <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 flex items-center justify-center font-display font-black text-slate-950 text-2xl sm:text-3xl shadow-2xl flex-shrink-0 border border-amber-400/40">
+                    {business.nombre.charAt(0)}
+                  </div>
+                )}
 
-                {/* Micro-strip de tiempo, entrega y métodos de pago dinámicos */}
-                <div className="pt-1 flex flex-wrap items-center gap-3 text-[11px] font-display text-slate-400">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                    <span className="text-slate-200 font-medium">{prepTimeText}</span>
-                  </span>
-                  <span className="text-slate-600">•</span>
-                  <span className="flex items-center gap-1">
-                    <Truck className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-                    <span className="text-slate-200 font-medium">{deliveryText}</span>
-                  </span>
-                  <span className="text-slate-600">•</span>
-                  <span className="flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5 text-sky-400 flex-shrink-0" />
-                    <span className="text-slate-200 font-medium">{paymentsText}</span>
-                  </span>
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-xl sm:text-3xl font-display font-black text-white tracking-tight leading-snug truncate">
+                      {business.nombre}
+                    </h1>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-mono font-bold border border-emerald-500/20 shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Abierto
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] sm:text-xs text-slate-300 line-clamp-1 font-normal">
+                    {business.branding?.slogan || 'Especialidades preparadas al instante. Pedidos directos a domicilio o retiro.'}
+                  </p>
+
+                  {/* Micro-strip de tiempo, entrega y métodos de pago dinámicos */}
+                  <div className="pt-1 flex flex-wrap items-center gap-2 text-[10px] sm:text-[11px] font-display text-slate-400">
+                    <span className="flex items-center gap-1 bg-slate-900/80 px-2 py-0.5 rounded-full border border-white/10">
+                      <Clock className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                      <span className="text-slate-200 font-medium">{prepTimeText}</span>
+                    </span>
+                    <span className="flex items-center gap-1 bg-slate-900/80 px-2 py-0.5 rounded-full border border-white/10">
+                      <Truck className="w-3 h-3 text-amber-400 flex-shrink-0" />
+                      <span className="text-slate-200 font-medium">{deliveryText}</span>
+                    </span>
+                    <span className="flex items-center gap-1 bg-slate-900/80 px-2 py-0.5 rounded-full border border-white/10">
+                      <ShieldCheck className="w-3 h-3 text-sky-400 flex-shrink-0" />
+                      <span className="text-slate-200 font-medium">{paymentsText}</span>
+                    </span>
+                  </div>
                 </div>
               </div>
             );
           })()}
 
-          <div className="flex flex-wrap items-center gap-2.5 flex-shrink-0">
+          {/* Acciones de Navegación del Cliente Adaptadas a Móviles */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 flex-shrink-0 relative z-10 w-full sm:w-auto">
+            <button
+              onClick={() => setIsOrdersOpen(true)}
+              className="px-3 py-2 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white transition-all border border-white/15 flex items-center justify-center gap-1.5 text-xs font-display font-bold active:scale-95 shadow-md"
+            >
+              <ClipboardList className="w-3.5 h-3.5 text-amber-400" />
+              <span>Mis Pedidos</span>
+              {activeOrdersCount > 0 && (
+                <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-amber-400 text-slate-950 rounded-full">
+                  {activeOrdersCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="px-3 py-2 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-display font-black text-xs md:text-sm shadow-lg shadow-amber-500/20 active:scale-95 transition-all border border-amber-400/30 flex items-center justify-center gap-1.5"
+            >
+              <ShoppingBag className="w-3.5 h-3.5 text-slate-950 stroke-[2.5]" />
+              <span>Mi Pedido</span>
+              {totalItemsCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-slate-950 text-amber-400 font-mono font-black text-[10px] flex items-center justify-center">
+                  {totalItemsCount}
+                </span>
+              )}
+            </button>
+
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.nombre + ' ' + (business.direccion || 'Cuenca Ecuador'))}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-1.5 rounded-xl text-xs font-display font-bold bg-slate-900/90 hover:bg-slate-800 border border-white/15 text-amber-400 hover:text-amber-300 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 group"
+              className="px-3 py-2 rounded-2xl text-xs font-display font-bold bg-slate-900/90 hover:bg-slate-800 border border-white/15 text-amber-400 hover:text-amber-300 transition-all flex items-center justify-center gap-1.5 shadow-md active:scale-95 group"
+              title="Ver ubicación en Google Maps"
             >
               <MapPin className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-              <span>Google Maps</span>
+              <span>Maps</span>
               <ExternalLink className="w-3 h-3 text-amber-400 opacity-70 group-hover:opacity-100" />
             </a>
 
@@ -213,7 +264,8 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
                 href={`https://wa.me/${business.telefono_whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3.5 py-1.5 rounded-xl text-xs font-display font-bold bg-slate-900/90 hover:bg-slate-800 border border-white/15 text-emerald-400 hover:text-emerald-300 transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+                className="px-3 py-2 rounded-2xl text-xs font-display font-bold bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 transition-all flex items-center justify-center gap-1.5 shadow-md active:scale-95"
+                title="Contactar al local por WhatsApp"
               >
                 <PhoneCall className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                 <span>WhatsApp</span>
@@ -225,14 +277,14 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
         {/* Barra de Filtro de Categorías & Buscador */}
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            {/* Categorías Desplazables (Pills Estilo Arc / Airbnb) */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            {/* Categorías Desplazables (Pills Estilo Arc / Airbnb sin sombras propensas a recortes) */}
+            <div className="flex items-center gap-2 overflow-x-auto py-1.5 px-1 -mx-1 scrollbar-none touch-pan-x">
               <button
                 onClick={() => setSelectedCategory(null)}
-                className={`px-4 py-2.5 rounded-2xl text-xs font-display font-bold whitespace-nowrap transition-all ${
+                className={`px-4 py-2 rounded-2xl text-xs font-display font-bold whitespace-nowrap transition-all ${
                   selectedCategory === null
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-lg shadow-amber-500/20'
-                    : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black border border-amber-400/30'
+                    : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800/80'
                 }`}
               >
                 Menú Completo ({products.length})
@@ -241,9 +293,9 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
               {promoProductsCount > 0 && (
                 <button
                   onClick={() => setSelectedCategory('promos')}
-                  className={`px-4 py-2.5 rounded-2xl text-xs font-display font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                  className={`px-4 py-2 rounded-2xl text-xs font-display font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                     selectedCategory === 'promos'
-                      ? 'bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 text-slate-950 font-black shadow-lg shadow-rose-500/20'
+                      ? 'bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 text-slate-950 font-black border border-rose-400/30'
                       : 'bg-rose-500/10 text-rose-300 hover:text-white border border-rose-500/30'
                   }`}
                 >
@@ -259,10 +311,10 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-4 py-2.5 rounded-2xl text-xs font-display font-bold whitespace-nowrap transition-all ${
+                    className={`px-4 py-2 rounded-2xl text-xs font-display font-bold whitespace-nowrap transition-all ${
                       isActive
-                        ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-lg shadow-amber-500/20'
-                        : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+                        ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black border border-amber-400/30'
+                        : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800/80'
                     }`}
                   >
                     {cat.nombre} ({count})
@@ -314,7 +366,7 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
               <span className="w-7 h-7 rounded-full bg-slate-950 text-amber-400 font-mono font-black text-xs flex items-center justify-center shadow-md">
                 {totalItemsCount}
               </span>
-              <span>Ver Pedido en Piku</span>
+              <span>Ver Pedido en Yapi</span>
             </div>
             <span className="font-mono text-base font-bold">
               {subtotal.toLocaleString('es-EC', { style: 'currency', currency: 'USD' })}
@@ -322,6 +374,15 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
           </button>
         </div>
       )}
+
+      {/* Drawer de Mis Pedidos */}
+      <CustomerOrdersDrawer
+        isOpen={isOrdersOpen}
+        onClose={() => setIsOrdersOpen(false)}
+        orders={customerOrders}
+        loading={loadingOrders}
+        businessSlug={slug}
+      />
 
       {/* Cart Drawer */}
       <CartDrawer

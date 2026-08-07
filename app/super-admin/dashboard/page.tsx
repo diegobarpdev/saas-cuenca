@@ -22,6 +22,11 @@ export default function SuperAdminDashboardPage() {
   const [editWhatsapp, setEditWhatsapp] = useState('');
   const [editDireccion, setEditDireccion] = useState('');
   const [editPlan, setEditPlan] = useState<'trial' | 'basico' | 'pro'>('pro');
+  const [editHasPayphone, setEditHasPayphone] = useState(false);
+  const [editHasLiveKitchen, setEditHasLiveKitchen] = useState(false);
+  const [editHasPosPrinting, setEditHasPosPrinting] = useState(false);
+  const [editHasCrmExport, setEditHasCrmExport] = useState(false);
+  const [editHasCustomDomain, setEditHasCustomDomain] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -50,7 +55,7 @@ export default function SuperAdminDashboardPage() {
 
   const handleEnterAsAdmin = (businessId: string) => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('piku_admin_business_id', businessId);
+      localStorage.setItem('yapi_admin_business_id', businessId);
     }
     router.push('/admin/dashboard');
   };
@@ -64,6 +69,11 @@ export default function SuperAdminDashboardPage() {
     setEditWhatsapp(b.telefono_whatsapp || '');
     setEditDireccion(b.direccion || '');
     setEditPlan(b.plan as any);
+    setEditHasPayphone(b.has_payphone || b.plan === 'pro');
+    setEditHasLiveKitchen(b.has_live_kitchen || b.plan === 'pro');
+    setEditHasPosPrinting(b.has_pos_printing || b.plan === 'pro');
+    setEditHasCrmExport(b.has_crm_export || b.plan === 'pro');
+    setEditHasCustomDomain(b.has_custom_domain || false);
   };
 
   const handleSaveEditBusiness = async (e: React.FormEvent) => {
@@ -87,6 +97,11 @@ export default function SuperAdminDashboardPage() {
           telefono_whatsapp: editWhatsapp,
           direccion: editDireccion || null,
           plan: editPlan,
+          has_payphone: editHasPayphone,
+          has_live_kitchen: editHasLiveKitchen,
+          has_pos_printing: editHasPosPrinting,
+          has_crm_export: editHasCrmExport,
+          has_custom_domain: editHasCustomDomain,
         })
         .eq('id', editingBusiness.id);
 
@@ -150,9 +165,8 @@ export default function SuperAdminDashboardPage() {
   );
 
   const planOptions = [
-    { value: 'trial', label: 'Trial (Prueba Gratuita 15 días)' },
-    { value: 'basico', label: 'Plan Básico ($15/mes)' },
-    { value: 'pro', label: 'Plan PRO ($29/mes - Recomendado)' },
+    { value: 'basico', label: 'Plan Base Core ($15/mes)' },
+    { value: 'trial', label: 'Trial (Prueba Gratuita 14 días)' },
   ];
 
   return (
@@ -379,6 +393,58 @@ export default function SuperAdminDashboardPage() {
                     onChange={(e) => setEditDireccion(e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100"
                   />
+                </div>
+              </div>
+
+              {/* Módulos Add-ons Habilitados */}
+              <div className="pt-2 border-t border-zinc-800 space-y-2">
+                <label className="block text-xs font-semibold text-emerald-400">Módulos & Add-ons Habilitados</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-zinc-300">
+                  <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
+                    <input
+                      type="checkbox"
+                      checked={editHasPayphone}
+                      onChange={(e) => setEditHasPayphone(e.target.checked)}
+                      className="rounded accent-emerald-500"
+                    />
+                    <span>💳 PayPhone Tarjetas (+$9/m)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
+                    <input
+                      type="checkbox"
+                      checked={editHasLiveKitchen}
+                      onChange={(e) => setEditHasLiveKitchen(e.target.checked)}
+                      className="rounded accent-emerald-500"
+                    />
+                    <span>🔔 Alertas Cocina (+$7/m)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
+                    <input
+                      type="checkbox"
+                      checked={editHasPosPrinting}
+                      onChange={(e) => setEditHasPosPrinting(e.target.checked)}
+                      className="rounded accent-emerald-500"
+                    />
+                    <span>🖨️ Impresión POS (+$7/m)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
+                    <input
+                      type="checkbox"
+                      checked={editHasCrmExport}
+                      onChange={(e) => setEditHasCrmExport(e.target.checked)}
+                      className="rounded accent-emerald-500"
+                    />
+                    <span>📊 CRM Exportación (+$5/m)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700 sm:col-span-2">
+                    <input
+                      type="checkbox"
+                      checked={editHasCustomDomain}
+                      onChange={(e) => setEditHasCustomDomain(e.target.checked)}
+                      className="rounded accent-emerald-500"
+                    />
+                    <span>🌐 Dominio Personalizado (+$9/m)</span>
+                  </label>
                 </div>
               </div>
 

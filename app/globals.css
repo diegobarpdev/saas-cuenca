@@ -21,7 +21,7 @@ body {
 }
 
 /* ============================================================================
-   PIKU BRANDING & TYPOGRAPHY SYSTEM
+   YAPI BRANDING & TYPOGRAPHY SYSTEM
    ============================================================================ */
 @layer utilities {
   .font-outfit {
@@ -85,5 +85,12 @@ body {
     padding: 0 !important;
     border: none !important;
     box-shadow: none !important;
+  }
+}
+
+/* Prevenir auto-zoom molesto en inputs en móviles / iOS Safari */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
   }
 }

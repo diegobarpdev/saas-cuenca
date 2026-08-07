@@ -15,7 +15,12 @@ export default function CreateBusinessPage() {
   const [ruc, setRuc] = useState('');
   const [telefonoWhatsapp, setTelefonoWhatsapp] = useState('593');
   const [direccion, setDireccion] = useState('');
-  const [plan, setPlan] = useState<'trial' | 'basico' | 'pro'>('pro');
+  const [plan, setPlan] = useState<'trial' | 'basico'>('basico');
+  const [hasPayphone, setHasPayphone] = useState(false);
+  const [hasLiveKitchen, setHasLiveKitchen] = useState(false);
+  const [hasPosPrinting, setHasPosPrinting] = useState(false);
+  const [hasCrmExport, setHasCrmExport] = useState(false);
+  const [hasCustomDomain, setHasCustomDomain] = useState(false);
 
   // Datos bancarios iniciales
   const [banco, setBanco] = useState('Banco Pichincha');
@@ -57,6 +62,11 @@ export default function CreateBusinessPage() {
         telefono_whatsapp: telefonoWhatsapp,
         direccion: direccion || null,
         plan: plan,
+        has_payphone: hasPayphone,
+        has_live_kitchen: hasLiveKitchen,
+        has_pos_printing: hasPosPrinting,
+        has_crm_export: hasCrmExport,
+        has_custom_domain: hasCustomDomain,
         datos_bancarios: {
           banco,
           tipo_cuenta: tipoCuenta,
@@ -123,7 +133,7 @@ export default function CreateBusinessPage() {
             <Sparkles className="w-3.5 h-3.5" /> Alta de Empresa Multi-Tenant
           </span>
           <h1 className="text-2xl font-display font-black text-white tracking-tight mt-2">
-            Registrar Nueva Empresa en Piku.ec
+            Registrar Nueva Empresa en Yapi.ec
           </h1>
           <p className="text-xs text-slate-400 mt-1">
             Se creará la empresa en Supabase Postgres con su propia URL exclusiva y aislamiento RLS.
@@ -178,7 +188,7 @@ export default function CreateBusinessPage() {
                 <input
                   type="text"
                   required
-                  placeholder="593987654321"
+                  placeholder="593969307527"
                   value={telefonoWhatsapp}
                   onChange={(e) => setTelefonoWhatsapp(e.target.value)}
                   className="w-full px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-sm text-white focus:outline-none focus:border-purple-500 font-mono-tech"
@@ -199,7 +209,10 @@ export default function CreateBusinessPage() {
               <div>
                 <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Plan de Suscripción</label>
                 <CustomSelect
-                  options={planOptions}
+                  options={[
+                    { value: 'basico', label: 'Plan Base Core ($15/mes)' },
+                    { value: 'trial', label: 'Trial (Prueba Gratuita 14 días)' },
+                  ]}
                   value={plan}
                   onChange={(val) => setPlan(val as any)}
                   accentColor="purple"
@@ -216,6 +229,49 @@ export default function CreateBusinessPage() {
                 onChange={(e) => setDireccion(e.target.value)}
                 className="w-full px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-sm text-white focus:outline-none focus:border-purple-500"
               />
+            </div>
+
+            {/* Módulos Add-ons Iniciales */}
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-purple-500/20 space-y-3">
+              <label className="block text-xs font-display font-bold text-purple-300">Activar Módulos Add-ons Iniciales (Opcional)</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
+                <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-purple-500/40">
+                  <input
+                    type="checkbox"
+                    checked={hasPayphone}
+                    onChange={(e) => setHasPayphone(e.target.checked)}
+                    className="rounded accent-purple-500"
+                  />
+                  <span>💳 PayPhone Tarjetas (+$9/m)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-purple-500/40">
+                  <input
+                    type="checkbox"
+                    checked={hasLiveKitchen}
+                    onChange={(e) => setHasLiveKitchen(e.target.checked)}
+                    className="rounded accent-purple-500"
+                  />
+                  <span>🔔 Alertas Cocina (+$7/m)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-purple-500/40">
+                  <input
+                    type="checkbox"
+                    checked={hasPosPrinting}
+                    onChange={(e) => setHasPosPrinting(e.target.checked)}
+                    className="rounded accent-purple-500"
+                  />
+                  <span>🖨️ Impresión POS (+$7/m)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-purple-500/40">
+                  <input
+                    type="checkbox"
+                    checked={hasCrmExport}
+                    onChange={(e) => setHasCrmExport(e.target.checked)}
+                    className="rounded accent-purple-500"
+                  />
+                  <span>📊 CRM Exportación (+$5/m)</span>
+                </label>
+              </div>
             </div>
           </div>
 

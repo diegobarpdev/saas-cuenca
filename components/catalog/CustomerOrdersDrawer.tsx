@@ -49,7 +49,7 @@ export function CustomerOrdersDrawer({
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="font-display font-black text-lg text-white leading-tight">Mis Pedidos en Piku</h2>
+                <h2 className="font-display font-black text-lg text-white leading-tight">Mis Pedidos en Yapi</h2>
                 <p className="text-[11px] text-slate-400 font-medium">Seguimiento en vivo y resumen de compra</p>
               </div>
             </div>

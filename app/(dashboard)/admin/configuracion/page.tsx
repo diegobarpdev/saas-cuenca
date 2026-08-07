@@ -246,6 +246,8 @@ export default function AdminSettingsPage() {
         </p>
       </div>
 
+
+
       <form onSubmit={handleSaveSettings} className="space-y-6">
         {/* 1. Perfil Comercial del Negocio */}
         <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl">
@@ -556,20 +558,43 @@ export default function AdminSettingsPage() {
                     <Smartphone className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-xs font-display font-bold text-white">PayPhone Ecuador (Tarjetas de Crédito / Débito)</h3>
+                    <h3 className="text-xs font-display font-bold text-white flex items-center gap-2">
+                      <span>PayPhone Ecuador (Tarjetas de Crédito / Débito)</span>
+                      {!business.has_payphone && (
+                        <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-mono-tech font-bold border border-purple-500/30">
+                          Módulo no contratado (+$9/m)
+                        </span>
+                      )}
+                    </h3>
                     <p className="text-[11px] text-slate-400">Cobro automatizado en línea con tarjetas Visa / Mastercard</p>
                   </div>
                 </div>
 
-                <CustomCheckbox
-                  checked={aceptaPayphone}
-                  onChange={setAceptaPayphone}
-                  label=""
-                  accentColor="purple"
-                />
+                {business.has_payphone && (
+                  <CustomCheckbox
+                    checked={aceptaPayphone}
+                    onChange={setAceptaPayphone}
+                    label=""
+                    accentColor="purple"
+                  />
+                )}
               </div>
 
-              {aceptaPayphone && (
+              {!business.has_payphone ? (
+                <div className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <p className="text-xs text-slate-400">
+                    Activa la pasarela de cobros PayPhone para recibir pagos con tarjeta de crédito o débito en tu catálogo.
+                  </p>
+                  <a
+                    href={`https://wa.me/593969307527?text=${encodeURIComponent(`Hola! Soy de ${business.nombre} (/${business.slug}). Me gustaría activar el módulo Add-on de PayPhone Tarjetas (+$9/mes) en Yapi.ec.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-display font-bold text-xs shrink-0 shadow-lg shadow-purple-500/20 transition-all"
+                  >
+                    Solicitar Módulo por WhatsApp
+                  </a>
+                </div>
+              ) : aceptaPayphone && (
                 <div className="pt-3 border-t border-slate-800/80 animate-in fade-in duration-200">
                   <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">
                     Token de Comercio PayPhone

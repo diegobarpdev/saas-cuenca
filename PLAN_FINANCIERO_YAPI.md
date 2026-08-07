@@ -1,15 +1,15 @@
-# 💰 PLAN FINANCIERO & ESTRATEGIA COMERCIAL DE PIKU.EC
+# 💰 PLAN FINANCIERO & ESTRATEGIA COMERCIAL DE YAPI.EC
 
-> **Piku.ec — Plataforma SaaS de Pedidos Directos para Restaurantes y Comercios**
+> **Yapi.ec — Plataforma SaaS de Pedidos Directos para Restaurantes y Comercios**
 > *Mercado Objetivo: Cuenca, Azuay y Ecuador.*
 
 ---
 
 ## 🥊 1. ANÁLISIS DE COMPETENCIA & ESTRATEGIA DE PRECIOS
 
-### Comparativa: PedidosYa / Rappi vs. Piku.ec
+### Comparativa: PedidosYa / Rappi vs. Yapi.ec
 
-| Criterio | 🛵 PedidosYa / Rappi / UberEats | 🚀 Piku.ec (Plataforma SaaS) |
+| Criterio | 🛵 PedidosYa / Rappi / UberEats | 🚀 Yapi.ec (Plataforma SaaS) |
 | :--- | :--- | :--- |
 | **Comisión por venta** | **22% al 35% + IVA** de cada pedido 💸 | **0% de comisión** (El 100% de la venta es del local) 🛡️ |
 | **Modelo de cobro** | Recorte de margen por cada plato vendido | **Suscripción Fija Mensual** ($15 a $29 / mes) 💳 |
@@ -25,7 +25,7 @@
 ### Costos Fijos de Infraestructura (Servidores en Nube)
 * **Vercel (Nube Next.js 16 App Router):** $0.00 a $20.00 USD / mes.
 * **Supabase (PostgreSQL en Tiempo Real + Realtime Websockets):** $0.00 (Free Tier) a $25.00 USD / mes.
-* **Dominio (`piku.ec`):** ~$1.25 USD / mes ($15/año).
+* **Dominio (`yapi.ec`):** ~$1.25 USD / mes ($15/año).
 * **COSTO TOTAL MÁXIMO:** **~$45.00 USD / mes** para atender hasta 100 restaurantes.
 
 ### Margen de Ganancia Neta SaaS: **> 95%**
@@ -42,7 +42,7 @@
 
 ---
 
-## 💎 4. ESTRUCTURA DE PLANES COMERCIALES DE PIKU.EC
+## 💎 4. ESTRUCTURA DE PLANES COMERCIALES DE YAPI.EC
 
 1. **🟢 Plan Básico — $15 USD / mes:** Catálogo digital responsive, código QR para mesas, pedidos ilimitados directos a WhatsApp, cobros por Transferencia/Deuna! y Efectivo.
 2. **💜 Plan PRO — $29 USD / mes (Recomendado):** Todo lo del Plan Básico + Pasarela PayPhone integrada, impresión térmica POS de comandas de cocina en vivo, panel de administración con alertas sonoras en tiempo real y exportación de clientes.

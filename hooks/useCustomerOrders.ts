@@ -14,8 +14,8 @@ export interface CustomerProfile {
   email: string;
 }
 
-const PROFILE_KEY = 'piku_customer_profile';
-const ORDERS_KEY = 'piku_customer_orders_ids';
+const PROFILE_KEY = 'yapi_customer_profile';
+const ORDERS_KEY = 'yapi_customer_orders_ids';
 
 export function useCustomerOrders(businessSlug: string) {
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
@@ -36,7 +36,7 @@ export function useCustomerOrders(businessSlug: string) {
         setOrderIds(JSON.parse(savedIds));
       }
     } catch (e) {
-      console.error('Error leyendo historial local de Piku:', e);
+      console.error('Error leyendo historial local de Yapi:', e);
     }
   }, []);
 
@@ -76,7 +76,7 @@ export function useCustomerOrders(businessSlug: string) {
       setProfile(newProfile);
       localStorage.setItem(PROFILE_KEY, JSON.stringify(newProfile));
     } catch (e) {
-      console.error('Error guardando perfil local de Piku:', e);
+      console.error('Error guardando perfil local de Yapi:', e);
     }
   };
 

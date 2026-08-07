@@ -12,7 +12,7 @@ export function useAdminBusiness() {
     async function loadBusiness() {
       try {
         const supabase = createClient();
-        const activeBusinessId = typeof window !== 'undefined' ? localStorage.getItem('piku_admin_business_id') : null;
+        const activeBusinessId = typeof window !== 'undefined' ? localStorage.getItem('yapi_admin_business_id') : null;
 
         let data: Business | null = null;
         let error: any = null;
@@ -39,7 +39,7 @@ export function useAdminBusiness() {
           if (!fallbackRes.error && fallbackRes.data) {
             data = fallbackRes.data as Business;
             if (typeof window !== 'undefined') {
-              localStorage.setItem('piku_admin_business_id', data.id);
+              localStorage.setItem('yapi_admin_business_id', data.id);
             }
           }
         }

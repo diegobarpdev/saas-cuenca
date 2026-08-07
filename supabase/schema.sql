@@ -30,6 +30,12 @@ CREATE TABLE IF NOT EXISTS businesses (
   ]'::jsonb,
   payphone_token TEXT,
   plan TEXT DEFAULT 'trial',
+  -- Módulos / Add-ons Contratados
+  has_payphone BOOLEAN DEFAULT false,
+  has_live_kitchen BOOLEAN DEFAULT false,
+  has_pos_printing BOOLEAN DEFAULT false,
+  has_crm_export BOOLEAN DEFAULT false,
+  has_custom_domain BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

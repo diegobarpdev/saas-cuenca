@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Package, Settings, LogOut, ExternalLink, Store, ShieldAlert, Palette } from 'lucide-react';
+import { ShoppingBag, Package, Settings, LogOut, ExternalLink, Store, ShieldAlert, Palette, ShoppingCart } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -22,6 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: 'Pedidos en Vivo', href: '/admin/dashboard', icon: ShoppingBag },
     { label: 'Productos y Categorías', href: '/admin/productos', icon: Package },
     { label: 'Apariencia & Branding', href: '/admin/apariencia', icon: Palette },
+    { label: 'Marketplace Add-ons', href: '/admin/marketplace', icon: ShoppingCart },
     { label: 'Configuración Negocio', href: '/admin/configuracion', icon: Settings },
   ];
 

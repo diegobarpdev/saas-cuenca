@@ -123,10 +123,11 @@ export default function AdminBrandingPage() {
   const [colorFondo, setColorFondo] = useState('#080B11');
   const [colorTexto, setColorTexto] = useState('#F8FAFC');
 
-  // Tipografía & Botones
+  // Tipografía, Botones & Patrón de Fondo
   const [tipografia, setTipografia] = useState<'Outfit' | 'Inter' | 'Playfair' | 'Plus Jakarta Sans'>('Outfit');
   const [estiloBotones, setEstiloBotones] = useState<'redondeado' | 'semi-redondeado' | 'pill' | 'recto'>('redondeado');
   const [temaDefecto, setTemaDefecto] = useState<'oscuro' | 'claro'>('oscuro');
+  const [patronFondo, setPatronFondo] = useState<'ondas_fluidas' | 'malla_aurora' | 'lineas_geomets' | 'degradado_luxe' | 'sin_patron'>('ondas_fluidas');
 
   // Subida de Archivos
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -151,6 +152,7 @@ export default function AdminBrandingPage() {
         if (b.tipografia) setTipografia(b.tipografia);
         if (b.estilo_botones) setEstiloBotones(b.estilo_botones);
         if (b.tema_defecto) setTemaDefecto(b.tema_defecto);
+        if (b.patron_fondo) setPatronFondo(b.patron_fondo);
       }
     }
   }, [business]);
@@ -229,6 +231,7 @@ export default function AdminBrandingPage() {
       tipografia,
       estilo_botones: estiloBotones,
       tema_defecto: temaDefecto,
+      patron_fondo: patronFondo,
     };
 
     try {
@@ -371,15 +374,29 @@ export default function AdminBrandingPage() {
                   </div>
                 </div>
 
-                {/* Carga de Banner */}
+                {/* Carga de Banner (Opcional) */}
                 <div>
-                  <label className="block text-xs font-display font-semibold text-slate-300 mb-1">
-                    Imagen de Portada / Banner Hero
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-display font-semibold text-slate-300">
+                      Imagen de Fondo / Portada Hero <span className="text-slate-500 font-normal">(Opcional)</span>
+                    </label>
+                    {bannerUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setBannerUrl('')}
+                        className="text-[11px] text-rose-400 hover:underline"
+                      >
+                        Quitar Imagen
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mb-1.5">
+                    No es obligatoria. La mayoría de restaurantes operan solo con su Logo y Slogan.
+                  </p>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      placeholder="https://..."
+                      placeholder="https://... (Opcional)"
                       value={bannerUrl}
                       onChange={(e) => setBannerUrl(e.target.value)}
                       className="flex-1 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono"
@@ -538,6 +555,109 @@ export default function AdminBrandingPage() {
                   accentColor="amber"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* 4. Patrón y Textura de Fondo del Catálogo */}
+          <div className="p-6 rounded-3xl bg-[#0F1420] border border-white/10 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display font-bold text-sm text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-400" />
+                <span>4. Estampa & Textura de Fondo del Catálogo</span>
+              </h3>
+              <span className="text-[11px] font-mono text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">
+                5 Estilos
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-400">
+              Personaliza el fondo visual de tu catálogo público eligiendo entre 4 patrones dinámicos o un fondo oscuro limpio.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-xs">
+              {[
+                {
+                  id: 'ondas_fluidas',
+                  label: '🌊 Ondas Curvas Fluídas',
+                  desc: 'Canvas animado de seda líquida en movimiento (Recomendado)',
+                  preview: (
+                    <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5">
+                      <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 200 60" preserveAspectRatio="none">
+                        <path d="M0 20 Q 50 40 100 20 T 200 20" stroke="#F59E0B" strokeWidth="2" fill="none" opacity="0.7" />
+                        <path d="M0 35 Q 60 10 120 40 T 200 30" stroke="#10B981" strokeWidth="2" fill="none" opacity="0.6" />
+                        <path d="M0 50 Q 40 30 100 45 T 200 35" stroke="#38BDF8" strokeWidth="1.5" fill="none" opacity="0.5" />
+                      </svg>
+                      <div className="absolute top-1 left-2 w-12 h-12 bg-amber-500/20 rounded-full blur-lg"></div>
+                    </div>
+                  ),
+                },
+                {
+                  id: 'malla_aurora',
+                  label: '🌌 Malla Aurora Difusa',
+                  desc: 'Luces de neón ambientales sin líneas fijas',
+                  preview: (
+                    <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5">
+                      <div className="absolute top-1 left-2 w-16 h-16 bg-amber-500/30 rounded-full blur-xl animate-pulse"></div>
+                      <div className="absolute bottom-1 right-2 w-16 h-16 bg-emerald-500/25 rounded-full blur-xl"></div>
+                    </div>
+                  ),
+                },
+                {
+                  id: 'lineas_geomets',
+                  label: '📐 Rejilla Tech Grid',
+                  desc: 'Cuadrícula minimalista con textura de precisión',
+                  preview: (
+                    <div
+                      className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5 opacity-60"
+                      style={{
+                        backgroundImage: `linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(to right, #ffffff 1px, transparent 1px)`,
+                        backgroundSize: '12px 12px',
+                      }}
+                    >
+                      <div className="absolute top-2 right-2 w-10 h-10 bg-amber-500/20 rounded-full blur-md"></div>
+                    </div>
+                  ),
+                },
+                {
+                  id: 'degradado_luxe',
+                  label: '✨ Degradado Velvet Luxe',
+                  desc: 'Fondo degradado cálido oro y obsidian',
+                  preview: (
+                    <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-gradient-to-b from-amber-500/25 via-[#07090E] to-emerald-500/20 mb-2.5">
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-8 bg-amber-400/30 rounded-full blur-md"></div>
+                    </div>
+                  ),
+                },
+                {
+                  id: 'sin_patron',
+                  label: '🚫 Sin Patrón (Sólido)',
+                  desc: 'Fondo oscuro plano y limpio sin gráficos',
+                  preview: (
+                    <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5 flex items-center justify-center text-[10px] font-mono text-slate-500">
+                      <span>[ 100% Sólido ]</span>
+                    </div>
+                  ),
+                },
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setPatronFondo(opt.id as any)}
+                  className={`p-3.5 rounded-2xl border text-left transition-all ${
+                    patronFondo === opt.id
+                      ? 'bg-purple-500/15 border-purple-500 text-white shadow-lg shadow-purple-500/10 ring-2 ring-purple-500/40'
+                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                  }`}
+                >
+                  {opt.preview}
+                  <span className="font-display font-bold block text-sm text-white mb-0.5">
+                    {opt.label}
+                  </span>
+                  <span className="text-[11px] text-slate-400 leading-snug block">
+                    {opt.desc}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         </form>

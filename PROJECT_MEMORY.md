@@ -1,13 +1,14 @@
-# 🧠 MEMORIA DEL PROYECTO — PIKU.EC (SaaS Pedidos Multi-Empresa)
+# 🧠 MEMORIA DEL PROYECTO — YAPI.EC (SaaS Pedidos Multi-Empresa)
 
 Este archivo sirve como **fuente única de verdad y memoria técnica** para cualquier sesión o agente AI en este proyecto.
 
 ---
 
 ## 📌 1. Identidad de Marca & Visión
-* **Nombre Comercial Oficial:** **`Piku`** (`Piku.ec`)
+* **Nombre Comercial Oficial:** **`Yapi`** (`Yapi.ec` / `yapiec.com`)
+* **Contacto Oficial / WhatsApp Admin:** **`+593 96 930 7527`** (`593969307527`)
 * **Propósito:** Plataforma SaaS multi-inquilino (*multi-tenant*) de comercio electrónico y pedidos en línea en tiempo real para restaurantes, panaderías, cafeterías y tiendas en **Cuenca y Ecuador**.
-* **Diferenciador Clave:** 0% comisiones por venta (modelo SaaS de suscripción fija $15/mes o $29/mes vs 30% de PedidosYa).
+* **Diferenciador Clave:** 0% comisiones por venta (Modelo SaaS de Plan Base $15/mes + Add-ons a la carta). El concepto "Yapi" evoca la "yapa" o beneficio directo para el negocio y cliente.
 
 ---
 
@@ -16,9 +17,9 @@ Este archivo sirve como **fuente única de verdad y memoria técnica** para cual
   * **Usuario:** `admin`
   * **Contraseña:** `cuenca2026`
 * **Negocio de Prueba Activo en Supabase DB:**
-  * **Nombre:** `Café & Panadería El Sagrario`
-  * **Slug URL Público:** `/panaderia-cuenca`
-  * **ID en Supabase:** `b1010101-0000-0000-0000-000000000001`
+  * **Nombre:** `Restaurante Tiopamba`
+  * **Slug URL Público:** `/restaurante-tiopamba`
+  * **ID en Supabase:** `04a106fb-4db1-4142-974c-c6dc74c7e4f9`
 * **Supabase Project:** `kuixombfmlwcaxbwcmmr.supabase.co`
   * Credenciales guardadas en [`.env.local`](file:///C:/Users/soportectin/Documents/dbdp/saas-cuenca/.env.local).
 
@@ -49,5 +50,5 @@ El esquema completo está sincronizado en [`supabase/schema.sql`](file:///C:/Use
 ---
 
 ## 📄 5. Enlaces a Documentación Relevante
-* **Plan Financiero y Estrategia Comercial:** [`PLAN_FINANCIERO_PIKU.md`](file:///C:/Users/soportectin/Documents/dbdp/saas-cuenca/PLAN_FINANCIERO_PIKU.md)
+* **Plan Financiero y Estrategia Comercial:** [`PLAN_FINANCIERO_YAPI.md`](file:///C:/Users/soportectin/Documents/dbdp/saas-cuenca/PLAN_FINANCIERO_YAPI.md)
 * **Esquema SQL de Supabase:** [`supabase/schema.sql`](file:///C:/Users/soportectin/Documents/dbdp/saas-cuenca/supabase/schema.sql)

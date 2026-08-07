@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus } from 'lucide-react';
+import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus, Download, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { Order, OrderStatus } from '@/lib/types/database';
 import { OrderBadge, PaymentBadge } from '@/components/ui/Badge';
@@ -22,7 +22,66 @@ export default function AdminDashboardPage() {
   const [selectedOrderForTicket, setSelectedOrderForTicket] = useState<(Order & { items?: any[] }) | null>(null);
   const [selectedComprobanteUrl, setSelectedComprobanteUrl] = useState<string | null>(null);
 
+  const handleToggleSound = () => {
+    if (!business?.has_live_kitchen) {
+      toast.info('🔒 Módulo Cocina en Vivo & Alertas Sonoras no activo (+ $7/mes)', {
+        description: 'Activa este Add-on para recibir timbres sonoros en tiempo real.',
+      });
+      return;
+    }
+    setSoundEnabled(!soundEnabled);
+  };
+
+  const handleExportCRM = () => {
+    if (!business?.has_crm_export) {
+      toast.info('🔒 Módulo de Exportación CRM no activo (+ $5/mes)', {
+        description: 'Activa este Add-on en tu suscripción para descargar tu base de clientes.',
+      });
+      return;
+    }
+
+    if (orders.length === 0) {
+      toast.error('No hay pedidos registrados para exportar clientes.');
+      return;
+    }
+
+    const uniqueCustomers = new Map();
+    orders.forEach((o) => {
+      if (o.cliente_telefono && !uniqueCustomers.has(o.cliente_telefono)) {
+        uniqueCustomers.set(o.cliente_telefono, {
+          nombre: o.cliente_nombre,
+          telefono: o.cliente_telefono,
+          direccion: o.cliente_direccion || '',
+          email: o.datos_facturacion?.email || '',
+          ruc: o.datos_facturacion?.num_doc || '',
+        });
+      }
+    });
+
+    const csvRows = ['Nombre,WhatsApp,Email,RUC,Direccion'];
+    uniqueCustomers.forEach((c) => {
+      csvRows.push(`"${c.nombre}","${c.telefono}","${c.email}","${c.ruc}","${c.direccion}"`);
+    });
+
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `clientes_${business.slug}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('¡Base de datos de clientes exportada exitosamente!');
+  };
+
   const handleOpenTicketModal = async (order: Order) => {
+    if (!business?.has_pos_printing) {
+      toast.info('🔒 Módulo de Impresión POS no activo (+ $7/mes)', {
+        description: 'Activa este Add-on para imprimir comandas en tu ticketera de cocina.',
+      });
+      return;
+    }
+
     if ((order as any).items && (order as any).items.length > 0) {
       setSelectedOrderForTicket(order);
       return;
@@ -153,17 +212,38 @@ export default function AdminDashboardPage() {
           </h1>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
+            onClick={handleExportCRM}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-              soundEnabled
+              business.has_crm_export
+                ? 'bg-zinc-800 border-zinc-700 text-sky-400 hover:bg-zinc-700'
+                : 'bg-zinc-950/80 border-zinc-800 text-zinc-500'
+            }`}
+            title={business.has_crm_export ? 'Exportar base de datos de clientes a Excel/CSV' : 'Módulo CRM no contratado (+$5/mes)'}
+          >
+            {business.has_crm_export ? <Download className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+            <span>Exportar CRM (CSV)</span>
+          </button>
+
+          <button
+            onClick={handleToggleSound}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+              soundEnabled && business.has_live_kitchen
                 ? 'bg-zinc-800 border-zinc-700 text-emerald-400'
                 : 'bg-zinc-950 border-zinc-800 text-zinc-500'
             }`}
           >
-            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-emerald-400" /> : <VolumeX className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">{soundEnabled ? 'Sonido Activo' : 'Silenciado'}</span>
+            {!business.has_live_kitchen ? (
+              <Lock className="w-3.5 h-3.5 text-zinc-500" />
+            ) : soundEnabled ? (
+              <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
+            ) : (
+              <VolumeX className="w-3.5 h-3.5" />
+            )}
+            <span className="hidden sm:inline">
+              {!business.has_live_kitchen ? 'Alertas (+$7/m)' : soundEnabled ? 'Sonido Activo' : 'Silenciado'}
+            </span>
           </button>
         </div>
       </div>

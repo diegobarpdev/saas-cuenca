@@ -76,7 +76,7 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
 
       fetchOrders();
 
-      const channelName = `piku-orders-${businessId}`;
+      const channelName = `yapi-orders-${businessId}`;
       const existingChannel = supabase.getChannels().find((ch: any) => ch.topic === `realtime:${channelName}`);
       if (existingChannel) {
         supabase.removeChannel(existingChannel);

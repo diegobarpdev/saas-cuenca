@@ -41,6 +41,7 @@ export interface BusinessBranding {
   tipografia?: 'Outfit' | 'Inter' | 'Playfair' | 'Plus Jakarta Sans';
   estilo_botones?: 'redondeado' | 'semi-redondeado' | 'pill' | 'recto';
   tema_defecto?: 'oscuro' | 'claro';
+  patron_fondo?: 'ondas_fluidas' | 'malla_aurora' | 'lineas_geomets' | 'degradado_luxe' | 'sin_patron';
 }
 
 export interface OperationalSettings {
@@ -83,6 +84,11 @@ export interface Business {
   zonas_envio: ShippingZone[];
   payphone_token: string | null;
   plan: 'trial' | 'basico' | 'pro';
+  has_payphone?: boolean;
+  has_live_kitchen?: boolean;
+  has_pos_printing?: boolean;
+  has_crm_export?: boolean;
+  has_custom_domain?: boolean;
   branding?: BusinessBranding;
   configuracion_operativa?: OperationalSettings;
   created_at: string;

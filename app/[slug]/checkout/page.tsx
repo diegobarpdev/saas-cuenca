@@ -51,6 +51,9 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
 
           if (data) {
             setBusiness(data as Business);
+            if (!data.has_payphone && metodoPago === 'payphone') {
+              setMetodoPago('transferencia');
+            }
             if (data.zonas_envio && data.zonas_envio.length > 0) {
               setSelectedZonaId(data.zonas_envio[0].id);
             }
@@ -194,7 +197,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
 
           // Emitir evento Supabase Realtime Broadcast para notificación instantánea en cualquier navegador
           try {
-            const channelName = `piku-orders-${business.id}`;
+            const channelName = `yapi-orders-${business.id}`;
             const rtChannel = supabase.channel(channelName);
             await new Promise<void>((resolve) => {
               rtChannel.subscribe(async (status: string) => {
@@ -503,7 +506,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
             </h2>
 
             <div className="space-y-2">
-              {business.configuracion_operativa?.acepta_payphone !== false && (
+              {business.configuracion_operativa?.acepta_payphone !== false && business.has_payphone && (
                 <label
                   className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
                     metodoPago === 'payphone'
