@@ -524,19 +524,12 @@ export default function AdminSettingsPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">Banco / Institución</label>
-                          <input
-                            type="text"
-                            list="ecuador-banks-list"
-                            placeholder="Ej: Banco Pichincha, Produbanco, JEP"
-                            value={acc.banco}
-                            onChange={(e) => handleUpdateAccount(index, 'banco', e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                          <CustomSelect
+                            options={ECUADOR_BANKS.map((b) => ({ value: b, label: b }))}
+                            value={acc.banco || 'Banco Pichincha'}
+                            onChange={(val) => handleUpdateAccount(index, 'banco', val)}
+                            accentColor="sky"
                           />
-                          <datalist id="ecuador-banks-list">
-                            {ECUADOR_BANKS.map((b) => (
-                              <option key={b} value={b} />
-                            ))}
-                          </datalist>
                         </div>
 
                         <div>

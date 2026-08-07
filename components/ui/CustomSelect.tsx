@@ -15,7 +15,7 @@ interface CustomSelectProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
-  accentColor?: 'emerald' | 'purple' | 'amber';
+  accentColor?: 'emerald' | 'purple' | 'amber' | 'sky';
 }
 
 export function CustomSelect({
@@ -46,12 +46,14 @@ export function CustomSelect({
     amber: 'focus:border-amber-500 border-slate-800 hover:border-amber-500/40',
     purple: 'focus:border-purple-500 border-slate-800 hover:border-purple-500/40',
     emerald: 'focus:border-emerald-500 border-slate-800 hover:border-emerald-500/40',
+    sky: 'focus:border-sky-500 border-slate-800 hover:border-sky-500/40',
   };
 
   const activeOptionMap = {
     amber: 'bg-amber-500/15 text-amber-300 font-bold',
     purple: 'bg-purple-500/15 text-purple-300 font-bold',
     emerald: 'bg-emerald-500/15 text-emerald-300 font-bold',
+    sky: 'bg-sky-500/15 text-sky-300 font-bold',
   };
 
   return (
