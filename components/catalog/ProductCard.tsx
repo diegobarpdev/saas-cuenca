@@ -8,9 +8,11 @@ import { getProductPriceInfo } from '@/lib/utils/promo';
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product, quantity: number, notas: string) => void;
+  primaryColor?: string;
+  secondaryColor?: string;
 }
 
-export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+export function ProductCard({ product, onAddToCart, primaryColor = '#F59E0B', secondaryColor = '#D97706' }: ProductCardProps) {
   const [added, setAdded] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const priceInfo = getProductPriceInfo(product);
@@ -100,12 +102,12 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
                   <span className="text-slate-500 text-[10px] sm:text-xs line-through leading-none mb-1">
                     {formatCurrency(priceInfo.precioOriginal)}
                   </span>
-                  <span className="text-amber-400 font-bold text-sm sm:text-base leading-none">
+                  <span className="font-bold text-sm sm:text-base leading-none" style={{ color: primaryColor }}>
                     {formatCurrency(priceInfo.precioActual)}
                   </span>
                 </>
               ) : (
-                <span className="text-amber-400 font-bold text-sm sm:text-base leading-none">
+                <span className="font-bold text-sm sm:text-base leading-none" style={{ color: primaryColor }}>
                   {formatCurrency(priceInfo.precioOriginal)}
                 </span>
               )}
@@ -115,12 +117,17 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             <button
               onClick={handleAdd}
               disabled={!product.disponible}
+              style={
+                product.disponible && !added
+                  ? { backgroundColor: primaryColor, borderColor: primaryColor, color: '#090D16' }
+                  : undefined
+              }
               className={`px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl font-display font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 border shrink-0 ${
                 !product.disponible
                   ? 'bg-slate-900/60 text-slate-600 border-slate-800 cursor-not-allowed'
                   : added
                   ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-black shadow-lg shadow-emerald-500/20'
-                  : 'bg-amber-500 text-slate-950 border-amber-400 hover:bg-amber-400 shadow-md shadow-amber-500/10'
+                  : 'shadow-md shadow-amber-500/10'
               }`}
             >
               {added ? (
