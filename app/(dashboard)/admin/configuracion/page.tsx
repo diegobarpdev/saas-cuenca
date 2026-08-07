@@ -189,7 +189,6 @@ export default function AdminSettingsPage() {
             ruc_ci: primaryBank.ruc_ci || ruc,
             email: primaryBank.email || '',
           },
-          cuentas_bancarias: cuentasBancarias,
           configuracion_operativa: {
             tiempo_preparacion: tiempoPreparacion,
             permite_domicilio: permiteDomicilio,
