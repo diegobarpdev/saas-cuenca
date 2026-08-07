@@ -197,7 +197,6 @@ export function FoodPatternBackground({ pattern = 'ondas_fluidas', color = '#fff
             style={{
               backgroundImage: `url("${patternUrl}")`,
               backgroundRepeat: 'repeat',
-              backgroundSize: ['geometria_moderna', 'lineas_organicas'].includes(pattern) ? '60px 60px' : '110px 110px',
             }}
           ></div>
           {/* Resplandores Ambientales de Acompañamiento */}

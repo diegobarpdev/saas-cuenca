@@ -649,7 +649,6 @@ export default function AdminBrandingPage() {
                               style={{
                                 backgroundImage: `url("${svgUrl}")`,
                                 backgroundRepeat: 'repeat',
-                                backgroundSize: ['geometria_moderna', 'lineas_organicas'].includes(opt.id) ? '25px 25px' : '45px 45px',
                               }}
                             ></div>
                           );
