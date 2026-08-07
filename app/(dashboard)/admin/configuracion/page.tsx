@@ -162,6 +162,13 @@ export default function AdminSettingsPage() {
 
     setIsSaving(true);
 
+    let finalAceptaDeuna = aceptaDeuna;
+    if (aceptaDeuna && (!deunaNumero || deunaNumero.trim() === '')) {
+      finalAceptaDeuna = false;
+      setAceptaDeuna(false);
+      toast.info('Deuna! fue desactivado automáticamente porque no ingresaste un número o alias de cobro.');
+    }
+
     const primaryBank = cuentasBancarias[0] || {
       banco: 'Banco Pichincha',
       tipo_cuenta: 'Ahorros',
@@ -194,7 +201,7 @@ export default function AdminSettingsPage() {
             permite_retiro: permiteRetiro,
             google_maps_url: googleMapsUrl || undefined,
 
-            acepta_deuna: aceptaDeuna,
+            acepta_deuna: finalAceptaDeuna,
             deuna_numero: deunaNumero,
             deuna_titular: deunaTitular,
 
