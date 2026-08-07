@@ -15,10 +15,6 @@ export interface PatternDefinition {
 }
 
 export const PATTERNS_LIST: PatternDefinition[] = [
-  { id: 'ondas_fluidas', label: 'Ondas Curvas Fluídas', desc: 'Seda líquida interactiva en movimiento continuo (Canvas)', category: 'Universal' },
-  { id: 'malla_aurora', label: 'Malla Aurora Difusa', desc: 'Resplandores neón ambientales sin líneas fijas', category: 'Universal' },
-  { id: 'lineas_geomets', label: 'Rejilla Graph Paper', desc: 'Cuadrícula de papel técnico milimetrado sutil (Graph Paper)', category: 'Universal' },
-  { id: 'degradado_luxe', label: 'Degradado Velvet Luxe', desc: 'Fondo degradado cálido oro y obsidian', category: 'Universal' },
   { id: 'sin_patron', label: 'Sin Patrón (Sólido)', desc: 'Fondo oscuro plano y limpio sin gráficos', category: 'Universal' },
   
   // Categoría Comida (Branding Abstracto Hero Patterns)
@@ -64,9 +60,6 @@ export function getPatternSvgUrl(patternId: PatternType, colorHex: string = '#FF
 
   let result = '';
   switch (patternId) {
-    case 'lineas_geomets':
-      return `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22%23${c}%22%20fill-opacity%3D%221%22%20fill-rule%3D%22evenodd%22%3E%3Cpath%20opacity%3D%22.5%22%20d%3D%22M96%2095h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-9-10h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm9-10v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-9-10h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm9-10v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-9-10h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm9-10v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-9-10h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9z%22%2F%3E%3Cpath%20d%3D%22M6%205V0H5v5H0v1h5v94h1V6h94V5H6z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E`;
-
     case 'restaurante_general':
       return `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2218%22%20width%3D%22100%22%20viewBox%3D%220%200%20100%2018%22%3E%3Cpath%20fill%3D%22%23${c}%22%20fill-opacity%3D%221%22%20d%3D%22M61.82%2018c3.47-1.45%206.86-3.78%2011.3-7.34C78%206.76%2080.34%205.1%2083.87%203.42%2088.56%201.16%2093.75%200%20100%200v6.16C98.76%206.05%2097.43%206%2096%206c-9.59%200-14.23%202.23-23.13%209.34-1.28%201.03-2.39%201.9-3.4%202.66h-7.65zm-23.64%200H22.52c-1-.76-2.1-1.63-3.4-2.66C11.57%209.3%207.08%206.78%200%206.16V0c6.25%200%2011.44%201.16%2016.14%203.42%203.53%201.7%205.87%203.35%2010.73%207.24%204.45%203.56%207.84%205.9%2011.31%207.34zM61.82%200h7.66a39.57%2039.57%200%200%201-7.34%204.58C57.44%206.84%2052.25%208%2046%208S34.56%206.84%2029.86%204.58A39.57%2039.57%200%200%201%2022.52%200h15.66C41.65%201.44%2045.21%202%2050%202c4.8%200%208.35-.56%2011.82-2z%22%2F%3E%3C%2Fsvg%3E`;
 

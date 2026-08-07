@@ -30,10 +30,6 @@ export interface BillingData {
 }
 
 export type PatternType =
-  | 'ondas_fluidas'
-  | 'malla_aurora'
-  | 'lineas_geomets'
-  | 'degradado_luxe'
   | 'sin_patron'
   | 'restaurante_general'
   | 'cafeteria'

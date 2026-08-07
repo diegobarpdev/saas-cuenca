@@ -128,7 +128,7 @@ export default function AdminBrandingPage() {
   const [tipografia, setTipografia] = useState<'Outfit' | 'Inter' | 'Playfair' | 'Plus Jakarta Sans'>('Outfit');
   const [estiloBotones, setEstiloBotones] = useState<'redondeado' | 'semi-redondeado' | 'pill' | 'recto'>('redondeado');
   const [temaDefecto, setTemaDefecto] = useState<'oscuro' | 'claro'>('oscuro');
-  const [patronFondo, setPatronFondo] = useState<PatternType>('ondas_fluidas');
+  const [patronFondo, setPatronFondo] = useState<PatternType>('sin_patron');
 
   // Subida de Archivos
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -600,42 +600,7 @@ export default function AdminBrandingPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-xs">
                       {catPatterns.map((opt) => {
                         let previewNode = null;
-                        if (opt.id === 'ondas_fluidas') {
-                          previewNode = (
-                            <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5">
-                              <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 200 60" preserveAspectRatio="none">
-                                <path d="M0 20 Q 50 40 100 20 T 200 20" stroke={colorPrimario} strokeWidth="2" fill="none" opacity="0.7" />
-                                <path d="M0 35 Q 60 10 120 40 T 200 30" stroke="#10B981" strokeWidth="2" fill="none" opacity="0.6" />
-                              </svg>
-                              <div className="absolute top-1 left-2 w-12 h-12 bg-amber-500/20 rounded-full blur-lg"></div>
-                            </div>
-                          );
-                        } else if (opt.id === 'malla_aurora') {
-                          previewNode = (
-                            <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5">
-                              <div className="absolute top-1 left-2 w-16 h-16 bg-amber-500/30 rounded-full blur-xl animate-pulse"></div>
-                              <div className="absolute bottom-1 right-2 w-16 h-16 bg-emerald-500/25 rounded-full blur-xl"></div>
-                            </div>
-                          );
-                        } else if (opt.id === 'lineas_geomets') {
-                          previewNode = (
-                            <div
-                              className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5 opacity-60"
-                              style={{
-                                backgroundImage: `linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(to right, #ffffff 1px, transparent 1px)`,
-                                backgroundSize: '12px 12px',
-                              }}
-                            >
-                              <div className="absolute top-2 right-2 w-10 h-10 bg-amber-500/20 rounded-full blur-md"></div>
-                            </div>
-                          );
-                        } else if (opt.id === 'degradado_luxe') {
-                          previewNode = (
-                            <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-gradient-to-b from-amber-500/25 via-[#07090E] to-emerald-500/20 mb-2.5">
-                              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-8 bg-amber-400/30 rounded-full blur-md"></div>
-                            </div>
-                          );
-                        } else if (opt.id === 'sin_patron') {
+                        if (opt.id === 'sin_patron') {
                           previewNode = (
                             <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5 flex items-center justify-center text-[10px] font-mono text-slate-500">
                               <span>[ 100% Sólido ]</span>
