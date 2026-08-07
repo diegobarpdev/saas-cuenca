@@ -254,10 +254,13 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
             </button>
 
             <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.nombre + ' ' + (business.direccion || 'Cuenca Ecuador'))}`}
+              href={
+                business.google_maps_url ||
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.nombre + ' ' + (business.direccion || 'Cuenca Ecuador'))}`
+              }
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-2 rounded-2xl text-xs font-display font-bold bg-slate-900/90 hover:bg-slate-800 border border-white/15 text-slate-200 hover:text-white transition-all flex items-center justify-center gap-1.5 shadow-md active:scale-95 group"
+              className="px-3 py-2 rounded-2xl text-xs font-display font-bold bg-slate-900/90 hover:bg-slate-800 border border-white/15 text-slate-200 hover:text-white transition-all flex items-center justify-center gap-1.5 shadow-md active:scale-95 group cursor-pointer"
               title="Ver ubicación en Google Maps"
             >
               <MapPin className="w-3.5 h-3.5 text-slate-300 flex-shrink-0" />

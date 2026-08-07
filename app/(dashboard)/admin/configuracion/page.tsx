@@ -38,6 +38,7 @@ export default function AdminSettingsPage() {
   const [ruc, setRuc] = useState('');
   const [telefonoWhatsapp, setTelefonoWhatsapp] = useState('');
   const [direccion, setDireccion] = useState('');
+  const [googleMapsUrl, setGoogleMapsUrl] = useState('');
 
   // 2. Tiempos & Modalidades
   const [tiempoPreparacion, setTiempoPreparacion] = useState('15 - 25 min');
@@ -70,6 +71,7 @@ export default function AdminSettingsPage() {
       setRuc(business.ruc || '');
       setTelefonoWhatsapp(business.telefono_whatsapp || '');
       setDireccion(business.direccion || '');
+      setGoogleMapsUrl(business.google_maps_url || '');
       setPayphoneToken(business.payphone_token || '');
 
       // Cargar Cuentas Bancarias
@@ -177,6 +179,7 @@ export default function AdminSettingsPage() {
           ruc,
           telefono_whatsapp: telefonoWhatsapp,
           direccion,
+          google_maps_url: googleMapsUrl || null,
           payphone_token: payphoneToken || null,
           datos_bancarios: {
             banco: primaryBank.banco,
@@ -299,6 +302,20 @@ export default function AdminSettingsPage() {
                 className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-white"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Enlace de Google Maps (Ubicación del Local)</label>
+            <input
+              type="url"
+              placeholder="Ej: https://maps.app.goo.gl/... o https://goo.gl/maps/..."
+              value={googleMapsUrl}
+              onChange={(e) => setGoogleMapsUrl(e.target.value)}
+              className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-white font-mono placeholder-slate-600"
+            />
+            <p className="text-[11px] text-slate-400 mt-1">
+              Enlace directo al mapa de tu local que se abrirá cuando los clientes hagan clic en el botón "Maps" del catálogo.
+            </p>
           </div>
         </div>
 

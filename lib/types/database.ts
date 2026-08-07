@@ -100,6 +100,7 @@ export interface Business {
   ruc: string | null;
   telefono_whatsapp: string;
   direccion: string | null;
+  google_maps_url?: string | null;
   logo_url: string | null;
   datos_bancarios: BankDetails;
   cuentas_bancarias?: BankDetails[];
