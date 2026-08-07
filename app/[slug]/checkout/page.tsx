@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect, use, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, CheckCircle2, Upload, Sparkles, Copy, Check, Landmark, Truck, Store, Utensils } from 'lucide-react';
+import { ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, CheckCircle2, Upload, Sparkles, Copy, Check, Landmark, Truck, Store, Utensils, AlertCircle } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { MOCK_BUSINESS } from '@/lib/supabase/mock-data';
 import { useCart } from '@/hooks/useCart';
@@ -14,6 +14,15 @@ import { createClient } from '@/lib/supabase/client';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 import { CustomCheckbox } from '@/components/ui/CustomCheckbox';
 import confetti from 'canvas-confetti';
+
+// ─── Helpers de validación ──────────────────────────────────────────────────
+const isValidEcPhone = (v: string) => /^(09|07|02|03|04|05|06|07|08)\d{8}$/.test(v.replace(/\s/g, ''));
+const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+const isValidCedula = (v: string) => /^\d{10}$/.test(v);
+const isValidRuc = (v: string) => /^\d{13}$/.test(v);
+const isValidPasaporte = (v: string) => v.trim().length >= 6;
+
+type FormErrors = Record<string, string>;
 
 export default function CheckoutPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
@@ -36,6 +45,13 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedAccNumber, setCopiedAccNumber] = useState<string | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  // Refs para scroll-to-error
+  const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
+  const setRef = (key: string) => (el: HTMLElement | null) => { fieldRefs.current[key] = el; };
+
+  const clearError = (key: string) => setErrors((prev) => { const n = { ...prev }; delete n[key]; return n; });
 
   // Cargar Negocio Real desde Supabase por slug
   useEffect(() => {
@@ -107,29 +123,83 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   const isUuid = (str: string) =>
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(str);
 
+  // ─── Validación completa del formulario ─────────────────────────────────
+  const validate = useCallback((): FormErrors => {
+    const errs: FormErrors = {};
+
+    // Nombre
+    if (!clienteNombre.trim()) {
+      errs.nombre = 'El nombre es obligatorio.';
+    } else if (clienteNombre.trim().length < 3) {
+      errs.nombre = 'Mínimo 3 caracteres.';
+    }
+
+    // Teléfono ecuatoriano
+    if (!clienteTelefono.trim()) {
+      errs.telefono = 'El número de teléfono es obligatorio.';
+    } else if (!isValidEcPhone(clienteTelefono)) {
+      errs.telefono = 'Número ecuatoriano inválido (ej: 0991234567).';
+    }
+
+    // Dirección si es a domicilio
+    if (tipoEntrega === 'domicilio') {
+      if (!clienteDireccion.trim()) {
+        errs.direccion = 'La dirección de entrega es obligatoria.';
+      } else if (clienteDireccion.trim().length < 10) {
+        errs.direccion = 'Ingresa una dirección más detallada.';
+      }
+    }
+
+    // Mesa si tipo=mesa
+    if (tipoEntrega === 'mesa' && !numeroMesa.trim()) {
+      errs.mesa = 'Indica el número de mesa.';
+    }
+
+    // Comprobante si transferencia
+    if (metodoPago === 'transferencia' && !comprobanteUrl) {
+      errs.comprobante = 'Debes adjuntar el comprobante de transferencia.';
+    }
+
+    // Factura
+    if (requiereFactura) {
+      if (!datosFacturacion.num_doc.trim()) {
+        errs.factura_num = 'El número de identificación es obligatorio.';
+      } else {
+        if (datosFacturacion.tipo_doc === 'CEDULA' && !isValidCedula(datosFacturacion.num_doc)) {
+          errs.factura_num = 'La cédula debe tener exactamente 10 dígitos.';
+        } else if (datosFacturacion.tipo_doc === 'RUC' && !isValidRuc(datosFacturacion.num_doc)) {
+          errs.factura_num = 'El RUC debe tener exactamente 13 dígitos.';
+        } else if (datosFacturacion.tipo_doc === 'PASAPORTE' && !isValidPasaporte(datosFacturacion.num_doc)) {
+          errs.factura_num = 'El pasaporte debe tener al menos 6 caracteres.';
+        }
+      }
+      if (!datosFacturacion.razon_social.trim()) {
+        errs.factura_razon = 'La razón social / nombre completo es obligatorio.';
+      }
+      if (!datosFacturacion.email.trim()) {
+        errs.factura_email = 'El correo electrónico es obligatorio.';
+      } else if (!isValidEmail(datosFacturacion.email)) {
+        errs.factura_email = 'Correo electrónico inválido.';
+      }
+    }
+
+    return errs;
+  }, [clienteNombre, clienteTelefono, tipoEntrega, clienteDireccion, numeroMesa, metodoPago, comprobanteUrl, requiereFactura, datosFacturacion]);
+
   // Enviar Pedido a Supabase Real / Fallback Local
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!clienteNombre || !clienteTelefono) {
-      alert('Por favor completa tu nombre y número de teléfono.');
+    const errs = validate();
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      // Scroll al primer campo con error
+      const firstKey = Object.keys(errs)[0];
+      const el = fieldRefs.current[firstKey];
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
-
-    if (tipoEntrega === 'domicilio' && !clienteDireccion) {
-      alert('Por favor ingresa tu dirección de entrega en Cuenca.');
-      return;
-    }
-
-    if (metodoPago === 'transferencia' && !comprobanteUrl) {
-      toast.error('Es obligatorio adjuntar la foto o comprobante de la transferencia para confirmar el pedido.');
-      return;
-    }
-
-    if (requiereFactura && (!datosFacturacion.num_doc || !datosFacturacion.razon_social || !datosFacturacion.email)) {
-      alert('Por favor completa los datos obligatorios para la factura (Cédula/RUC, Razón Social y Email).');
-      return;
-    }
+    setErrors({});
 
     setIsSubmitting(true);
 
@@ -309,28 +379,40 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
+              <div ref={setRef('nombre') as any}>
                 <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Nombre Completo *</label>
                 <input
                   type="text"
-                  required
                   placeholder="Ej: Juan Pérez"
                   value={clienteNombre}
-                  onChange={(e) => setClienteNombre(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-sm text-white focus:outline-none focus:border-amber-500"
+                  onChange={(e) => { setClienteNombre(e.target.value); clearError('nombre'); }}
+                  className={`w-full px-4 py-3 rounded-2xl bg-slate-950/80 border text-sm text-white focus:outline-none transition-colors ${
+                    errors.nombre ? 'border-rose-500 focus:border-rose-400 bg-rose-500/5' : 'border-slate-800 focus:border-amber-500'
+                  }`}
                 />
+                {errors.nombre && (
+                  <p className="mt-1 text-[11px] text-rose-400 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.nombre}
+                  </p>
+                )}
               </div>
 
-              <div>
+              <div ref={setRef('telefono') as any}>
                 <label className="block text-xs font-display font-semibold text-slate-300 mb-1">WhatsApp / Celular *</label>
                 <input
                   type="tel"
-                  required
                   placeholder="Ej: 0991234567"
                   value={clienteTelefono}
-                  onChange={(e) => setClienteTelefono(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-sm text-white focus:outline-none focus:border-amber-500 font-mono-tech"
+                  onChange={(e) => { setClienteTelefono(e.target.value); clearError('telefono'); }}
+                  className={`w-full px-4 py-3 rounded-2xl bg-slate-950/80 border text-sm text-white focus:outline-none transition-colors font-mono-tech ${
+                    errors.telefono ? 'border-rose-500 focus:border-rose-400 bg-rose-500/5' : 'border-slate-800 focus:border-amber-500'
+                  }`}
                 />
+                {errors.telefono && (
+                  <p className="mt-1 text-[11px] text-rose-400 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.telefono}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -393,30 +475,43 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
                   />
                 </div>
 
-                <div>
+                <div ref={setRef('direccion') as any}>
                   <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Dirección Exacta y Referencia *</label>
                   <textarea
-                    required
                     rows={2}
                     placeholder="Ej: Calle Larga 4-12 y Vargas Machuca, junto a la panadería."
                     value={clienteDireccion}
-                    onChange={(e) => setClienteDireccion(e.target.value)}
-                    className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:border-amber-500"
+                    onChange={(e) => { setClienteDireccion(e.target.value); clearError('direccion'); }}
+                    className={`w-full px-4 py-3 rounded-2xl bg-slate-950 border text-sm text-white focus:outline-none transition-colors ${
+                      errors.direccion ? 'border-rose-500 focus:border-rose-400 bg-rose-500/5' : 'border-slate-800 focus:border-amber-500'
+                    }`}
                   />
+                  {errors.direccion && (
+                    <p className="mt-1 text-[11px] text-rose-400 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.direccion}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
 
             {tipoEntrega === 'mesa' && (
-              <div>
-                <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Número de Mesa</label>
+              <div ref={setRef('mesa') as any}>
+                <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Número de Mesa *</label>
                 <input
                   type="text"
                   placeholder="Ej: Mesa 4"
                   value={numeroMesa}
-                  onChange={(e) => setNumeroMesa(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:border-amber-500"
+                  onChange={(e) => { setNumeroMesa(e.target.value); clearError('mesa'); }}
+                  className={`w-full px-4 py-3 rounded-2xl bg-slate-950 border text-sm text-white focus:outline-none transition-colors ${
+                    errors.mesa ? 'border-rose-500 focus:border-rose-400 bg-rose-500/5' : 'border-slate-800 focus:border-amber-500'
+                  }`}
                 />
+                {errors.mesa && (
+                  <p className="mt-1 text-[11px] text-rose-400 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.mesa}
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -449,42 +544,60 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
                     />
                   </div>
 
-                  <div className="sm:col-span-2">
+                  <div className="sm:col-span-2" ref={setRef('factura_num') as any}>
                     <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Nro. Identificación *</label>
                     <input
                       type="text"
-                      required
                       placeholder="0102938475001"
                       value={datosFacturacion.num_doc}
-                      onChange={(e) => setDatosFacturacion({ ...datosFacturacion, num_doc: e.target.value })}
-                      className="w-full px-3.5 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white font-mono-tech"
+                      onChange={(e) => { setDatosFacturacion({ ...datosFacturacion, num_doc: e.target.value }); clearError('factura_num'); }}
+                      className={`w-full px-3.5 py-3 rounded-2xl bg-slate-950 border text-xs text-white font-mono-tech transition-colors ${
+                        errors.factura_num ? 'border-rose-500 bg-rose-500/5' : 'border-slate-800'
+                      }`}
                     />
+                    {errors.factura_num && (
+                      <p className="mt-1 text-[11px] text-rose-400 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.factura_num}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                <div>
+                <div ref={setRef('factura_razon') as any}>
                   <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Razón Social / Nombre Completo *</label>
                   <input
                     type="text"
-                    required
                     placeholder="Ej: Comercializadora Cuenca S.A."
                     value={datosFacturacion.razon_social}
-                    onChange={(e) => setDatosFacturacion({ ...datosFacturacion, razon_social: e.target.value })}
-                    className="w-full px-3.5 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white"
+                    onChange={(e) => { setDatosFacturacion({ ...datosFacturacion, razon_social: e.target.value }); clearError('factura_razon'); }}
+                    className={`w-full px-3.5 py-3 rounded-2xl bg-slate-950 border text-xs text-white transition-colors ${
+                      errors.factura_razon ? 'border-rose-500 bg-rose-500/5' : 'border-slate-800'
+                    }`}
                   />
+                  {errors.factura_razon && (
+                    <p className="mt-1 text-[11px] text-rose-400 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.factura_razon}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
+                  <div ref={setRef('factura_email') as any}>
                     <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Correo Electrónico *</label>
                     <input
                       type="email"
-                      required
                       placeholder="facturas@empresa.com"
                       value={datosFacturacion.email}
-                      onChange={(e) => setDatosFacturacion({ ...datosFacturacion, email: e.target.value })}
-                      className="w-full px-3.5 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-white"
+                      onChange={(e) => { setDatosFacturacion({ ...datosFacturacion, email: e.target.value }); clearError('factura_email'); }}
+                      className={`w-full px-3.5 py-3 rounded-2xl bg-slate-950 border text-xs text-white transition-colors ${
+                        errors.factura_email ? 'border-rose-500 bg-rose-500/5' : 'border-slate-800'
+                      }`}
                     />
+                    {errors.factura_email && (
+                      <p className="mt-1 text-[11px] text-rose-400 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.factura_email}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Dirección Fiscal</label>
@@ -672,7 +785,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
                     ))}
                   </div>
 
-                  <div className="pt-2 border-t border-slate-800">
+                  <div className="pt-2 border-t border-slate-800" ref={setRef('comprobante') as any}>
                     <label className="block text-xs font-display font-bold text-amber-400 mb-1.5 flex items-center justify-between">
                       <span>Adjuntar Comprobante de Transferencia</span>
                       <span className="text-[10px] text-rose-400 font-mono-tech font-bold uppercase">* Obligatorio</span>
@@ -684,14 +797,24 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
                       </div>
                     ) : (
                       <div className="space-y-1.5">
-                        <label className="flex items-center justify-center gap-2 p-3.5 rounded-2xl border border-dashed border-amber-500/50 bg-amber-500/5 text-xs text-amber-300 hover:text-white hover:border-amber-400 cursor-pointer transition-colors">
-                          <Upload className="w-4 h-4 text-amber-400" />
+                        <label className={`flex items-center justify-center gap-2 p-3.5 rounded-2xl border border-dashed text-xs cursor-pointer transition-colors ${
+                          errors.comprobante
+                            ? 'border-rose-500 bg-rose-500/10 text-rose-300 hover:border-rose-400'
+                            : 'border-amber-500/50 bg-amber-500/5 text-amber-300 hover:text-white hover:border-amber-400'
+                        }`}>
+                          <Upload className="w-4 h-4" />
                           <span>{isUploading ? 'Subiendo imagen...' : 'Seleccionar foto de comprobante *'}</span>
-                          <input type="file" accept="image/*" onChange={handleUploadSimulated} className="hidden" />
+                          <input type="file" accept="image/*" onChange={(e) => { handleUploadSimulated(e); clearError('comprobante'); }} className="hidden" />
                         </label>
-                        <p className="text-[10px] text-rose-400 font-medium">
-                          * Debes adjuntar la foto del comprobante bancario para poder procesar la orden.
-                        </p>
+                        {errors.comprobante ? (
+                          <p className="text-[11px] text-rose-400 flex items-center gap-1 font-medium">
+                            <AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.comprobante}
+                          </p>
+                        ) : (
+                          <p className="text-[10px] text-rose-400 font-medium">
+                            * Debes adjuntar la foto del comprobante bancario para poder procesar la orden.
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
