@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { Toaster } from 'sileo';
-import 'sileo/styles.css';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -32,7 +31,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased bg-[#080B11] text-slate-100 selection:bg-amber-500 selection:text-slate-950">
         {children}
-        <Toaster position="top-left" theme="dark" />
+        <Toaster position="top-right" theme="dark" closeButton richColors />
       </body>
     </html>
   );
