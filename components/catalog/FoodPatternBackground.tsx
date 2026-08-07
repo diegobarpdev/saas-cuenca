@@ -33,67 +33,74 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
     window.addEventListener('resize', handleResize);
 
     let step = 0;
+    let isTabVisible = true;
+    const handleVisibilityChange = () => {
+      isTabVisible = document.visibilityState === 'visible';
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     const render = () => {
-      step += 0.004;
-      ctx.clearRect(0, 0, width, height);
+      if (isTabVisible) {
+        step += 0.004;
+        ctx.clearRect(0, 0, width, height);
 
-      // Dibujar Líneas Curvas Orgánicas Fluídas (Estilo Seda / Liquid Waves)
-      const waveConfigs = [
-        {
-          color: 'rgba(245, 158, 11, 0.12)',
-          lineWidth: 2.5,
-          speed: 1,
-          amplitude: 60,
-          frequency: 0.003,
-          yOffset: height * 0.25,
-        },
-        {
-          color: 'rgba(16, 185, 129, 0.09)',
-          lineWidth: 2,
-          speed: 1.3,
-          amplitude: 80,
-          frequency: 0.002,
-          yOffset: height * 0.45,
-        },
-        {
-          color: 'rgba(244, 63, 94, 0.07)',
-          lineWidth: 1.8,
-          speed: 0.8,
-          amplitude: 70,
-          frequency: 0.0025,
-          yOffset: height * 0.65,
-        },
-        {
-          color: 'rgba(56, 189, 248, 0.08)',
-          lineWidth: 2.2,
-          speed: 1.1,
-          amplitude: 50,
-          frequency: 0.0035,
-          yOffset: height * 0.82,
-        },
-      ];
+        // Dibujar Líneas Curvas Orgánicas Fluídas (Estilo Seda / Liquid Waves)
+        const waveConfigs = [
+          {
+            color: 'rgba(245, 158, 11, 0.12)',
+            lineWidth: 2.5,
+            speed: 1,
+            amplitude: 60,
+            frequency: 0.003,
+            yOffset: height * 0.25,
+          },
+          {
+            color: 'rgba(16, 185, 129, 0.09)',
+            lineWidth: 2,
+            speed: 1.3,
+            amplitude: 80,
+            frequency: 0.002,
+            yOffset: height * 0.45,
+          },
+          {
+            color: 'rgba(244, 63, 94, 0.07)',
+            lineWidth: 1.8,
+            speed: 0.8,
+            amplitude: 70,
+            frequency: 0.0025,
+            yOffset: height * 0.65,
+          },
+          {
+            color: 'rgba(56, 189, 248, 0.08)',
+            lineWidth: 2.2,
+            speed: 1.1,
+            amplitude: 50,
+            frequency: 0.0035,
+            yOffset: height * 0.82,
+          },
+        ];
 
-      waveConfigs.forEach((wave) => {
-        ctx.beginPath();
-        ctx.lineWidth = wave.lineWidth;
-        ctx.strokeStyle = wave.color;
+        waveConfigs.forEach((wave) => {
+          ctx.beginPath();
+          ctx.lineWidth = wave.lineWidth;
+          ctx.strokeStyle = wave.color;
 
-        for (let x = 0; x <= width; x += 10) {
-          const y =
-            wave.yOffset +
-            Math.sin(x * wave.frequency + step * wave.speed) * wave.amplitude +
-            Math.cos(x * 0.001 + step * 0.5) * (wave.amplitude * 0.4);
+          for (let x = 0; x <= width; x += 20) {
+            const y =
+              wave.yOffset +
+              Math.sin(x * wave.frequency + step * wave.speed) * wave.amplitude +
+              Math.cos(x * 0.001 + step * 0.5) * (wave.amplitude * 0.4);
 
-          if (x === 0) {
-            ctx.moveTo(x, y);
-          } else {
-            ctx.lineTo(x, y);
+            if (x === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
           }
-        }
 
-        ctx.stroke();
-      });
+          ctx.stroke();
+        });
+      }
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -102,6 +109,7 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, [pattern]);
@@ -173,7 +181,7 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
             className="absolute inset-0 opacity-[0.035]"
             style={{
               backgroundImage: `linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(to right, #ffffff 1px, transparent 1px)`,
-              backgroundSize: '40px 40px',
+              backgroundSize: '60px 60px',
             }}
           ></div>
           <div className="absolute top-0 right-1/4 w-[450px] h-[450px] bg-amber-500/10 rounded-full blur-[130px]"></div>
@@ -191,12 +199,13 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
       {/* 5. Opción: Patrón Custom SVG Cargado desde el Registro */}
       {isCustomSvgPattern && patternUrl && (
         <>
-          {/* Fondo Texturizado */}
+          {/* Fondo Texturizado con escala amplia optimizada (Escala ampliada para menor consumo de memoria GPU y textura elegante) */}
           <div
-            className="absolute inset-0 opacity-[0.04] sm:opacity-[0.06] transition-opacity duration-500"
+            className="absolute inset-0 opacity-[0.05] transition-opacity duration-500"
             style={{
               backgroundImage: `url("${patternUrl}")`,
               backgroundRepeat: 'repeat',
+              backgroundSize: '140px auto',
             }}
           ></div>
           {/* Resplandores Ambientales de Acompañamiento */}

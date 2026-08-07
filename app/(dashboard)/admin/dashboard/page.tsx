@@ -24,7 +24,7 @@ export default function AdminDashboardPage() {
 
   const handleToggleSound = () => {
     if (!business?.has_live_kitchen) {
-      toast.info('🔒 Módulo Cocina en Vivo & Alertas Sonoras no activo (+ $7/mes)', {
+      toast.info('Módulo Cocina en Vivo & Alertas Sonoras no activo (+ $7/mes)', {
         description: 'Activa este Add-on para recibir timbres sonoros en tiempo real.',
       });
       return;
@@ -34,7 +34,7 @@ export default function AdminDashboardPage() {
 
   const handleExportCRM = () => {
     if (!business?.has_crm_export) {
-      toast.info('🔒 Módulo de Exportación CRM no activo (+ $5/mes)', {
+      toast.info('Módulo de Exportación CRM no activo (+ $5/mes)', {
         description: 'Activa este Add-on en tu suscripción para descargar tu base de clientes.',
       });
       return;
@@ -76,7 +76,7 @@ export default function AdminDashboardPage() {
 
   const handleOpenTicketModal = async (order: Order) => {
     if (!business?.has_pos_printing) {
-      toast.info('🔒 Módulo de Impresión POS no activo (+ $7/mes)', {
+      toast.info('Módulo de Impresión POS no activo (+ $7/mes)', {
         description: 'Activa este Add-on para imprimir comandas en tu ticketera de cocina.',
       });
       return;
@@ -311,7 +311,7 @@ export default function AdminDashboardPage() {
                         className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 transition-colors shadow-sm"
                         title="Marcar como Pagado"
                       >
-                        ✓ Marcar Pagado
+                        Marcar Pagado
                       </button>
                     ) : (
                       <button
@@ -319,7 +319,7 @@ export default function AdminDashboardPage() {
                         className="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-400 border border-zinc-700 transition-colors"
                         title="Marcar como Pendiente"
                       >
-                        ↩ Marcar Pendiente
+                        Marcar Pendiente
                       </button>
                     )}
                   </div>

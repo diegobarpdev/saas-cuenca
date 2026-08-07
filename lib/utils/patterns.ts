@@ -15,47 +15,54 @@ export interface PatternDefinition {
 }
 
 export const PATTERNS_LIST: PatternDefinition[] = [
-  { id: 'ondas_fluidas', label: '🌊 Ondas Curvas Fluídas', desc: 'Seda líquida interactiva en movimiento continuo (Canvas)', category: 'Universal' },
-  { id: 'malla_aurora', label: '🌌 Malla Aurora Difusa', desc: 'Resplandores neón ambientales sin líneas fijas', category: 'Universal' },
-  { id: 'lineas_geomets', label: '📐 Rejilla Graph Paper', desc: 'Cuadrícula de papel técnico milimetrado sutil (Graph Paper)', category: 'Universal' },
-  { id: 'degradado_luxe', label: '✨ Degradado Velvet Luxe', desc: 'Fondo degradado cálido oro y obsidian', category: 'Universal' },
-  { id: 'sin_patron', label: '🚫 Sin Patrón (Sólido)', desc: 'Fondo oscuro plano y limpio sin gráficos', category: 'Universal' },
+  { id: 'ondas_fluidas', label: 'Ondas Curvas Fluídas', desc: 'Seda líquida interactiva en movimiento continuo (Canvas)', category: 'Universal' },
+  { id: 'malla_aurora', label: 'Malla Aurora Difusa', desc: 'Resplandores neón ambientales sin líneas fijas', category: 'Universal' },
+  { id: 'lineas_geomets', label: 'Rejilla Graph Paper', desc: 'Cuadrícula de papel técnico milimetrado sutil (Graph Paper)', category: 'Universal' },
+  { id: 'degradado_luxe', label: 'Degradado Velvet Luxe', desc: 'Fondo degradado cálido oro y obsidian', category: 'Universal' },
+  { id: 'sin_patron', label: 'Sin Patrón (Sólido)', desc: 'Fondo oscuro plano y limpio sin gráficos', category: 'Universal' },
   
   // Categoría Comida (Branding Abstracto Hero Patterns)
-  { id: 'restaurante_general', label: '🍽️ Formal Invitation', desc: 'Líneas decorativas y de gala clásica (Formal Invitation)', category: 'Comida' },
-  { id: 'cafeteria', label: '☕ Texture Terrazzo', desc: 'Textura granulada mineral de roca y terrazo (Texture)', category: 'Comida' },
-  { id: 'panaderia', label: '🥐 Moroccan Tile', desc: 'Mosaico entrelazado de estilo mudéjar tradicional (Moroccan)', category: 'Comida' },
-  { id: 'pasteleria', label: '🧁 Overlapping Circles', desc: 'Patrón de círculos concéntricos traslapados (Overlapping Circles)', category: 'Comida' },
-  { id: 'pizzeria', label: '🍕 Bathroom Floor Tile', desc: 'Mosaico ortogonal geométrico limpio (Bathroom Floor)', category: 'Comida' },
-  { id: 'hamburgueseria', label: '🍔 Steel Beams Grid', desc: 'Líneas industriales cruzadas de soporte estructural (Steel Beams)', category: 'Comida' },
-  { id: 'sushi_japones', label: '🥢 Bamboo Shoji', desc: 'Estructuras de bambú oriental abstractas (Bamboo)', category: 'Comida' },
-  { id: 'comida_mexicana', label: '🌮 Aztec Chevron', desc: 'Grecas y chevrones geométricos precolombinos (Aztec)', category: 'Comida' },
-  { id: 'comida_italiana', label: '🍝 Floor Tile', desc: 'Rejilla clásica de baldosas de piedra toscana (Floor Tile)', category: 'Comida' },
-  { id: 'mariscos', label: '🐟 Creamy Wiggle', desc: 'Ríos ondulantes y corrientes marinas continuas (Wiggle)', category: 'Comida' },
-  { id: 'comida_rapida', label: '🍟 Boxes Pop Art', desc: 'Cuadrados angulares modernos de estilo pop (Boxes)', category: 'Comida' },
-  { id: 'comida_saludable', label: '🥑 Natural Leaf', desc: 'Siluetas de hojas botánicas y frescura natural (Leaf)', category: 'Comida' },
-  { id: 'parrilladas', label: '🥩 Diagonal Lines Grill', desc: 'Textura de trama lineal inclinada de barras de carbón (Diagonal Lines)', category: 'Comida' },
+  { id: 'restaurante_general', label: 'Formal Invitation', desc: 'Líneas decorativas y de gala clásica (Formal Invitation)', category: 'Comida' },
+  { id: 'cafeteria', label: 'Texture Terrazzo', desc: 'Textura granulada mineral de roca y terrazo (Texture)', category: 'Comida' },
+  { id: 'panaderia', label: 'Moroccan Tile', desc: 'Mosaico entrelazado de estilo mudéjar tradicional (Moroccan)', category: 'Comida' },
+  { id: 'pasteleria', label: 'Overlapping Circles', desc: 'Patrón de círculos concéntricos traslapados (Overlapping Circles)', category: 'Comida' },
+  { id: 'pizzeria', label: 'Bathroom Floor Tile', desc: 'Mosaico ortogonal geométrico limpio (Bathroom Floor)', category: 'Comida' },
+  { id: 'hamburgueseria', label: 'Steel Beams Grid', desc: 'Líneas industriales cruzadas de soporte estructural (Steel Beams)', category: 'Comida' },
+  { id: 'sushi_japones', label: 'Bamboo Shoji', desc: 'Estructuras de bambú oriental abstractas (Bamboo)', category: 'Comida' },
+  { id: 'comida_mexicana', label: 'Aztec Chevron', desc: 'Grecas y chevrones geométricos precolombinos (Aztec)', category: 'Comida' },
+  { id: 'comida_italiana', label: 'Floor Tile', desc: 'Rejilla clásica de baldosas de piedra toscana (Floor Tile)', category: 'Comida' },
+  { id: 'mariscos', label: 'Creamy Wiggle', desc: 'Ríos ondulantes y corrientes marinas continuas (Wiggle)', category: 'Comida' },
+  { id: 'comida_rapida', label: 'Boxes Pop Art', desc: 'Cuadrados angulares modernos de estilo pop (Boxes)', category: 'Comida' },
+  { id: 'comida_saludable', label: 'Natural Leaf', desc: 'Siluetas de hojas botánicas y frescura natural (Leaf)', category: 'Comida' },
+  { id: 'parrilladas', label: 'Diagonal Lines Grill', desc: 'Textura de trama lineal inclinada de barras de carbón (Diagonal Lines)', category: 'Comida' },
 
   // Categoría Bebida
-  { id: 'bar_cocteles', label: '🍹 Overlapping Diamonds', desc: 'Diamantes de cristal y rombos Art Deco (Overlapping Diamonds)', category: 'Bebida' },
-  { id: 'vinos', label: '🍷 Circles & Squares', desc: 'Círculos inscritos en cuadrículas de barricas (Circles & Squares)', category: 'Bebida' },
-  { id: 'cerveceria', label: '🍺 Industrial Hexagons', desc: 'Malla metálica de panal industrial limpia (Hexagons)', category: 'Bebida' },
+  { id: 'bar_cocteles', label: 'Overlapping Diamonds', desc: 'Diamantes de cristal y rombos Art Deco (Overlapping Diamonds)', category: 'Bebida' },
+  { id: 'vinos', label: 'Circles & Squares', desc: 'Círculos inscritos en cuadrículas de barricas (Circles & Squares)', category: 'Bebida' },
+  { id: 'cerveceria', label: 'Industrial Hexagons', desc: 'Malla metálica de panal industrial limpia (Hexagons)', category: 'Bebida' },
 
   // Categoría Dulces
-  { id: 'heladeria_postres', label: '🍦 Overlapping Hexagons', desc: 'Malla alveolar geométrica continua y dulce (Overlapping Hexagons)', category: 'Dulces' },
+  { id: 'heladeria_postres', label: 'Overlapping Hexagons', desc: 'Malla alveolar geométrica continua y dulce (Overlapping Hexagons)', category: 'Dulces' },
 
   // Categoría Universal / Adicionales
-  { id: 'geometria_moderna', label: '🔶 Temple Geometry', desc: 'Trazados angulares de templos minimalistas (Temple)', category: 'Universal' },
-  { id: 'lineas_organicas', label: '🌀 Lines In Motion', desc: 'Líneas paralelas dinámicas en flujo zen (Lines In Motion)', category: 'Universal' },
-  { id: 'hojas_ramas', label: '🌿 Forest Leaf', desc: 'Textura tupida de hojas de árbol silvestres (Leaf)', category: 'Universal' },
+  { id: 'geometria_moderna', label: 'Temple Geometry', desc: 'Trazados angulares de templos minimalistas (Temple)', category: 'Universal' },
+  { id: 'lineas_organicas', label: 'Lines In Motion', desc: 'Líneas paralelas dinámicas en flujo zen (Lines In Motion)', category: 'Universal' },
+  { id: 'hojas_ramas', label: 'Forest Leaf', desc: 'Textura tupida de hojas de árbol silvestres (Leaf)', category: 'Universal' },
 ];
 
-const cleanHex = (hex: string) => hex.substring(hex.indexOf('#') + 1);
+const cleanHex = (hex: string) => (hex.includes('#') ? hex.substring(hex.indexOf('#') + 1) : hex);
+const patternCache = new Map<string, string>();
 
 export function getPatternSvgUrl(patternId: PatternType, colorHex: string = '#FFFFFF'): string {
   const color = colorHex.startsWith('#') ? colorHex : `#${colorHex}`;
   const c = cleanHex(color);
+  const cacheKey = `${patternId}_${c}`;
 
+  if (patternCache.has(cacheKey)) {
+    return patternCache.get(cacheKey)!;
+  }
+
+  let result = '';
   switch (patternId) {
     case 'lineas_geomets':
       return `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22%23${c}%22%20fill-opacity%3D%221%22%20fill-rule%3D%22evenodd%22%3E%3Cpath%20opacity%3D%22.5%22%20d%3D%22M96%2095h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-9-10h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm9-10v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-9-10h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm9-10v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-9-10h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm9-10v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-10%200v-9h-9v9h9zm-9-10h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9zm10%200h9v-9h-9v9z%22%2F%3E%3Cpath%20d%3D%22M6%205V0H5v5H0v1h5v94h1V6h94V5H6z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E`;
@@ -122,6 +129,9 @@ export function getPatternSvgUrl(patternId: PatternType, colorHex: string = '#FF
 
     default:
       // Fallback a un patrón neutro de puntos sutiles
-      return `data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='1' fill='%23${c}' fill-opacity='0.5'/%3E%3C/svg%3E`;
+      result = `data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='1' fill='%23${c}' fill-opacity='0.5'/%3E%3C/svg%3E`;
   }
+
+  patternCache.set(cacheKey, result);
+  return result;
 }

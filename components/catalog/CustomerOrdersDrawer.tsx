@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { X, ShoppingBag, Clock, ExternalLink, RefreshCw, CheckCircle2, AlertCircle, ChevronRight } from 'lucide-react';
+import { X, ShoppingBag, Clock, ExternalLink, RefreshCw, CheckCircle2, AlertCircle, ChevronRight, ShieldCheck } from 'lucide-react';
 import { Order } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
 
@@ -144,8 +144,9 @@ export function CustomerOrdersDrawer({
 
           {/* Footer */}
           <div className="p-4 border-t border-white/10 bg-[#080B11] text-center">
-            <p className="text-[11px] text-slate-500 font-medium">
-              🔒 Tus datos e historial se resguardan de forma privada en tu dispositivo.
+            <p className="text-[11px] text-slate-500 font-medium flex items-center justify-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+              <span>Tus datos e historial se resguardan de forma privada en tu dispositivo.</span>
             </p>
           </div>
         </div>

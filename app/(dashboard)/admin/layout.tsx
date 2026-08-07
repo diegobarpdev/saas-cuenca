@@ -14,7 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const isLogged = localStorage.getItem('super_admin_logged') === 'true' || document.cookie.includes('super_admin_session=true');
+      const isLogged = sessionStorage.getItem('is_super_admin_impersonating') === 'true';
       setIsSuperAdmin(isLogged);
     }
   }, []);

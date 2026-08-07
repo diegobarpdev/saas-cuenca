@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, CheckCircle2, Upload, Sparkles, Copy, Check, Landmark } from 'lucide-react';
+import { ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, CheckCircle2, Upload, Sparkles, Copy, Check, Landmark, Truck, Store, Utensils } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { MOCK_BUSINESS } from '@/lib/supabase/mock-data';
 import { useCart } from '@/hooks/useCart';
@@ -346,35 +346,38 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
               <button
                 type="button"
                 onClick={() => setTipoEntrega('domicilio')}
-                className={`p-3.5 rounded-2xl border text-xs font-display font-bold text-center transition-all ${
+                className={`p-3.5 rounded-2xl border text-xs font-display font-bold text-center flex items-center justify-center gap-2 transition-all ${
                   tipoEntrega === 'domicilio'
                     ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-md shadow-amber-500/10'
                     : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
-                🚚 Domicilio
+                <Truck className="w-4 h-4" />
+                <span>Domicilio</span>
               </button>
               <button
                 type="button"
                 onClick={() => setTipoEntrega('retiro_local')}
-                className={`p-3.5 rounded-2xl border text-xs font-display font-bold text-center transition-all ${
+                className={`p-3.5 rounded-2xl border text-xs font-display font-bold text-center flex items-center justify-center gap-2 transition-all ${
                   tipoEntrega === 'retiro_local'
                     ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-md shadow-amber-500/10'
                     : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
-                🏪 Retiro Local
+                <Store className="w-4 h-4" />
+                <span>Retiro Local</span>
               </button>
               <button
                 type="button"
                 onClick={() => setTipoEntrega('mesa')}
-                className={`p-3.5 rounded-2xl border text-xs font-display font-bold text-center transition-all ${
+                className={`p-3.5 rounded-2xl border text-xs font-display font-bold text-center flex items-center justify-center gap-2 transition-all ${
                   tipoEntrega === 'mesa'
                     ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-md shadow-amber-500/10'
                     : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
-                🪟 En Mesa
+                <Utensils className="w-4 h-4" />
+                <span>En Mesa</span>
               </button>
             </div>
 

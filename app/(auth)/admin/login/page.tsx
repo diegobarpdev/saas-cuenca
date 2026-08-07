@@ -13,6 +13,9 @@ export default function AdminLoginPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('is_super_admin_impersonating');
+    }
     // Simulación de login local para desarrollo
     setTimeout(() => {
       setLoading(false);

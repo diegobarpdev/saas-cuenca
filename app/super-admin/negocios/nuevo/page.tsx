@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Building2, Save, Sparkles } from 'lucide-react';
+import { ArrowLeft, Building2, Save, Sparkles, CreditCard, Bell, Printer, Database } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 
@@ -242,7 +242,7 @@ export default function CreateBusinessPage() {
                     onChange={(e) => setHasPayphone(e.target.checked)}
                     className="rounded accent-purple-500"
                   />
-                  <span>💳 PayPhone Tarjetas (+$9/m)</span>
+                  <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-purple-400" /> PayPhone Tarjetas (+$9/m)</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-purple-500/40">
                   <input
@@ -251,7 +251,7 @@ export default function CreateBusinessPage() {
                     onChange={(e) => setHasLiveKitchen(e.target.checked)}
                     className="rounded accent-purple-500"
                   />
-                  <span>🔔 Alertas Cocina (+$7/m)</span>
+                  <span className="flex items-center gap-1.5"><Bell className="w-3.5 h-3.5 text-purple-400" /> Alertas Cocina (+$7/m)</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-purple-500/40">
                   <input
@@ -260,7 +260,7 @@ export default function CreateBusinessPage() {
                     onChange={(e) => setHasPosPrinting(e.target.checked)}
                     className="rounded accent-purple-500"
                   />
-                  <span>🖨️ Impresión POS (+$7/m)</span>
+                  <span className="flex items-center gap-1.5"><Printer className="w-3.5 h-3.5 text-purple-400" /> Impresión POS (+$7/m)</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-purple-500/40">
                   <input
@@ -269,7 +269,7 @@ export default function CreateBusinessPage() {
                     onChange={(e) => setHasCrmExport(e.target.checked)}
                     className="rounded accent-purple-500"
                   />
-                  <span>📊 CRM Exportación (+$5/m)</span>
+                  <span className="flex items-center gap-1.5"><Database className="w-3.5 h-3.5 text-purple-400" /> CRM Exportación (+$5/m)</span>
                 </label>
               </div>
             </div>

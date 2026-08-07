@@ -44,7 +44,7 @@ export default function AdminMarketplacePage() {
       description: 'Notificación con sonido de timbre fuerte en tiempo real cada vez que un cliente realiza un nuevo pedido en tu local.',
       benefits: [
         'Alertas sonoras instantáneas en pantalla',
-        'Flujo de estados en tiempo real (Pendiente ➔ Cocina ➔ Listo)',
+        'Flujo de estados en tiempo real (Pendiente -> Cocina -> Listo)',
         'Sin refrescar la página manualmente',
       ],
     },
@@ -131,9 +131,14 @@ export default function AdminMarketplacePage() {
                     <Icon className="w-5 h-5 text-emerald-400" />
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-mono-tech font-bold border ${
-                    mod.active ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-slate-900 text-slate-300 border-slate-700'
+                    mod.active ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 flex items-center gap-1.5' : 'bg-slate-900 text-slate-300 border-slate-700'
                   }`}>
-                    {mod.active ? '✓ ACTIVO EN TU PLAN' : mod.price}
+                    {mod.active ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>ACTIVO EN TU PLAN</span>
+                      </>
+                    ) : mod.price}
                   </span>
                 </div>
 

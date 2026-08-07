@@ -21,49 +21,56 @@ export function CustomToaster() {
     <div 
       className="fixed top-4 right-4 left-4 sm:left-auto z-50 flex flex-col gap-2.5 max-w-sm w-auto sm:w-[350px] pointer-events-none"
       aria-live="assertive"
-      aria-instant="true"
+      aria-atomic="true"
     >
       {toasts.map((t) => {
-        // Asignación de icono y color de acento
+        // Asignación de icono, borde de alta visibilidad y barra de acento
         let Icon = Info;
-        let iconColor = 'text-sky-400';
-        let borderColor = 'border-sky-500/20';
-        let bgGlow = 'bg-sky-500/5';
-        
+        let iconColor = 'text-cyan-400';
+        let borderColor = 'border-cyan-500/50 hover:border-cyan-500/80';
+        let accentBarColor = 'bg-cyan-500';
+        let shadowGlow = 'shadow-cyan-500/10';
+
         if (t.type === 'success') {
           Icon = CheckCircle2;
           iconColor = 'text-emerald-400';
-          borderColor = 'border-emerald-500/20';
-          bgGlow = 'bg-emerald-500/5';
+          borderColor = 'border-emerald-500/50 hover:border-emerald-500/80';
+          accentBarColor = 'bg-emerald-500';
+          shadowGlow = 'shadow-emerald-500/10';
         } else if (t.type === 'error') {
           Icon = XCircle;
           iconColor = 'text-rose-400';
-          borderColor = 'border-rose-500/20';
-          bgGlow = 'bg-rose-500/5';
+          borderColor = 'border-rose-500/50 hover:border-rose-500/80';
+          accentBarColor = 'bg-rose-500';
+          shadowGlow = 'shadow-rose-500/10';
         } else if (t.type === 'warning') {
           Icon = AlertTriangle;
           iconColor = 'text-amber-400';
-          borderColor = 'border-amber-500/20';
-          bgGlow = 'bg-amber-500/5';
+          borderColor = 'border-amber-500/50 hover:border-amber-500/80';
+          accentBarColor = 'bg-amber-500';
+          shadowGlow = 'shadow-amber-500/10';
         }
 
         return (
           <div
             key={t.id}
-            className={`pointer-events-auto w-full p-3.5 sm:p-4 rounded-2xl bg-[#121826] border ${borderColor} ${bgGlow} shadow-2xl flex items-start gap-3 transition-all duration-300 animate-in slide-in-from-top-4 fade-in duration-200`}
+            className={`pointer-events-auto relative w-full p-4 rounded-2xl bg-slate-950/95 backdrop-blur-2xl border ${borderColor} shadow-2xl ${shadowGlow} flex items-start gap-3.5 transition-all duration-300 animate-in slide-in-from-top-4 fade-in overflow-hidden`}
           >
+            {/* Barra lateral de acento de color de estado */}
+            <div className={`absolute top-0 left-0 bottom-0 w-1.5 ${accentBarColor}`}></div>
+
             {/* Icono de Estado */}
-            <div className="shrink-0 mt-0.5">
+            <div className="shrink-0 mt-0.5 ml-1">
               <Icon className={`w-5 h-5 ${iconColor}`} />
             </div>
 
             {/* Mensaje e Info */}
             <div className="flex-1 min-w-0">
-              <h4 className="font-display font-extrabold text-xs sm:text-sm text-white leading-tight">
+              <h4 className="font-display font-black text-xs sm:text-sm text-slate-100 leading-snug">
                 {t.message}
               </h4>
               {t.description && (
-                <p className="text-[11px] sm:text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-300 font-medium mt-1 leading-relaxed">
                   {t.description}
                 </p>
               )}
@@ -72,10 +79,10 @@ export function CustomToaster() {
             {/* Botón Cerrar */}
             <button
               onClick={() => toastStore.dismiss(t.id)}
-              className="shrink-0 p-1 rounded-lg hover:bg-white/5 text-slate-500 hover:text-slate-300 transition-colors"
+              className="shrink-0 p-1.5 rounded-xl hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
               aria-label="Cerrar notificación"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         );

@@ -33,7 +33,7 @@ const defaultThemeOptions = [
 const PRESET_THEMES = [
   {
     id: 'luxe-bistro',
-    name: '🥖 Luxe Bistro',
+    name: 'Luxe Bistro',
     desc: 'Oscuro elegante con acentos en oro ámbar',
     colors: {
       color_primario: '#F59E0B',
@@ -48,7 +48,7 @@ const PRESET_THEMES = [
   },
   {
     id: 'cafe-artesanal',
-    name: '☕ Café Artesanal',
+    name: 'Café Artesanal',
     desc: 'Tonos tostados y calidez de espresso',
     colors: {
       color_primario: '#D97706',
@@ -63,7 +63,7 @@ const PRESET_THEMES = [
   },
   {
     id: 'fresh-organic',
-    name: '🥑 Fresh Organic',
+    name: 'Fresh Organic',
     desc: 'Esmeralda botánico y frescura natural',
     colors: {
       color_primario: '#10B981',
@@ -78,7 +78,7 @@ const PRESET_THEMES = [
   },
   {
     id: 'bistro-moderno',
-    name: '🍕 Crimson Bistro',
+    name: 'Crimson Bistro',
     desc: 'Carmesí apasionado y alta intensidad',
     colors: {
       color_primario: '#EF4444',
@@ -93,7 +93,7 @@ const PRESET_THEMES = [
   },
   {
     id: 'clean-light',
-    name: '☀️ Clean Slate (Claro)',
+    name: 'Clean Slate (Claro)',
     desc: 'Minimalismo claro, moderno y luminoso',
     colors: {
       color_primario: '#2563EB',
@@ -585,12 +585,12 @@ export default function AdminBrandingPage() {
                     <h4 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider border-b border-white/5 pb-1 flex items-center justify-between">
                       <span>
                         {cat === 'Universal'
-                          ? '✨ Universales y Texturas'
+                          ? 'Universales y Texturas'
                           : cat === 'Comida'
-                          ? '🍔 Especialidades de Comida'
+                          ? 'Especialidades de Comida'
                           : cat === 'Bebida'
-                          ? '🍹 Bebidas y Copas'
-                          : '🧁 Heladerías y Dulces'}
+                          ? 'Bebidas y Copas'
+                          : 'Heladerías y Dulces'}
                       </span>
                       <span className="text-[10px] font-normal lowercase text-slate-500">
                         {catPatterns.length} {catPatterns.length === 1 ? 'estilo' : 'estilos'}
@@ -753,7 +753,7 @@ export default function AdminBrandingPage() {
               {!bannerUrl && (
                 <div className="space-y-1">
                   <span className="text-xs font-bold uppercase tracking-wider" style={{ color: colorPrimario }}>
-                    ★ Especialidades de la Casa
+                    Especialidades de la Casa
                   </span>
                   <p className="text-[11px] opacity-90">{slogan}</p>
                 </div>

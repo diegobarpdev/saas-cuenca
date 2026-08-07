@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Building2, Plus, ExternalLink, Edit3, Trash2, X, Save, Search, RefreshCw, LogIn } from 'lucide-react';
+import { Building2, Plus, ExternalLink, Edit3, Trash2, X, Save, Search, RefreshCw, LogIn, CreditCard, Bell, Printer, Database, Globe } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Business } from '@/lib/types/database';
 import { CustomSelect } from '@/components/ui/CustomSelect';
@@ -56,6 +56,7 @@ export default function SuperAdminDashboardPage() {
   const handleEnterAsAdmin = (businessId: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('yapi_admin_business_id', businessId);
+      sessionStorage.setItem('is_super_admin_impersonating', 'true');
     }
     router.push('/admin/dashboard');
   };
@@ -407,7 +408,7 @@ export default function SuperAdminDashboardPage() {
                       onChange={(e) => setEditHasPayphone(e.target.checked)}
                       className="rounded accent-emerald-500"
                     />
-                    <span>💳 PayPhone Tarjetas (+$9/m)</span>
+                    <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-emerald-400" /> PayPhone Tarjetas (+$9/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
                     <input
@@ -416,7 +417,7 @@ export default function SuperAdminDashboardPage() {
                       onChange={(e) => setEditHasLiveKitchen(e.target.checked)}
                       className="rounded accent-emerald-500"
                     />
-                    <span>🔔 Alertas Cocina (+$7/m)</span>
+                    <span className="flex items-center gap-1.5"><Bell className="w-3.5 h-3.5 text-emerald-400" /> Alertas Cocina (+$7/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
                     <input
@@ -425,7 +426,7 @@ export default function SuperAdminDashboardPage() {
                       onChange={(e) => setEditHasPosPrinting(e.target.checked)}
                       className="rounded accent-emerald-500"
                     />
-                    <span>🖨️ Impresión POS (+$7/m)</span>
+                    <span className="flex items-center gap-1.5"><Printer className="w-3.5 h-3.5 text-emerald-400" /> Impresión POS (+$7/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
                     <input
@@ -434,7 +435,7 @@ export default function SuperAdminDashboardPage() {
                       onChange={(e) => setEditHasCrmExport(e.target.checked)}
                       className="rounded accent-emerald-500"
                     />
-                    <span>📊 CRM Exportación (+$5/m)</span>
+                    <span className="flex items-center gap-1.5"><Database className="w-3.5 h-3.5 text-emerald-400" /> CRM Exportación (+$5/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700 sm:col-span-2">
                     <input
@@ -443,7 +444,7 @@ export default function SuperAdminDashboardPage() {
                       onChange={(e) => setEditHasCustomDomain(e.target.checked)}
                       className="rounded accent-emerald-500"
                     />
-                    <span>🌐 Dominio Personalizado (+$9/m)</span>
+                    <span className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-emerald-400" /> Dominio Personalizado (+$9/m)</span>
                   </label>
                 </div>
               </div>

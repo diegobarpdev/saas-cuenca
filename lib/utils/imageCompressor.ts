@@ -79,7 +79,7 @@ export async function compressImage(
             });
 
             console.log(
-              `⚡ Optimización completada: ${(file.size / 1024).toFixed(1)} KB ➔ ${(
+              `Optimización completada: ${(file.size / 1024).toFixed(1)} KB -> ${(
                 compressedFile.size / 1024
               ).toFixed(1)} KB (Ahorro: ${(
                 (1 - compressedFile.size / file.size) *
