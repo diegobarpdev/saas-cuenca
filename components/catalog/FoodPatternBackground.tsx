@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { PatternType, getPatternSvgUrl } from '@/lib/utils/patterns';
 
 interface FoodPatternBackgroundProps {
-  pattern?: 'ondas_fluidas' | 'malla_aurora' | 'lineas_geomets' | 'degradado_luxe' | 'sin_patron';
+  pattern?: PatternType;
+  color?: string;
 }
 
-export function FoodPatternBackground({ pattern = 'ondas_fluidas' }: FoodPatternBackgroundProps) {
+export function FoodPatternBackground({ pattern = 'ondas_fluidas', color = '#ffffff' }: FoodPatternBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -108,6 +110,17 @@ export function FoodPatternBackground({ pattern = 'ondas_fluidas' }: FoodPattern
     return null;
   }
 
+  // Verificar si es un patrón custom SVG de la base de datos
+  const isCustomSvgPattern = ![
+    'ondas_fluidas',
+    'malla_aurora',
+    'lineas_geomets',
+    'degradado_luxe',
+    'sin_patron',
+  ].includes(pattern);
+
+  const patternUrl = isCustomSvgPattern ? getPatternSvgUrl(pattern, color) : '';
+
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
       {/* 1. Opción: Ondas Curvas Orgánicas Animadas */}
@@ -172,6 +185,24 @@ export function FoodPatternBackground({ pattern = 'ondas_fluidas' }: FoodPattern
         <>
           <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 via-transparent to-emerald-500/10 opacity-70"></div>
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-amber-500/15 rounded-full blur-[180px]"></div>
+        </>
+      )}
+
+      {/* 5. Opción: Patrón Custom SVG Cargado desde el Registro */}
+      {isCustomSvgPattern && patternUrl && (
+        <>
+          {/* Fondo Texturizado */}
+          <div
+            className="absolute inset-0 opacity-[0.04] sm:opacity-[0.06] transition-opacity duration-500"
+            style={{
+              backgroundImage: `url("${patternUrl}")`,
+              backgroundRepeat: 'repeat',
+              backgroundSize: ['geometria_moderna', 'lineas_organicas'].includes(pattern) ? '60px 60px' : '110px 110px',
+            }}
+          ></div>
+          {/* Resplandores Ambientales de Acompañamiento */}
+          <div className="absolute -top-24 left-1/4 w-[450px] h-[450px] bg-amber-500/5 rounded-full blur-[130px]"></div>
+          <div className="absolute top-1/2 right-10 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[150px]"></div>
         </>
       )}
     </div>

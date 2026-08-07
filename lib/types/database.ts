@@ -29,6 +29,33 @@ export interface BillingData {
   direccion: string;
 }
 
+export type PatternType =
+  | 'ondas_fluidas'
+  | 'malla_aurora'
+  | 'lineas_geomets'
+  | 'degradado_luxe'
+  | 'sin_patron'
+  | 'restaurante_general'
+  | 'cafeteria'
+  | 'panaderia'
+  | 'pasteleria'
+  | 'pizzeria'
+  | 'hamburgueseria'
+  | 'sushi_japones'
+  | 'comida_mexicana'
+  | 'comida_italiana'
+  | 'mariscos'
+  | 'comida_rapida'
+  | 'comida_saludable'
+  | 'parrilladas'
+  | 'bar_cocteles'
+  | 'vinos'
+  | 'cerveceria'
+  | 'heladeria_postres'
+  | 'geometria_moderna'
+  | 'lineas_organicas'
+  | 'hojas_ramas';
+
 export interface BusinessBranding {
   slogan?: string;
   banner_url?: string;
@@ -41,7 +68,7 @@ export interface BusinessBranding {
   tipografia?: 'Outfit' | 'Inter' | 'Playfair' | 'Plus Jakarta Sans';
   estilo_botones?: 'redondeado' | 'semi-redondeado' | 'pill' | 'recto';
   tema_defecto?: 'oscuro' | 'claro';
-  patron_fondo?: 'ondas_fluidas' | 'malla_aurora' | 'lineas_geomets' | 'degradado_luxe' | 'sin_patron';
+  patron_fondo?: PatternType;
 }
 
 export interface OperationalSettings {

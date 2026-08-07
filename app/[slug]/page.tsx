@@ -131,7 +131,10 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
       }}
     >
       {/* Estampado & Luces Ambientales de Fondo Personalizable */}
-      <FoodPatternBackground pattern={business.branding?.patron_fondo} />
+      <FoodPatternBackground 
+        pattern={business.branding?.patron_fondo} 
+        color={business.branding?.color_primario || '#ffffff'}
+      />
 
       {/* Contenido Principal con Espaciado Generoso & Riqueza Visual */}
       <main className="max-w-7xl mx-auto px-3 sm:px-8 py-4 sm:py-8 flex-1 w-full space-y-6 sm:space-y-8 relative z-10">

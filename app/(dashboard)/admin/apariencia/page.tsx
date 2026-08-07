@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { BusinessBranding } from '@/lib/types/database';
 import { compressImage } from '@/lib/utils/imageCompressor';
 import { CustomSelect } from '@/components/ui/CustomSelect';
+import { PATTERNS_LIST, getPatternSvgUrl, PatternType } from '@/lib/utils/patterns';
 
 const typographyOptions = [
   { value: 'Outfit', label: 'Outfit (Moderna & Vanguardista)' },
@@ -127,7 +128,7 @@ export default function AdminBrandingPage() {
   const [tipografia, setTipografia] = useState<'Outfit' | 'Inter' | 'Playfair' | 'Plus Jakarta Sans'>('Outfit');
   const [estiloBotones, setEstiloBotones] = useState<'redondeado' | 'semi-redondeado' | 'pill' | 'recto'>('redondeado');
   const [temaDefecto, setTemaDefecto] = useState<'oscuro' | 'claro'>('oscuro');
-  const [patronFondo, setPatronFondo] = useState<'ondas_fluidas' | 'malla_aurora' | 'lineas_geomets' | 'degradado_luxe' | 'sin_patron'>('ondas_fluidas');
+  const [patronFondo, setPatronFondo] = useState<PatternType>('ondas_fluidas');
 
   // Subida de Archivos
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -574,90 +575,111 @@ export default function AdminBrandingPage() {
               Personaliza el fondo visual de tu catálogo público eligiendo entre 4 patrones dinámicos o un fondo oscuro limpio.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-xs">
-              {[
-                {
-                  id: 'ondas_fluidas',
-                  label: '🌊 Ondas Curvas Fluídas',
-                  desc: 'Canvas animado de seda líquida en movimiento (Recomendado)',
-                  preview: (
-                    <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5">
-                      <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 200 60" preserveAspectRatio="none">
-                        <path d="M0 20 Q 50 40 100 20 T 200 20" stroke="#F59E0B" strokeWidth="2" fill="none" opacity="0.7" />
-                        <path d="M0 35 Q 60 10 120 40 T 200 30" stroke="#10B981" strokeWidth="2" fill="none" opacity="0.6" />
-                        <path d="M0 50 Q 40 30 100 45 T 200 35" stroke="#38BDF8" strokeWidth="1.5" fill="none" opacity="0.5" />
-                      </svg>
-                      <div className="absolute top-1 left-2 w-12 h-12 bg-amber-500/20 rounded-full blur-lg"></div>
+            <div className="space-y-6">
+              {(['Universal', 'Comida', 'Bebida', 'Dulces'] as const).map((cat) => {
+                const catPatterns = PATTERNS_LIST.filter((p) => p.category === cat);
+                if (catPatterns.length === 0) return null;
+
+                return (
+                  <div key={cat} className="space-y-3">
+                    <h4 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider border-b border-white/5 pb-1 flex items-center justify-between">
+                      <span>
+                        {cat === 'Universal'
+                          ? '✨ Universales y Texturas'
+                          : cat === 'Comida'
+                          ? '🍔 Especialidades de Comida'
+                          : cat === 'Bebida'
+                          ? '🍹 Bebidas y Copas'
+                          : '🧁 Heladerías y Dulces'}
+                      </span>
+                      <span className="text-[10px] font-normal lowercase text-slate-500">
+                        {catPatterns.length} {catPatterns.length === 1 ? 'estilo' : 'estilos'}
+                      </span>
+                    </h4>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-xs">
+                      {catPatterns.map((opt) => {
+                        let previewNode = null;
+                        if (opt.id === 'ondas_fluidas') {
+                          previewNode = (
+                            <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5">
+                              <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 200 60" preserveAspectRatio="none">
+                                <path d="M0 20 Q 50 40 100 20 T 200 20" stroke={colorPrimario} strokeWidth="2" fill="none" opacity="0.7" />
+                                <path d="M0 35 Q 60 10 120 40 T 200 30" stroke="#10B981" strokeWidth="2" fill="none" opacity="0.6" />
+                              </svg>
+                              <div className="absolute top-1 left-2 w-12 h-12 bg-amber-500/20 rounded-full blur-lg"></div>
+                            </div>
+                          );
+                        } else if (opt.id === 'malla_aurora') {
+                          previewNode = (
+                            <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5">
+                              <div className="absolute top-1 left-2 w-16 h-16 bg-amber-500/30 rounded-full blur-xl animate-pulse"></div>
+                              <div className="absolute bottom-1 right-2 w-16 h-16 bg-emerald-500/25 rounded-full blur-xl"></div>
+                            </div>
+                          );
+                        } else if (opt.id === 'lineas_geomets') {
+                          previewNode = (
+                            <div
+                              className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5 opacity-60"
+                              style={{
+                                backgroundImage: `linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(to right, #ffffff 1px, transparent 1px)`,
+                                backgroundSize: '12px 12px',
+                              }}
+                            >
+                              <div className="absolute top-2 right-2 w-10 h-10 bg-amber-500/20 rounded-full blur-md"></div>
+                            </div>
+                          );
+                        } else if (opt.id === 'degradado_luxe') {
+                          previewNode = (
+                            <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-gradient-to-b from-amber-500/25 via-[#07090E] to-emerald-500/20 mb-2.5">
+                              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-8 bg-amber-400/30 rounded-full blur-md"></div>
+                            </div>
+                          );
+                        } else if (opt.id === 'sin_patron') {
+                          previewNode = (
+                            <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5 flex items-center justify-center text-[10px] font-mono text-slate-500">
+                              <span>[ 100% Sólido ]</span>
+                            </div>
+                          );
+                        } else {
+                          const svgUrl = getPatternSvgUrl(opt.id, colorPrimario);
+                          previewNode = (
+                            <div
+                              className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5 opacity-70"
+                              style={{
+                                backgroundImage: `url("${svgUrl}")`,
+                                backgroundRepeat: 'repeat',
+                                backgroundSize: ['geometria_moderna', 'lineas_organicas'].includes(opt.id) ? '25px 25px' : '45px 45px',
+                              }}
+                            ></div>
+                          );
+                        }
+
+                        return (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => setPatronFondo(opt.id)}
+                            className={`p-3 rounded-2xl border text-left transition-all ${
+                              patronFondo === opt.id
+                                ? 'bg-purple-500/15 border-purple-500 text-white shadow-lg shadow-purple-500/10 ring-2 ring-purple-500/40'
+                                : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                            }`}
+                          >
+                            {previewNode}
+                            <span className="font-display font-bold block text-[13px] text-white mb-0.5 truncate">
+                              {opt.label}
+                            </span>
+                            <span className="text-[10px] text-slate-400 leading-snug block line-clamp-2">
+                              {opt.desc}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
-                  ),
-                },
-                {
-                  id: 'malla_aurora',
-                  label: '🌌 Malla Aurora Difusa',
-                  desc: 'Luces de neón ambientales sin líneas fijas',
-                  preview: (
-                    <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5">
-                      <div className="absolute top-1 left-2 w-16 h-16 bg-amber-500/30 rounded-full blur-xl animate-pulse"></div>
-                      <div className="absolute bottom-1 right-2 w-16 h-16 bg-emerald-500/25 rounded-full blur-xl"></div>
-                    </div>
-                  ),
-                },
-                {
-                  id: 'lineas_geomets',
-                  label: '📐 Rejilla Tech Grid',
-                  desc: 'Cuadrícula minimalista con textura de precisión',
-                  preview: (
-                    <div
-                      className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5 opacity-60"
-                      style={{
-                        backgroundImage: `linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(to right, #ffffff 1px, transparent 1px)`,
-                        backgroundSize: '12px 12px',
-                      }}
-                    >
-                      <div className="absolute top-2 right-2 w-10 h-10 bg-amber-500/20 rounded-full blur-md"></div>
-                    </div>
-                  ),
-                },
-                {
-                  id: 'degradado_luxe',
-                  label: '✨ Degradado Velvet Luxe',
-                  desc: 'Fondo degradado cálido oro y obsidian',
-                  preview: (
-                    <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-gradient-to-b from-amber-500/25 via-[#07090E] to-emerald-500/20 mb-2.5">
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-8 bg-amber-400/30 rounded-full blur-md"></div>
-                    </div>
-                  ),
-                },
-                {
-                  id: 'sin_patron',
-                  label: '🚫 Sin Patrón (Sólido)',
-                  desc: 'Fondo oscuro plano y limpio sin gráficos',
-                  preview: (
-                    <div className="w-full h-16 rounded-xl relative overflow-hidden border border-white/10 bg-[#07090E] mb-2.5 flex items-center justify-center text-[10px] font-mono text-slate-500">
-                      <span>[ 100% Sólido ]</span>
-                    </div>
-                  ),
-                },
-              ].map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => setPatronFondo(opt.id as any)}
-                  className={`p-3.5 rounded-2xl border text-left transition-all ${
-                    patronFondo === opt.id
-                      ? 'bg-purple-500/15 border-purple-500 text-white shadow-lg shadow-purple-500/10 ring-2 ring-purple-500/40'
-                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
-                  }`}
-                >
-                  {opt.preview}
-                  <span className="font-display font-bold block text-sm text-white mb-0.5">
-                    {opt.label}
-                  </span>
-                  <span className="text-[11px] text-slate-400 leading-snug block">
-                    {opt.desc}
-                  </span>
-                </button>
-              ))}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </form>
