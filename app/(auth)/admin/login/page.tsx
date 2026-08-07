@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Store, Lock, Mail, ArrowRight } from 'lucide-react';
+import { Store, Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,13 +60,22 @@ export default function AdminLoginPage() {
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500"
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-3 text-slate-500 hover:text-slate-300 transition-colors"
+                tabIndex={-1}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 

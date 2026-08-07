@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, Building2, CreditCard, Clock, ShieldCheck, RefreshCw, QrCode, Banknote, Landmark, Smartphone, Plus, Trash2 } from 'lucide-react';
+import { Settings, Save, Building2, CreditCard, Clock, ShieldCheck, RefreshCw, QrCode, Banknote, Landmark, Smartphone, Plus, Trash2, Eye, EyeOff } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { createClient } from '@/lib/supabase/client';
@@ -85,6 +85,7 @@ export default function AdminSettingsPage() {
   // PayPhone
   const [aceptaPayphone, setAceptaPayphone] = useState(true);
   const [payphoneToken, setPayphoneToken] = useState('');
+  const [showPayphoneToken, setShowPayphoneToken] = useState(false);
 
   // Efectivo
   const [aceptaEfectivo, setAceptaEfectivo] = useState(true);
@@ -642,13 +643,24 @@ export default function AdminSettingsPage() {
                   <label className="block text-[11px] font-display font-medium text-slate-300 mb-1">
                     Token de Comercio PayPhone
                   </label>
-                  <input
-                    type="password"
-                    placeholder="Token JWT proporcionado por PayPhone Ecuador"
-                    value={payphoneToken}
-                    onChange={(e) => setPayphoneToken(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white font-mono"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPayphoneToken ? 'text' : 'password'}
+                      placeholder="Token JWT proporcionado por PayPhone Ecuador"
+                      value={payphoneToken}
+                      onChange={(e) => setPayphoneToken(e.target.value)}
+                      className="w-full px-3.5 py-2.5 pr-10 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPayphoneToken((v) => !v)}
+                      className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 transition-colors"
+                      tabIndex={-1}
+                      aria-label={showPayphoneToken ? 'Ocultar token' : 'Mostrar token'}
+                    >
+                      {showPayphoneToken ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
