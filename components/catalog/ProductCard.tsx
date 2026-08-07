@@ -36,7 +36,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
       {/* Tarjeta de Producto - Diseño Unificado Premium */}
       <div
         onClick={() => setShowPreview(true)}
-        className={`group relative rounded-2xl sm:rounded-3xl bg-[#0D121F]/90 backdrop-blur-md border transition-all duration-300 overflow-hidden flex flex-row sm:flex-col justify-between shadow-lg hover:shadow-2xl hover:shadow-amber-500/10 p-3 sm:p-0 cursor-pointer h-full ${
+        className={`group relative rounded-2xl sm:rounded-3xl bg-[#0D121F] border transition-all duration-300 overflow-hidden flex flex-row sm:flex-col justify-between shadow-lg hover:shadow-2xl hover:shadow-amber-500/10 p-3 sm:p-0 cursor-pointer h-full ${
           product.disponible
             ? 'border-white/10 hover:border-amber-500/40'
             : 'border-rose-500/20 opacity-60 bg-[#0D121F]/50'

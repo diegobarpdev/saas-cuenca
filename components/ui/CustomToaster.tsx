@@ -50,7 +50,7 @@ export function CustomToaster() {
         return (
           <div
             key={t.id}
-            className={`pointer-events-auto w-full p-3.5 sm:p-4 rounded-2xl bg-[#0D121F]/95 backdrop-blur-xl border ${borderColor} ${bgGlow} shadow-2xl flex items-start gap-3 transition-all duration-300 animate-in slide-in-from-top-4 fade-in duration-200`}
+            className={`pointer-events-auto w-full p-3.5 sm:p-4 rounded-2xl bg-[#121826] border ${borderColor} ${bgGlow} shadow-2xl flex items-start gap-3 transition-all duration-300 animate-in slide-in-from-top-4 fade-in duration-200`}
           >
             {/* Icono de Estado */}
             <div className="shrink-0 mt-0.5">
