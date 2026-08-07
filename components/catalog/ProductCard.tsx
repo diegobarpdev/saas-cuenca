@@ -156,14 +156,23 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
               <X className="w-4 h-4" />
             </button>
 
-            {/* Imagen del Modal */}
-            <div className="relative w-full h-64 bg-[#07090E]">
+            {/* Imagen del Modal con Blur Inteligente de Fondo */}
+            <div className="relative w-full h-64 bg-[#07090E] overflow-hidden">
               {product.imagen_url ? (
-                <img
-                  src={product.imagen_url}
-                  alt={product.nombre}
-                  className="w-full h-full object-cover"
-                />
+                <>
+                  {/* Imagen difusa de fondo para rellenar bordes */}
+                  <img
+                    src={product.imagen_url}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-30 select-none pointer-events-none"
+                  />
+                  {/* Imagen nítida contenida al frente */}
+                  <img
+                    src={product.imagen_url}
+                    alt={product.nombre}
+                    className="relative z-10 w-full h-full object-contain"
+                  />
+                </>
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-[#121929] via-[#0E1424] to-[#182035] flex items-center justify-center text-slate-400">
                   <div className="w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-display font-black text-4xl shadow-lg">
