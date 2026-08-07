@@ -14,6 +14,7 @@ interface CartDrawerProps {
   onClearCart: () => void;
   subtotal: number;
   businessSlug: string;
+  primaryColor?: string;
 }
 
 export function CartDrawer({
@@ -25,6 +26,7 @@ export function CartDrawer({
   onClearCart,
   subtotal,
   businessSlug,
+  primaryColor = '#10B981',
 }: CartDrawerProps) {
   React.useEffect(() => {
     if (isOpen) {
@@ -67,7 +69,7 @@ export function CartDrawer({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+            className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -100,7 +102,7 @@ export function CartDrawer({
                           <span className="text-[11px] text-slate-500 line-through">
                             {formatCurrency(priceInfo.precioOriginal)}
                           </span>
-                          <span className="text-xs text-amber-400 font-bold">
+                          <span className="text-xs font-bold" style={{ color: primaryColor }}>
                             {formatCurrency(priceInfo.precioActual)} c/u
                           </span>
                           <span className="text-[10px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 font-sans font-bold border border-rose-500/30">
@@ -108,7 +110,7 @@ export function CartDrawer({
                           </span>
                         </>
                       ) : (
-                        <span className="text-xs text-emerald-400 font-semibold">
+                        <span className="text-xs font-semibold" style={{ color: primaryColor }}>
                           {formatCurrency(priceInfo.precioOriginal)} c/u
                         </span>
                       )}
@@ -120,14 +122,14 @@ export function CartDrawer({
                   <div className="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex-shrink-0">
                     <button
                       onClick={() => onUpdateQuantity(item.product.id, item.cantidad - 1, item.notas)}
-                      className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                      className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
                     <span className="w-6 text-center font-mono-tech font-bold text-xs text-white">{item.cantidad}</span>
                     <button
                       onClick={() => onUpdateQuantity(item.product.id, item.cantidad + 1, item.notas)}
-                      className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                      className="p-1 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                     </button>
@@ -136,7 +138,7 @@ export function CartDrawer({
                   {/* Botón Eliminar */}
                   <button
                     onClick={() => onRemoveItem(item.product.id, item.notas)}
-                    className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors flex-shrink-0"
+                    className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors flex-shrink-0 cursor-pointer"
                     title="Eliminar"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -151,34 +153,35 @@ export function CartDrawer({
         {items.length > 0 && (
           <div className="p-4 border-t border-white/10 bg-slate-950/90 flex-shrink-0 space-y-3">
             {ahorroTotal > 0 && (
-              <div className="p-2.5 rounded-xl bg-gradient-to-r from-emerald-500/15 via-amber-500/15 to-rose-500/15 border border-emerald-500/30 flex items-center justify-between text-xs text-emerald-300 font-display font-semibold">
+              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-xs text-emerald-300 font-display font-semibold">
                 <span className="flex items-center gap-1.5">
-                  <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  <Flame className="w-4 h-4 text-emerald-400 fill-emerald-400" />
                   ¡Estás ahorrando con tus promociones!
                 </span>
-                <span className="font-mono-tech font-bold text-amber-400">-{formatCurrency(ahorroTotal)}</span>
+                <span className="font-mono-tech font-bold text-emerald-400">-{formatCurrency(ahorroTotal)}</span>
               </div>
             )}
 
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-400 font-medium">Subtotal a pagar</span>
-              <span className="font-mono-tech font-black text-xl text-emerald-400">{formatCurrency(subtotal)}</span>
+              <span className="font-mono-tech font-black text-xl text-white">{formatCurrency(subtotal)}</span>
             </div>
 
             <div className="flex gap-2.5">
               <button
                 onClick={onClearCart}
-                className="px-3.5 py-3 rounded-2xl border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900 text-xs font-display font-semibold transition-colors"
+                className="px-3.5 py-3 rounded-2xl border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900 text-xs font-display font-semibold transition-colors cursor-pointer"
               >
                 Vaciar
               </button>
               <Link
                 href={`/${businessSlug}/checkout`}
                 onClick={onClose}
-                className="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-display font-black text-sm flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/25 active:scale-98 transition-all border border-emerald-400/30"
+                style={{ backgroundColor: primaryColor, borderColor: primaryColor, color: '#090D16' }}
+                className="flex-1 py-3.5 px-5 rounded-2xl font-display font-black text-sm flex items-center justify-center gap-2 shadow-xl active:scale-98 transition-all border cursor-pointer"
               >
                 <span>Proceder al Checkout</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-slate-950" />
               </Link>
             </div>
           </div>

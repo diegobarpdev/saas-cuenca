@@ -476,15 +476,16 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
         )}
       </main>
 
-      {/* Floating Bottom Bar para Móviles (Estilo Apple / Shopify) */}
+      {/* Floating Bottom Bar para Móviles */}
       {totalItemsCount > 0 && (
         <div className="fixed bottom-5 left-4 right-4 z-40 max-w-md mx-auto">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-display font-black text-sm shadow-2xl shadow-amber-500/30 flex items-center justify-between active:scale-98 transition-all border border-amber-400/40"
+            style={{ backgroundColor: activePrimaryColor, borderColor: activePrimaryColor, color: '#090D16' }}
+            className="w-full py-4 px-6 rounded-2xl font-display font-black text-sm shadow-2xl flex items-center justify-between active:scale-98 transition-all border cursor-pointer"
           >
             <div className="flex items-center gap-3">
-              <span className="w-7 h-7 rounded-full bg-slate-950 text-amber-400 font-mono font-black text-xs flex items-center justify-center shadow-md">
+              <span className="w-7 h-7 rounded-full bg-slate-950 text-white font-mono font-black text-xs flex items-center justify-center shadow-md">
                 {totalItemsCount}
               </span>
               <span>Ver Pedido en Yapi</span>
@@ -515,6 +516,7 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
         onClearCart={clearCart}
         subtotal={subtotal}
         businessSlug={slug}
+        primaryColor={activePrimaryColor}
       />
     </div>
   );
