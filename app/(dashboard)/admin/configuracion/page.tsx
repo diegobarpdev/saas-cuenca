@@ -71,7 +71,7 @@ export default function AdminSettingsPage() {
       setRuc(business.ruc || '');
       setTelefonoWhatsapp(business.telefono_whatsapp || '');
       setDireccion(business.direccion || '');
-      setGoogleMapsUrl(business.google_maps_url || '');
+      setGoogleMapsUrl(business.configuracion_operativa?.google_maps_url || business.google_maps_url || '');
       setPayphoneToken(business.payphone_token || '');
 
       // Cargar Cuentas Bancarias
@@ -179,7 +179,6 @@ export default function AdminSettingsPage() {
           ruc,
           telefono_whatsapp: telefonoWhatsapp,
           direccion,
-          google_maps_url: googleMapsUrl || null,
           payphone_token: payphoneToken || null,
           datos_bancarios: {
             banco: primaryBank.banco,
@@ -193,6 +192,7 @@ export default function AdminSettingsPage() {
             tiempo_preparacion: tiempoPreparacion,
             permite_domicilio: permiteDomicilio,
             permite_retiro: permiteRetiro,
+            google_maps_url: googleMapsUrl || undefined,
 
             acepta_deuna: aceptaDeuna,
             deuna_numero: deunaNumero,

@@ -70,6 +70,7 @@ export interface OperationalSettings {
   tiempo_preparacion?: string;
   permite_domicilio?: boolean;
   permite_retiro?: boolean;
+  google_maps_url?: string;
 
   // Deuna!
   acepta_deuna?: boolean;
