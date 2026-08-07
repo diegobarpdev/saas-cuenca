@@ -21,7 +21,7 @@ export default function SuperAdminDashboardPage() {
   const [editRuc, setEditRuc] = useState('');
   const [editWhatsapp, setEditWhatsapp] = useState('');
   const [editDireccion, setEditDireccion] = useState('');
-  const [editPlan, setEditPlan] = useState<'trial' | 'basico' | 'pro'>('pro');
+  const [editPlan, setEditPlan] = useState<'trial' | 'basico'>('basico');
   const [editHasPayphone, setEditHasPayphone] = useState(false);
   const [editHasLiveKitchen, setEditHasLiveKitchen] = useState(false);
   const [editHasPosPrinting, setEditHasPosPrinting] = useState(false);
@@ -69,11 +69,11 @@ export default function SuperAdminDashboardPage() {
     setEditRuc(b.ruc || '');
     setEditWhatsapp(b.telefono_whatsapp || '');
     setEditDireccion(b.direccion || '');
-    setEditPlan(b.plan as any);
-    setEditHasPayphone(b.has_payphone || b.plan === 'pro');
-    setEditHasLiveKitchen(b.has_live_kitchen || b.plan === 'pro');
-    setEditHasPosPrinting(b.has_pos_printing || b.plan === 'pro');
-    setEditHasCrmExport(b.has_crm_export || b.plan === 'pro');
+    setEditPlan((b.plan as any) === 'basico' ? 'basico' : 'trial');
+    setEditHasPayphone(b.has_payphone || false);
+    setEditHasLiveKitchen(b.has_live_kitchen || false);
+    setEditHasPosPrinting(b.has_pos_printing || false);
+    setEditHasCrmExport(b.has_crm_export || false);
     setEditHasCustomDomain(b.has_custom_domain || false);
   };
 
@@ -167,8 +167,20 @@ export default function SuperAdminDashboardPage() {
 
   const planOptions = [
     { value: 'basico', label: 'Plan Base Core ($15/mes)' },
-    { value: 'trial', label: 'Trial (Prueba Gratuita 14 días)' },
+    { value: 'trial', label: 'Trial — Prueba Gratuita 14 días' },
   ];
+
+  // Helpers de plan
+  const getPlanLabel = (plan: string) => {
+    if (plan === 'basico') return 'BASE';
+    if (plan === 'trial') return 'TRIAL';
+    return plan?.toUpperCase() || '—';
+  };
+  const getPlanColor = (plan: string) => {
+    if (plan === 'basico') return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+    if (plan === 'trial') return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+    return 'bg-zinc-800 text-zinc-400 border-zinc-700';
+  };
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
@@ -196,21 +208,21 @@ export default function SuperAdminDashboardPage() {
       {/* Métricas limpias */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 space-y-1">
-          <span className="text-xs text-zinc-400 font-medium">Total Empresas Activas</span>
+          <span className="text-xs text-zinc-400 font-medium">Total Empresas Registradas</span>
           <p className="text-2xl font-mono font-bold text-zinc-100">{businesses.length}</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 space-y-1">
-          <span className="text-xs text-zinc-400 font-medium">Empresas Plan PRO</span>
-          <p className="text-2xl font-mono font-bold text-purple-400">
-            {businesses.filter((b) => b.plan === 'pro').length}
+        <div className="p-4 rounded-xl bg-zinc-900/40 border border-emerald-900/40 space-y-1">
+          <span className="text-xs text-zinc-400 font-medium">Plan Base Core (activos)</span>
+          <p className="text-2xl font-mono font-bold text-emerald-400">
+            {businesses.filter((b) => b.plan === 'basico').length}
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 space-y-1">
-          <span className="text-xs text-zinc-400 font-medium">Empresas Trial / Básico</span>
-          <p className="text-2xl font-mono font-bold text-emerald-400">
-            {businesses.filter((b) => b.plan !== 'pro').length}
+        <div className="p-4 rounded-xl bg-zinc-900/40 border border-amber-900/40 space-y-1">
+          <span className="text-xs text-zinc-400 font-medium">Trial / En evaluación</span>
+          <p className="text-2xl font-mono font-bold text-amber-400">
+            {businesses.filter((b) => b.plan === 'trial' || b.plan !== 'basico').length}
           </p>
         </div>
       </div>
@@ -252,8 +264,8 @@ export default function SuperAdminDashboardPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-sm text-zinc-100">{b.nombre}</h3>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">
-                      PLAN {b.plan}
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${getPlanColor(b.plan)}`}>
+                      {getPlanLabel(b.plan)}
                     </span>
                   </div>
                   <p className="text-xs text-zinc-400 font-mono mt-0.5">
@@ -372,6 +384,9 @@ export default function SuperAdminDashboardPage() {
                     onChange={(val) => setEditPlan(val as any)}
                     accentColor="emerald"
                   />
+                  <p className="text-[10px] text-zinc-500 mt-1">
+                    {editPlan === 'basico' ? 'Pago mensual activo — $15/mes base.' : 'En período de prueba gratuita.'}
+                  </p>
                 </div>
               </div>
 
