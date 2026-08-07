@@ -36,14 +36,14 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
       {/* Tarjeta de Producto - Clic en cualquier lado abre la vista previa */}
       <div
         onClick={() => setShowPreview(true)}
-        className={`group relative rounded-2xl sm:rounded-3xl bg-[#0D121F]/90 backdrop-blur-md border transition-all duration-300 overflow-hidden flex flex-row sm:flex-col justify-between shadow-lg hover:shadow-2xl hover:shadow-amber-500/10 p-2.5 sm:p-0 cursor-pointer ${
+        className={`group relative rounded-2xl sm:rounded-3xl bg-[#0D121F]/90 backdrop-blur-md border transition-all duration-300 overflow-hidden flex flex-row sm:flex-col justify-between shadow-lg hover:shadow-2xl hover:shadow-amber-500/10 p-2.5 sm:p-0 cursor-pointer h-full ${
           product.disponible
             ? 'border-white/10 hover:border-amber-500/40'
             : 'border-rose-500/20 opacity-60 bg-[#0D121F]/50'
         }`}
       >
-        {/* 1. FOTOGRAFÍA DEL PRODUCTO (A la Izquierda en Móvil (w-20 h-20), Arriba en Desktop) */}
-        <div className="relative w-20 h-20 sm:w-full sm:h-56 bg-[#07090E] rounded-xl sm:rounded-none overflow-hidden shrink-0 order-1 self-center sm:self-auto">
+        {/* 1. FOTOGRAFÍA DEL PRODUCTO (A la Izquierda en Móvil (w-20 h-20), Arriba en Desktop (h-40)) */}
+        <div className="relative w-20 h-20 sm:w-full sm:h-40 bg-[#07090E] rounded-xl sm:rounded-none overflow-hidden shrink-0 order-1 self-center sm:self-auto">
           {product.imagen_url ? (
             <img
               src={product.imagen_url}
@@ -52,7 +52,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#121929] via-[#0E1424] to-[#182035] flex flex-col items-center justify-center text-slate-400 p-2 text-center">
-              <div className="w-8 h-8 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-display font-black text-xs sm:text-xl shadow-lg">
+              <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-display font-black text-xs sm:text-lg shadow-lg">
                 {product.nombre.charAt(0)}
               </div>
             </div>
@@ -63,28 +63,28 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
           {/* Chip Promo - Flotante arriba de la foto */}
           {product.disponible && priceInfo.tieneOferta && (
-            <div className="absolute top-1 left-1 sm:top-3 sm:left-3 z-10 px-1.5 py-0.5 sm:px-3 sm:py-1 rounded bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-slate-950 font-display font-black text-[8px] sm:text-[11px] shadow-xl flex items-center gap-0.5 border border-amber-300/40 tracking-tight">
-              <Flame className="w-2.5 sm:w-3.5 h-2.5 sm:h-3.5 fill-slate-950 text-slate-950" />
+            <div className="absolute top-1 left-1 sm:top-2.5 sm:left-2.5 z-10 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-slate-950 font-display font-black text-[8px] sm:text-[10px] shadow-xl flex items-center gap-0.5 border border-amber-300/40 tracking-tight">
+              <Flame className="w-2.5 sm:w-3 h-2.5 sm:h-3 fill-slate-950 text-slate-950" />
               <span>{product.etiqueta_promo || `${priceInfo.descuentoPorcentaje}% OFF`}</span>
             </div>
           )}
 
           {!product.disponible && (
-            <div className="absolute top-1 left-1 sm:top-3 sm:left-3 px-1.5 py-0.5 sm:px-3 sm:py-1 rounded bg-rose-950/90 backdrop-blur-md text-rose-300 font-medium text-[8px] sm:text-xs border border-rose-500/30">
+            <div className="absolute top-1 left-1 sm:top-2.5 sm:left-2.5 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded bg-rose-950/90 backdrop-blur-md text-rose-300 font-medium text-[8px] sm:text-[10px] border border-rose-500/30">
               Agotado
             </div>
           )}
         </div>
 
         {/* 2. DETALLE E INFORMACIÓN DEL PRODUCTO (A la Derecha en Móvil, Abajo en Desktop) */}
-        <div className="flex-1 min-w-0 pl-3 sm:pl-0 sm:p-5 flex flex-col justify-between gap-1.5 sm:gap-4 order-2">
-          <div className="space-y-0.5 sm:space-y-2">
-            <h3 className="font-display font-extrabold text-white text-base sm:text-lg md:text-xl group-hover:text-amber-400 transition-colors leading-tight tracking-tight line-clamp-1 sm:line-clamp-2">
+        <div className="flex-1 min-w-0 pl-3 sm:pl-0 sm:p-4 flex flex-col justify-between gap-1 sm:gap-3 order-2">
+          <div className="space-y-0.5 sm:space-y-1">
+            <h3 className="font-display font-extrabold text-white text-base sm:text-base md:text-lg group-hover:text-amber-400 transition-colors leading-tight tracking-tight line-clamp-1 sm:line-clamp-2">
               {product.nombre}
             </h3>
 
             {product.descripcion && (
-              <p className="text-xs sm:text-sm text-slate-400 line-clamp-1 sm:line-clamp-2 leading-relaxed font-normal">
+              <p className="text-xs text-slate-400 line-clamp-1 sm:line-clamp-2 leading-relaxed font-normal">
                 {product.descripcion}
               </p>
             )}
@@ -92,19 +92,19 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
           {/* Fila de Precio y Botón Agregar (Solo visible en Móvil en esta línea) */}
           <div className="flex items-center justify-between gap-2 mt-auto">
-            {/* Precio con fuentes agrandadas */}
+            {/* Precio */}
             <div className="font-mono flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5">
               {priceInfo.tieneOferta ? (
                 <div className="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5">
                   <span className="text-slate-500 text-[10px] sm:text-xs line-through leading-none">
                     {formatCurrency(priceInfo.precioOriginal)}
                   </span>
-                  <span className="text-amber-400 font-bold text-sm sm:text-lg leading-none">
+                  <span className="text-amber-400 font-bold text-sm sm:text-base leading-none">
                     {formatCurrency(priceInfo.precioActual)}
                   </span>
                 </div>
               ) : (
-                <span className="text-amber-400 font-bold text-sm sm:text-lg leading-none">
+                <span className="text-amber-400 font-bold text-sm sm:text-base leading-none">
                   {formatCurrency(priceInfo.precioOriginal)}
                 </span>
               )}
@@ -142,7 +142,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           <button
             onClick={handleAdd}
             disabled={!product.disponible}
-            className={`hidden sm:flex w-full mt-4 py-3 px-4 rounded-2xl font-display font-bold text-xs sm:text-sm items-center justify-center gap-1.5 transition-all active:scale-95 border ${
+            className={`hidden sm:flex w-full mt-3 py-2 px-3 rounded-xl font-display font-bold text-xs items-center justify-center gap-1.5 transition-all active:scale-95 border ${
               !product.disponible
                 ? 'bg-slate-900/60 text-slate-600 border-slate-800 cursor-not-allowed'
                 : added
@@ -152,7 +152,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           >
             {added ? (
               <>
-                <Check className="w-4 h-4 text-slate-950 stroke-[3]" />
+                <Check className="w-3.5 h-3.5 text-slate-950 stroke-[3]" />
                 <span>¡Agregado al Pedido!</span>
               </>
             ) : !product.disponible ? (
