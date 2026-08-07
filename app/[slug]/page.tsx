@@ -376,7 +376,7 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
                   <span>{categories.find((c) => c.id === selectedCategory)?.nombre}</span>
                 )}
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
@@ -424,7 +424,7 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
                           <Flame className="w-5 h-5 fill-rose-500 text-rose-500" />
                           <span>Ofertas de la Casa</span>
                         </h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                           {matchingPromos.map((product) => (
                             <ProductCard
                               key={product.id}
@@ -460,7 +460,7 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
                           {matchingProducts.length} {matchingProducts.length === 1 ? 'plato' : 'platos'}
                         </span>
                       </h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {matchingProducts.map((product) => (
                           <ProductCard
                             key={product.id}

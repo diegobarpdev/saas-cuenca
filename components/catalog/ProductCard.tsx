@@ -38,14 +38,14 @@ export function ProductCard({ product, onAddToCart, primaryColor = '#F59E0B', se
       {/* Tarjeta de Producto - Diseño Unificado Premium */}
       <div
         onClick={() => setShowPreview(true)}
-        className={`group relative rounded-2xl sm:rounded-3xl bg-[#0D121F] border transition-all duration-300 overflow-hidden flex flex-row sm:flex-col justify-between shadow-lg hover:shadow-2xl hover:shadow-amber-500/10 p-3 sm:p-0 cursor-pointer h-full ${
+        className={`group relative rounded-2xl bg-[#0D121F] border transition-all duration-300 overflow-hidden flex flex-row sm:flex-col justify-between shadow-lg hover:shadow-xl hover:shadow-amber-500/10 p-3 sm:p-0 cursor-pointer h-full ${
           product.disponible
             ? 'border-white/10 hover:border-amber-500/40'
             : 'border-rose-500/20 opacity-60 bg-[#0D121F]/50'
         }`}
       >
         {/* 1. FOTOGRAFÍA DEL PRODUCTO (Izquierda en Móvil, Arriba en Desktop) */}
-        <div className="relative w-20 h-20 sm:w-full sm:h-44 bg-[#07090E] rounded-xl sm:rounded-none overflow-hidden shrink-0 order-1 self-center sm:self-auto">
+        <div className="relative w-20 h-20 sm:w-full sm:h-32 bg-[#07090E] rounded-xl sm:rounded-none overflow-hidden shrink-0 order-1 self-center sm:self-auto">
           {product.imagen_url ? (
             <img
               src={product.imagen_url}
@@ -79,22 +79,22 @@ export function ProductCard({ product, onAddToCart, primaryColor = '#F59E0B', se
         </div>
 
         {/* 2. DETALLE E INFORMACIÓN DEL PRODUCTO (A la Derecha en Móvil, Abajo en Desktop) */}
-        <div className="flex-1 min-w-0 pl-3 sm:p-5 flex flex-col justify-between gap-2 sm:gap-4 order-2">
+        <div className="flex-1 min-w-0 pl-3 sm:p-3 flex flex-col justify-between gap-2 sm:gap-2.5 order-2">
           {/* Textos del Producto (Título y Descripción) */}
           <div className="space-y-1 sm:space-y-1.5">
-            <h3 className="font-display font-extrabold text-white text-base sm:text-lg md:text-xl group-hover:text-amber-400 transition-colors leading-tight tracking-tight line-clamp-1 sm:line-clamp-2">
+            <h3 className="font-display font-extrabold text-white text-base sm:text-sm group-hover:text-amber-400 transition-colors leading-tight tracking-tight line-clamp-1 sm:line-clamp-2">
               {product.nombre}
             </h3>
 
             {product.descripcion && (
-              <p className="text-xs sm:text-sm text-slate-400 line-clamp-1 sm:line-clamp-2 leading-relaxed font-normal">
+              <p className="text-xs text-slate-400 line-clamp-1 sm:line-clamp-2 leading-relaxed font-normal">
                 {product.descripcion}
               </p>
             )}
           </div>
 
           {/* Fila de Precio y Botón Agregar (Unificada y Alineada) */}
-          <div className="flex items-center justify-between gap-3 mt-auto pt-2 sm:pt-3 border-t border-white/5">
+          <div className="flex items-center justify-between gap-2 mt-auto pt-2 border-t border-white/5">
             {/* Precio */}
             <div className="font-mono flex flex-col">
               {priceInfo.tieneOferta ? (
@@ -102,12 +102,12 @@ export function ProductCard({ product, onAddToCart, primaryColor = '#F59E0B', se
                   <span className="text-slate-500 text-[10px] sm:text-xs line-through leading-none mb-1">
                     {formatCurrency(priceInfo.precioOriginal)}
                   </span>
-                  <span className="font-bold text-sm sm:text-base leading-none" style={{ color: primaryColor }}>
+                  <span className="font-bold text-sm leading-none" style={{ color: primaryColor }}>
                     {formatCurrency(priceInfo.precioActual)}
                   </span>
                 </>
               ) : (
-                <span className="font-bold text-sm sm:text-base leading-none" style={{ color: primaryColor }}>
+                <span className="font-bold text-sm leading-none" style={{ color: primaryColor }}>
                   {formatCurrency(priceInfo.precioOriginal)}
                 </span>
               )}
@@ -122,7 +122,7 @@ export function ProductCard({ product, onAddToCart, primaryColor = '#F59E0B', se
                   ? { backgroundColor: primaryColor, borderColor: primaryColor, color: '#090D16' }
                   : undefined
               }
-              className={`px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl font-display font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 border shrink-0 ${
+              className={`px-3 py-1.5 sm:px-3 sm:py-1.5 rounded-xl font-display font-extrabold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 border shrink-0 ${
                 !product.disponible
                   ? 'bg-slate-900/60 text-slate-600 border-slate-800 cursor-not-allowed'
                   : added
