@@ -143,15 +143,21 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
       {/* 3. MODAL DE PREVISUALIZACIÓN DETALLADA (Preview del Producto) */}
       {showPreview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md transition-opacity">
-          <div className="bg-[#0D121F] border border-white/10 rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
-            {/* Botón Cerrar */}
+        <div
+          onClick={() => setShowPreview(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md transition-opacity"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#0D121F] border border-white/10 rounded-3xl max-w-md w-full overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-200"
+          >
+            {/* Botón Cerrar con z-30 para evitar que la imagen lo tape */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setShowPreview(false);
               }}
-              className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+              className="absolute top-3 right-3 z-30 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
