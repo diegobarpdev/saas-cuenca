@@ -46,10 +46,9 @@ export function CartDrawer({
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden flex flex-col justify-end sm:justify-stretch">
-      {/* Backdrop con Blur */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-[#05070D]/90 transition-opacity"
+        className="fixed inset-0 bg-transparent"
       />
 
       {/* Drawer Container: Bottom-Sheet en móvil, Side-Drawer en Desktop */}
