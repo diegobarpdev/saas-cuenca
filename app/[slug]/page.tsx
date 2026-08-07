@@ -337,21 +337,120 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
           </div>
         </div>
 
-        {/* Cuadrícula de Productos Elegante */}
-        {filteredProducts.length === 0 ? (
-          <div className="p-16 text-center rounded-3xl border border-slate-800 bg-slate-900/30 text-slate-400 font-display text-sm">
-            No encontramos platos disponibles en esta sección.
-          </div>
+        {/* Cuadrícula de Productos Elegante Agrupada por Categorías */}
+        {selectedCategory !== null ? (
+          // Vista de una categoría específica o Promociones
+          filteredProducts.length === 0 ? (
+            <div className="p-16 text-center rounded-3xl border border-slate-800 bg-slate-900/30 text-slate-400 font-display text-sm">
+              No encontramos platos disponibles en esta sección.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <h2 className="text-xl md:text-2xl font-display font-black text-white border-b border-white/10 pb-2.5 flex items-center gap-2">
+                {selectedCategory === 'promos' ? (
+                  <>
+                    <Flame className="w-5 h-5 fill-rose-500 text-rose-500" />
+                    <span>Ofertas & Promos Especiales</span>
+                  </>
+                ) : (
+                  <span>{categories.find((c) => c.id === selectedCategory)?.nombre}</span>
+                )}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onAddToCart={addItem}
+                  />
+                ))}
+              </div>
+            </div>
+          )
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onAddToCart={addItem}
-              />
-            ))}
-          </div>
+          // Vista de Menú Completo: Agrupado por Categorías
+          (() => {
+            const matchesSearchGlobal = products.filter((p) =>
+              p.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              (p.descripcion && p.descripcion.toLowerCase().includes(searchQuery.toLowerCase()))
+            );
+
+            if (matchesSearchGlobal.length === 0) {
+              return (
+                <div className="p-16 text-center rounded-3xl border border-slate-800 bg-slate-900/30 text-slate-400 font-display text-sm">
+                  No encontramos platos que coincidan con tu búsqueda.
+                </div>
+              );
+            }
+
+            return (
+              <div className="space-y-12">
+                {/* 1. Sección de Ofertas en Menú Completo (Si existen y coinciden con la búsqueda) */}
+                {(() => {
+                  const matchingPromos = products.filter(
+                    (p) =>
+                      p.en_oferta &&
+                      p.precio_oferta &&
+                      (p.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (p.descripcion && p.descripcion.toLowerCase().includes(searchQuery.toLowerCase())))
+                  );
+
+                  if (matchingPromos.length > 0) {
+                    return (
+                      <div className="space-y-5 animate-in fade-in slide-in-from-bottom-3 duration-300">
+                        <h2 className="text-xl md:text-2xl font-display font-black text-white border-b border-white/10 pb-2.5 flex items-center gap-2">
+                          <Flame className="w-5 h-5 fill-rose-500 text-rose-500" />
+                          <span>Ofertas de la Casa</span>
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {matchingPromos.map((product) => (
+                            <ProductCard
+                              key={product.id}
+                              product={product}
+                              onAddToCart={addItem}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
+                {/* 2. Sección para cada Categoría */}
+                {categories.map((cat) => {
+                  const matchingProducts = products.filter(
+                    (p) =>
+                      p.category_id === cat.id &&
+                      (p.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (p.descripcion && p.descripcion.toLowerCase().includes(searchQuery.toLowerCase())))
+                  );
+
+                  if (matchingProducts.length === 0) return null;
+
+                  return (
+                    <div key={cat.id} className="space-y-5 animate-in fade-in slide-in-from-bottom-3 duration-300">
+                      <h2 className="text-xl md:text-2xl font-display font-black text-white border-b border-white/10 pb-2.5 flex items-center gap-2.5">
+                        <span>{cat.nombre}</span>
+                        <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-900/60 px-2.5 py-0.5 rounded-full border border-white/5 shrink-0">
+                          {matchingProducts.length} {matchingProducts.length === 1 ? 'plato' : 'platos'}
+                        </span>
+                      </h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {matchingProducts.map((product) => (
+                          <ProductCard
+                            key={product.id}
+                            product={product}
+                            onAddToCart={addItem}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()
         )}
       </main>
 
