@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Check, X, Package, Tag, RefreshCw, FolderPlus, Save, UploadCloud, Link as LinkIcon, Loader2, Flame } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { Product, Category } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';

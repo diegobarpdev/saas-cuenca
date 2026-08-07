@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus, Download, Lock } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { Order, OrderStatus } from '@/lib/types/database';
 import { OrderBadge, PaymentBadge } from '@/components/ui/Badge';
 import { formatCurrency, formatDeliveryType } from '@/lib/utils/currency';

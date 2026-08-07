@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Palette, Save, UploadCloud, CheckCircle2, RefreshCw, Sparkles, Image as ImageIcon, Type, Layout, Eye } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { createClient } from '@/lib/supabase/client';
 import { BusinessBranding } from '@/lib/types/database';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Check, Flame, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { Product } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
 import { getProductPriceInfo } from '@/lib/utils/promo';

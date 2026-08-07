@@ -4,7 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, CheckCircle2, Upload, Sparkles, Copy, Check, Landmark } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { MOCK_BUSINESS } from '@/lib/supabase/mock-data';
 import { useCart } from '@/hooks/useCart';
 import { useCustomerOrders } from '@/hooks/useCustomerOrders';
