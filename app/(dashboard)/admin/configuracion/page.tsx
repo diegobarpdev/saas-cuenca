@@ -18,15 +18,42 @@ const prepTimeOptions = [
 ];
 
 const ECUADOR_BANKS = [
+  // Bancos Privados
   'Banco Pichincha',
   'Banco Guayaquil',
   'Produbanco',
-  'Cooperativa JEP',
   'Banco del Pacífico',
-  'Cooperativa Jardín Azuayo',
-  'Banco Internacional',
   'Banco del Austro',
-  'Cooperativa Policía Nacional',
+  'Banco Internacional',
+  'Banco Bolivariano',
+  'Banco de Loja',
+  'Banco Machala',
+  'Banco Solidario',
+  'Banco D-MIRO',
+  'Banco ProCredit',
+  'Citibank Ecuador',
+
+  // Cooperativas de Ahorro y Crédito
+  'Cooperativa JEP',
+  'Cooperativa Jardín Azuayo',
+  'Cooperativa Policía Nacional (CPN)',
+  'Cooperativa Alianza del Valle',
+  'Cooperativa 29 de Octubre',
+  'Cooperativa Atuntaqui',
+  'Cooperativa San Francisco',
+  'Cooperativa Oscus',
+  'Cooperativa Cacpeco',
+  'Cooperativa Comercio',
+  'Cooperativa Andalucía',
+  'Cooperativa CoopNacional',
+  'Cooperativa CACPE Loja',
+  'Cooperativa Padre Julián Lorente',
+
+  // Mutualistas & Estatales
+  'Mutualista Pichincha',
+  'Mutualista Azuay',
+  'BanEcuador B.P.',
+  'BIESS (Banco del IESS)',
   'Otro / Institución Financiera',
 ];
 
