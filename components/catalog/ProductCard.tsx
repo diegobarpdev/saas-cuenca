@@ -145,7 +145,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
       {showPreview && (
         <div
           onClick={() => setShowPreview(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md transition-opacity"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 transition-opacity"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -157,7 +157,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
                 e.stopPropagation();
                 setShowPreview(false);
               }}
-              className="absolute top-3 right-3 z-30 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+              className="absolute top-3 right-3 z-30 w-8 h-8 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
             >
               <X className="w-4 h-4" />
             </button>

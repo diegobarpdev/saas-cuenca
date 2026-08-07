@@ -38,7 +38,7 @@ export function CartDrawer({
       {/* Backdrop con Blur */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"
+        className="fixed inset-0 bg-[#05070D]/90 transition-opacity"
       />
 
       {/* Drawer Container: Bottom-Sheet en móvil, Side-Drawer en Desktop */}
