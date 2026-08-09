@@ -92,6 +92,9 @@ export interface OperationalSettings {
   // Efectivo
   acepta_efectivo?: boolean;
   instrucciones_efectivo?: string;
+
+  // Servicio en Mesa
+  tipo_servicio_mesa?: 'mesero' | 'barra';
 }
 
 export interface Business {

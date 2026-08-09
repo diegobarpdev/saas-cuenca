@@ -71,6 +71,7 @@ export default function AdminSettingsPage() {
   const [tiempoPreparacion, setTiempoPreparacion] = useState('15 - 25 min');
   const [permiteDomicilio, setPermiteDomicilio] = useState(true);
   const [permiteRetiro, setPermiteRetiro] = useState(true);
+  const [tipoServicioMesa, setTipoServicioMesa] = useState<'mesero' | 'barra'>('mesero');
 
   // 3. Configuración Específica por Método de Pago
   // Deuna!
@@ -137,6 +138,7 @@ export default function AdminSettingsPage() {
         if (op.tiempo_preparacion) setTiempoPreparacion(op.tiempo_preparacion);
         if (op.permite_domicilio !== undefined) setPermiteDomicilio(op.permite_domicilio);
         if (op.permite_retiro !== undefined) setPermiteRetiro(op.permite_retiro);
+        if (op.tipo_servicio_mesa) setTipoServicioMesa(op.tipo_servicio_mesa);
 
         if (op.acepta_deuna !== undefined) setAceptaDeuna(op.acepta_deuna);
         if (op.deuna_numero) setDeunaNumero(op.deuna_numero);
@@ -227,6 +229,7 @@ export default function AdminSettingsPage() {
             tiempo_preparacion: tiempoPreparacion,
             permite_domicilio: permiteDomicilio,
             permite_retiro: permiteRetiro,
+            tipo_servicio_mesa: tipoServicioMesa,
             google_maps_url: googleMapsUrl || undefined,
 
             acepta_deuna: finalAceptaDeuna,
@@ -400,6 +403,53 @@ export default function AdminSettingsPage() {
                   accentColor="emerald"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Modalidad de Servicio en Mesa (Dine-in) */}
+          <div className="border-t border-white/5 pt-5 mt-2 space-y-3">
+            <label className="block text-xs font-display font-semibold text-slate-300">
+              Modalidad de Servicio en Mesa (Consumo en Local)
+            </label>
+            <p className="text-[11px] text-slate-400">
+              ¿Cómo debe operar el flujo cuando el cliente realiza un pedido para consumir en el establecimiento?
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setTipoServicioMesa('mesero')}
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                  tipoServicioMesa === 'mesero'
+                    ? 'bg-emerald-500/10 border-emerald-500 text-white shadow-lg shadow-emerald-500/5'
+                    : 'bg-slate-950/80 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <p className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${tipoServicioMesa === 'mesero' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`}></span>
+                  Servicio Tradicional (Mesero a la Mesa)
+                </p>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  El cliente espera en la mesa y un mesero le sirve su comida directamente.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTipoServicioMesa('barra')}
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                  tipoServicioMesa === 'barra'
+                    ? 'bg-emerald-500/10 border-emerald-500 text-white shadow-lg shadow-emerald-500/5'
+                    : 'bg-slate-950/80 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <p className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${tipoServicioMesa === 'barra' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`}></span>
+                  Autoservicio / Retiro en Caja (Estilo Fast Food)
+                </p>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  El cliente recibe una notificación y retira su comida de la barra/caja por su cuenta.
+                </p>
+              </button>
             </div>
           </div>
         </div>

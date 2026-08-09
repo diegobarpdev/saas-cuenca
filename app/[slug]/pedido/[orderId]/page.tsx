@@ -169,6 +169,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
   const getStatusLabel = () => {
     const estado = order.estado;
     const tipo = order.tipo_entrega;
+    const servicioMesa = business?.configuracion_operativa?.tipo_servicio_mesa || 'mesero';
 
     switch (estado) {
       case 'pendiente':
@@ -178,11 +179,17 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
       case 'en_preparacion':
         return 'En Cocina';
       case 'listo':
-        if (tipo === 'mesa') return '¡Listo para Servir!';
+        if (tipo === 'mesa') {
+          if (servicioMesa === 'barra') return 'Listo en Barra / Caja';
+          return '¡Listo para Servir!';
+        }
         if (tipo === 'retiro_local') return '¡Listo para Retirar!';
         return '¡En Camino!';
       case 'entregado':
-        if (tipo === 'mesa') return 'Servido';
+        if (tipo === 'mesa') {
+          if (servicioMesa === 'barra') return 'Entregado en Caja';
+          return 'Servido';
+        }
         if (tipo === 'retiro_local') return 'Retirado';
         return 'Entregado';
       case 'cancelado':
@@ -196,23 +203,36 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
     const estado = order.estado;
     const tipo = order.tipo_entrega;
     const mesa = order.numero_mesa ? ` Mesa ${order.numero_mesa}` : '';
+    const servicioMesa = business?.configuracion_operativa?.tipo_servicio_mesa || 'mesero';
 
     switch (estado) {
       case 'pendiente':
         return 'Esperando confirmación del restaurante...';
       case 'aceptado':
-        if (tipo === 'mesa') return `¡Tu pedido para la${mesa} fue recibido! Preparando ingredientes...`;
+        if (tipo === 'mesa') {
+          if (servicioMesa === 'barra') return `¡Tu pedido para la${mesa} fue recibido! Preparando ingredientes...`;
+          return `¡Tu pedido para la${mesa} fue recibido! Preparando ingredientes...`;
+        }
         if (tipo === 'retiro_local') return '¡Tu pedido para llevar fue recibido! Preparando ingredientes...';
         return '¡Tu pedido para domicilio fue recibido! Preparando ingredientes...';
       case 'en_preparacion':
-        if (tipo === 'mesa') return `El chef está cocinando tus platos para la${mesa}.`;
+        if (tipo === 'mesa') {
+          if (servicioMesa === 'barra') return `El chef está cocinando tus platos para llevar a tu${mesa}.`;
+          return `El chef está cocinando tus platos para la${mesa}.`;
+        }
         return 'El chef está cocinando tus platos ahora mismo.';
       case 'listo':
-        if (tipo === 'mesa') return `¡Tu comida está lista! Un mesero la llevará a tu${mesa} de inmediato.`;
+        if (tipo === 'mesa') {
+          if (servicioMesa === 'barra') return `¡Tu comida está lista! Por favor acércate a la barra/caja para retirarla y llevarla a tu${mesa}.`;
+          return `¡Tu comida está lista! Un mesero la llevará a tu${mesa} de inmediato.`;
+        }
         if (tipo === 'retiro_local') return '¡Tu pedido está listo para llevar! Ya puedes acercarte a retirarlo.';
         return '¡Tu pedido está listo! El motorizado va en camino a tu dirección.';
       case 'entregado':
-        if (tipo === 'mesa') return '¡Pedido servido en tu mesa! Que disfrutes tu comida.';
+        if (tipo === 'mesa') {
+          if (servicioMesa === 'barra') return `¡Comida retirada en caja y disfrutada en tu${mesa}! ¡Buen provecho!`;
+          return `¡Pedido servido en tu${mesa}! Que disfrutes tu comida.`;
+        }
         if (tipo === 'retiro_local') return '¡Pedido entregado y retirado del local! ¡Buen provecho!';
         return '¡Pedido entregado en tu domicilio! ¡Buen provecho!';
       case 'cancelado':
