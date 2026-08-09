@@ -13,42 +13,11 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
   const broadcastRef = useRef<BroadcastChannel | null>(null);
   const channelRef = useRef<any>(null);
 
-  // Inicializar audio de notificación y BroadcastChannel para comunicación entre pestañas
+  // Inicializar audio de notificación
   useEffect(() => {
     if (typeof window !== 'undefined') {
       audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-      
-      // BroadcastChannel para sincronizar ventanas locales al instante
-      if ('BroadcastChannel' in window) {
-        broadcastRef.current = new BroadcastChannel('saas-cuenca-orders-channel');
-        
-        broadcastRef.current.onmessage = (event) => {
-          if (event.data?.type === 'ORDER_STATUS_CHANGED') {
-            const timestampKey = `${event.data.newStatus}_at`;
-            setOrders((prev) =>
-              prev.map((order) =>
-                order.id === event.data.orderId ? { ...order, estado: event.data.newStatus, [timestampKey]: event.data.timestamp } : order
-              )
-            );
-          } else if (event.data?.type === 'ORDER_PAYMENT_STATUS_CHANGED') {
-            setOrders((prev) =>
-              prev.map((order) =>
-                order.id === event.data.orderId ? { ...order, estado_pago: event.data.newPaymentStatus } : order
-              )
-            );
-          } else if (event.data?.type === 'NEW_ORDER_CREATED') {
-            setOrders((prev) => [event.data.order, ...prev]);
-            playNotificationSound();
-          }
-        };
-      }
     }
-
-    return () => {
-      if (broadcastRef.current) {
-        broadcastRef.current.close();
-      }
-    };
   }, []);
 
   const playNotificationSound = () => {
@@ -59,6 +28,32 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
 
   useEffect(() => {
     if (!businessId) return;
+
+    // BroadcastChannel local aislado por inquilino para sincronizar ventanas locales al instante
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      const bc = new BroadcastChannel(`yapi-orders-bc-${businessId}`);
+      broadcastRef.current = bc;
+      
+      bc.onmessage = (event) => {
+        if (event.data?.type === 'ORDER_STATUS_CHANGED') {
+          const timestampKey = `${event.data.newStatus}_at`;
+          setOrders((prev) =>
+            prev.map((order) =>
+              order.id === event.data.orderId ? { ...order, estado: event.data.newStatus, [timestampKey]: event.data.timestamp } : order
+            )
+          );
+        } else if (event.data?.type === 'ORDER_PAYMENT_STATUS_CHANGED') {
+          setOrders((prev) =>
+            prev.map((order) =>
+              order.id === event.data.orderId ? { ...order, estado_pago: event.data.newPaymentStatus } : order
+            )
+          );
+        } else if (event.data?.type === 'NEW_ORDER_CREATED') {
+          setOrders((prev) => [event.data.order, ...prev]);
+          playNotificationSound();
+        }
+      };
+    }
 
     // Si hay cliente Supabase real en producción
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
@@ -92,11 +87,11 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
             event: 'INSERT',
             schema: 'public',
             table: 'orders',
+            filter: `business_id=eq.${businessId}`
           },
           (payload: any) => {
             const newOrder = payload.new as Order;
             if (!newOrder) return;
-            if (businessId && newOrder.business_id && newOrder.business_id !== businessId) return;
             setOrders((prev) => {
               const exists = prev.some((o) => o.id === newOrder.id);
               if (exists) return prev;
@@ -111,6 +106,7 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
             event: 'UPDATE',
             schema: 'public',
             table: 'orders',
+            filter: `business_id=eq.${businessId}`
           },
           (payload: any) => {
             const updatedOrder = payload.new as Order;
@@ -167,8 +163,19 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
       return () => {
         supabase.removeChannel(channel);
         channelRef.current = null;
+        if (broadcastRef.current) {
+          broadcastRef.current.close();
+          broadcastRef.current = null;
+        }
       };
     }
+
+    return () => {
+      if (broadcastRef.current) {
+        broadcastRef.current.close();
+        broadcastRef.current = null;
+      }
+    };
   }, [businessId, soundEnabled]);
 
   // Agregar pedido localmente y emitir a todas las ventanas
