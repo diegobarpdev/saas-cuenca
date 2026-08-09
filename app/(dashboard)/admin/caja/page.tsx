@@ -27,6 +27,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import { CustomSelect } from '@/components/ui/CustomSelect';
 
 export default function CajaPOSPage() {
   const { business, loading: loadingBusiness } = useAdminBusiness();
@@ -915,15 +916,17 @@ export default function CajaPOSPage() {
               <label className="block text-[10px] font-display font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
                 Método de Pago
               </label>
-              <select
+              <CustomSelect
+                options={[
+                  { value: 'efectivo', label: 'Efectivo' },
+                  { value: 'transferencia', label: 'Transferencia' },
+                  { value: 'payphone', label: 'PayPhone' }
+                ]}
                 value={metodoPago}
-                onChange={(e) => setMetodoPago(e.target.value as any)}
-                className="w-full px-2 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
-              >
-                <option value="efectivo">Efectivo</option>
-                <option value="transferencia">Transferencia</option>
-                <option value="payphone">PayPhone</option>
-              </select>
+                onChange={(val) => setMetodoPago(val as any)}
+                accentColor="emerald"
+                className="text-xs"
+              />
             </div>
 
             <div>

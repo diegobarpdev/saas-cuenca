@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ShoppingBag, Package, Settings, LogOut, ExternalLink, Store, ShieldAlert, Palette, ShoppingCart, Menu, X, Tv } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
+import { CustomSelect } from '@/components/ui/CustomSelect';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -63,17 +64,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         
         {/* Selector de Roles flotante para vistas de pantalla completa (POS/KDS) */}
         <div className="fixed bottom-4 right-4 z-50 bg-[#0B0F1B]/95 backdrop-blur-md border border-white/10 rounded-2xl p-2.5 shadow-2xl flex items-center gap-2">
-          <span className="text-[10px] font-mono-tech font-bold text-amber-400">⚡ Simulador:</span>
-          <select
+          <span className="text-[10px] font-mono-tech font-bold text-amber-400 shrink-0">⚡ Simulador:</span>
+          <CustomSelect
+            options={[
+              { value: 'dueño', label: 'Dueño / Admin' },
+              { value: 'cajero-1', label: 'Cajero 1 (Principal)' },
+              { value: 'cajero-2', label: 'Cajero 2 (Barra)' },
+              { value: 'cocinero', label: 'Cocinero (KDS)' }
+            ]}
             value={simulatedRole}
-            onChange={(e) => handleSwitchRole(e.target.value as any)}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-[11px] text-white focus:outline-none focus:border-amber-400 cursor-pointer"
-          >
-            <option value="dueño">Dueño / Admin</option>
-            <option value="cajero-1">Cajero 1 (Principal)</option>
-            <option value="cajero-2">Cajero 2 (Barra)</option>
-            <option value="cocinero">Cocinero (KDS)</option>
-          </select>
+            onChange={(val) => handleSwitchRole(val as any)}
+            accentColor="amber"
+            className="w-44 text-[11px]"
+          />
         </div>
       </div>
     );
@@ -205,16 +208,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <label className="block text-[9px] font-mono-tech font-bold uppercase tracking-wider text-amber-400">
               ⚡ Simulador de Roles
             </label>
-            <select
+            <CustomSelect
+              options={[
+                { value: 'dueño', label: 'Dueño / Admin' },
+                { value: 'cajero-1', label: 'Cajero 1 (Principal)' },
+                { value: 'cajero-2', label: 'Cajero 2 (Barra)' },
+                { value: 'cocinero', label: 'Cocinero (KDS)' }
+              ]}
               value={simulatedRole}
-              onChange={(e) => handleSwitchRole(e.target.value as any)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400 cursor-pointer"
-            >
-              <option value="dueño">Dueño / Admin</option>
-              <option value="cajero-1">Cajero 1 (Principal)</option>
-              <option value="cajero-2">Cajero 2 (Barra)</option>
-              <option value="cocinero">Cocinero (KDS)</option>
-            </select>
+              onChange={(val) => handleSwitchRole(val as any)}
+              accentColor="amber"
+              className="text-xs"
+            />
           </div>
         </div>
       </aside>
