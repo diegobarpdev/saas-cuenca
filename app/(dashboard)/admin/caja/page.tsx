@@ -686,7 +686,7 @@ export default function CajaPOSPage() {
         </div>
 
         {/* Catálogo de Productos */}
-        <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
+        <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
           {filteredProducts.length === 0 ? (
             <div className="col-span-full flex flex-col items-center justify-center p-12 text-slate-500 border border-dashed border-white/10 rounded-2xl">
               <AlertCircle className="w-7 h-7 mb-2 text-slate-600" />
@@ -699,10 +699,10 @@ export default function CajaPOSPage() {
                 <div 
                   key={p.id}
                   onClick={() => addToCart(p)}
-                  className="bg-[#0B0F1B] border border-white/5 hover:border-emerald-500/40 rounded-2xl p-3 flex flex-col justify-between space-y-3 cursor-pointer group active:scale-95 transition-all shadow-md relative overflow-hidden"
+                  className="bg-[#0B0F1B] border border-white/5 hover:border-emerald-500/40 rounded-xl p-2.5 flex flex-col justify-between space-y-2 cursor-pointer group active:scale-95 transition-all shadow-md relative overflow-hidden h-full"
                 >
                   {/* Foto o fallback */}
-                  <div className="w-full aspect-square rounded-xl bg-slate-950 flex items-center justify-center overflow-hidden relative border border-white/5">
+                  <div className="w-full h-24 sm:h-28 rounded-lg bg-slate-950 flex items-center justify-center overflow-hidden relative border border-white/5 shrink-0">
                     {p.imagen_url ? (
                       <img 
                         src={p.imagen_url} 
@@ -710,29 +710,29 @@ export default function CajaPOSPage() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <Store className="w-7 h-7 text-slate-700" />
+                      <Store className="w-5 h-5 text-slate-700" />
                     )}
 
                     {p.en_oferta && (
-                      <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 text-[9px] font-black uppercase tracking-wider">
+                      <div className="absolute top-1.5 left-1.5 px-1 py-0.5 rounded bg-amber-500 text-slate-950 text-[8px] font-black uppercase tracking-wider">
                         PROMO
                       </div>
                     )}
                   </div>
 
                   {/* Detalles */}
-                  <div className="space-y-1">
-                    <h4 className="text-xs font-display font-extrabold text-white line-clamp-1 group-hover:text-emerald-400 transition-colors">
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <h4 className="text-[11px] sm:text-xs font-display font-extrabold text-white line-clamp-1 group-hover:text-emerald-400 transition-colors leading-tight">
                       {p.nombre}
                     </h4>
-                    <p className="text-[10px] text-slate-400 line-clamp-1 leading-tight">
+                    <p className="text-[9px] text-slate-400 line-clamp-1 leading-normal">
                       {p.descripcion || 'Sin descripción.'}
                     </p>
                   </div>
 
                   {/* Precio & Acción */}
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-xs font-mono-tech font-extrabold text-emerald-400">
+                  <div className="flex items-center justify-between pt-1 border-t border-white/5 mt-auto">
+                    <span className="text-[11px] sm:text-xs font-mono font-bold text-emerald-400">
                       {formatCurrency(displayPrice)}
                     </span>
                     <button 
@@ -740,9 +740,9 @@ export default function CajaPOSPage() {
                         e.stopPropagation();
                         addToCart(p);
                       }}
-                      className="w-7 h-7 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center justify-center transition-colors cursor-pointer"
+                      className="w-6 h-6 rounded-md bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center justify-center transition-colors cursor-pointer shrink-0"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
