@@ -166,6 +166,62 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
 
   const currentStep = getCurrentStepIndex();
 
+  const getStatusLabel = () => {
+    const estado = order.estado;
+    const tipo = order.tipo_entrega;
+
+    switch (estado) {
+      case 'pendiente':
+        return 'Procesando Pedido';
+      case 'aceptado':
+        return 'Confirmado';
+      case 'en_preparacion':
+        return 'En Cocina';
+      case 'listo':
+        if (tipo === 'mesa') return '¡Listo para Servir!';
+        if (tipo === 'retiro_local') return '¡Listo para Retirar!';
+        return '¡En Camino!';
+      case 'entregado':
+        if (tipo === 'mesa') return 'Servido';
+        if (tipo === 'retiro_local') return 'Retirado';
+        return 'Entregado';
+      case 'cancelado':
+        return 'Pedido Cancelado';
+      default:
+        return 'Procesando';
+    }
+  };
+
+  const getStatusDescription = () => {
+    const estado = order.estado;
+    const tipo = order.tipo_entrega;
+    const mesa = order.numero_mesa ? ` Mesa ${order.numero_mesa}` : '';
+
+    switch (estado) {
+      case 'pendiente':
+        return 'Esperando confirmación del restaurante...';
+      case 'aceptado':
+        if (tipo === 'mesa') return `¡Tu pedido para la${mesa} fue recibido! Preparando ingredientes...`;
+        if (tipo === 'retiro_local') return '¡Tu pedido para llevar fue recibido! Preparando ingredientes...';
+        return '¡Tu pedido para domicilio fue recibido! Preparando ingredientes...';
+      case 'en_preparacion':
+        if (tipo === 'mesa') return `El chef está cocinando tus platos para la${mesa}.`;
+        return 'El chef está cocinando tus platos ahora mismo.';
+      case 'listo':
+        if (tipo === 'mesa') return `¡Tu comida está lista! Un mesero la llevará a tu${mesa} de inmediato.`;
+        if (tipo === 'retiro_local') return '¡Tu pedido está listo para llevar! Ya puedes acercarte a retirarlo.';
+        return '¡Tu pedido está listo! El motorizado va en camino a tu dirección.';
+      case 'entregado':
+        if (tipo === 'mesa') return '¡Pedido servido en tu mesa! Que disfrutes tu comida.';
+        if (tipo === 'retiro_local') return '¡Pedido entregado y retirado del local! ¡Buen provecho!';
+        return '¡Pedido entregado en tu domicilio! ¡Buen provecho!';
+      case 'cancelado':
+        return 'El restaurante canceló el pedido. Ponte en contacto por WhatsApp.';
+      default:
+        return 'Tu pedido está siendo procesado.';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#070A11] text-slate-100 font-sans pb-16 relative overflow-hidden">
       {/* Glow Ambient Backdrop */}
@@ -252,20 +308,10 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
 
             <div className="text-center relative z-10 space-y-1">
               <span className="block text-[10px] font-mono-tech font-bold uppercase tracking-wider text-slate-400">
-                {order.estado === 'pendiente' && 'Procesando Pedido'}
-                {order.estado === 'aceptado' && 'Confirmado'}
-                {order.estado === 'en_preparacion' && 'En Cocina'}
-                {order.estado === 'listo' && '¡Pedido Terminado!'}
-                {order.estado === 'entregado' && 'Entregado'}
-                {order.estado === 'cancelado' && 'Pedido Cancelado'}
+                {getStatusLabel()}
               </span>
               <p className="text-sm font-display font-extrabold text-white">
-                {order.estado === 'pendiente' && 'Esperando confirmación del restaurante...'}
-                {order.estado === 'aceptado' && '¡Tu pedido fue recibido! Preparando ingredientes...'}
-                {order.estado === 'en_preparacion' && 'El chef está cocinando tus platos ahora mismo.'}
-                {order.estado === 'listo' && '¡Tu comida está lista! En camino a tu mesa o dirección.'}
-                {order.estado === 'entregado' && '¡Pedido recibido con éxito! Disfruta tu comida.'}
-                {order.estado === 'cancelado' && 'El restaurante canceló el pedido. Ponte en contacto.'}
+                {getStatusDescription()}
               </p>
             </div>
           </div>
