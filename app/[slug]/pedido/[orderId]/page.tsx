@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Clock, CheckCircle2, Package, Truck, PhoneCall, Receipt, Sparkles } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle2, Package, Truck, PhoneCall, Receipt, Sparkles, ChefHat, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { MOCK_BUSINESS } from '@/lib/supabase/mock-data';
 import { formatCurrency, formatDeliveryType } from '@/lib/utils/currency';
@@ -197,6 +197,77 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
             <p className="text-xs text-slate-400 mt-1">
               Esta pantalla cambia automáticamente en tu celular cuando {business.nombre} actualiza tu pedido.
             </p>
+          </div>
+
+          {/* Visualizador de Actividad en Vivo */}
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center justify-center space-y-3 relative overflow-hidden">
+            {order.estado !== 'entregado' && order.estado !== 'cancelado' && (
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-teal-500/5 animate-pulse"></div>
+            )}
+            
+            <div className="relative z-10 flex items-center justify-center">
+              {order.estado === 'pendiente' && (
+                <div className="relative flex h-10 w-10">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400/20 opacity-75"></span>
+                  <div className="relative rounded-full h-10 w-10 bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                    <Clock className="w-5 h-5 animate-pulse" />
+                  </div>
+                </div>
+              )}
+              {order.estado === 'aceptado' && (
+                <div className="relative flex h-10 w-10">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400/20 opacity-75"></span>
+                  <div className="relative rounded-full h-10 w-10 bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                    <CheckCircle2 className="w-5 h-5 animate-pulse" />
+                  </div>
+                </div>
+              )}
+              {order.estado === 'en_preparacion' && (
+                <div className="relative flex h-12 w-12 items-center justify-center">
+                  <div className="absolute inset-0 rounded-full border-2 border-emerald-500/20 border-t-emerald-400 animate-spin"></div>
+                  <div className="rounded-full h-9 w-9 bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                    <ChefHat className="w-5 h-5 animate-bounce" />
+                  </div>
+                </div>
+              )}
+              {order.estado === 'listo' && (
+                <div className="relative flex h-12 w-12 items-center justify-center">
+                  <span className="animate-ping absolute inline-flex h-8 w-8 rounded-full bg-emerald-400/20 opacity-75"></span>
+                  <div className="relative rounded-full h-10 w-10 bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <Truck className="w-5 h-5 animate-bounce" />
+                  </div>
+                </div>
+              )}
+              {order.estado === 'entregado' && (
+                <div className="rounded-full h-10 w-10 bg-emerald-500/15 border border-emerald-500 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/20">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+              )}
+              {order.estado === 'cancelado' && (
+                <div className="rounded-full h-10 w-10 bg-rose-500/15 border border-rose-500 flex items-center justify-center text-rose-400">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+              )}
+            </div>
+
+            <div className="text-center relative z-10 space-y-1">
+              <span className="block text-[10px] font-mono-tech font-bold uppercase tracking-wider text-slate-400">
+                {order.estado === 'pendiente' && 'Procesando Pedido'}
+                {order.estado === 'aceptado' && 'Confirmado'}
+                {order.estado === 'en_preparacion' && 'En Cocina'}
+                {order.estado === 'listo' && '¡Pedido Terminado!'}
+                {order.estado === 'entregado' && 'Entregado'}
+                {order.estado === 'cancelado' && 'Pedido Cancelado'}
+              </span>
+              <p className="text-sm font-display font-extrabold text-white">
+                {order.estado === 'pendiente' && 'Esperando confirmación del restaurante...'}
+                {order.estado === 'aceptado' && '¡Tu pedido fue recibido! Preparando ingredientes...'}
+                {order.estado === 'en_preparacion' && 'El chef está cocinando tus platos ahora mismo.'}
+                {order.estado === 'listo' && '¡Tu comida está lista! En camino a tu mesa o dirección.'}
+                {order.estado === 'entregado' && '¡Pedido recibido con éxito! Disfruta tu comida.'}
+                {order.estado === 'cancelado' && 'El restaurante canceló el pedido. Ponte en contacto.'}
+              </p>
+            </div>
           </div>
 
           {/* Stepper de Progreso */}
