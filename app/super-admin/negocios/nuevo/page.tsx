@@ -101,9 +101,8 @@ export default function CreateBusinessPage() {
   };
 
   const planOptions = [
-    { value: 'trial', label: 'Trial (Prueba Gratuita 15 días)' },
-    { value: 'basico', label: 'Plan Básico ($15/mes)' },
-    { value: 'pro', label: 'Plan PRO ($29/mes - Recomendado)' },
+    { value: 'basico', label: 'Plan Base Core ($15/mes)' },
+    { value: 'trial', label: 'Trial — Prueba Gratuita 14 días' },
   ];
 
   const bancoOptions = [
@@ -251,7 +250,7 @@ export default function CreateBusinessPage() {
                     onChange={(e) => setHasLiveKitchen(e.target.checked)}
                     className="rounded accent-purple-500"
                   />
-                  <span className="flex items-center gap-1.5"><Bell className="w-3.5 h-3.5 text-purple-400" /> Alertas Cocina (+$7/m)</span>
+                  <span className="flex items-center gap-1.5"><Bell className="w-3.5 h-3.5 text-purple-400" /> Monitor Cocina KDS (+$7/m)</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-purple-500/40">
                   <input
@@ -269,7 +268,7 @@ export default function CreateBusinessPage() {
                     onChange={(e) => setHasCrmExport(e.target.checked)}
                     className="rounded accent-purple-500"
                   />
-                  <span className="flex items-center gap-1.5"><Database className="w-3.5 h-3.5 text-purple-400" /> CRM Exportación (+$5/m)</span>
+                  <span className="flex items-center gap-1.5"><Database className="w-3.5 h-3.5 text-purple-400" /> Reportes & CRM (+$5/m)</span>
                 </label>
               </div>
             </div>

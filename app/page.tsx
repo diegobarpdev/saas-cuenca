@@ -164,9 +164,9 @@ export default function LandingPage() {
               <Printer className="w-6 h-6" />
             </div>
             <div className="space-y-1.5">
-              <h3 className="font-display font-bold text-lg text-white">Comandas POS & Alertas</h3>
+              <h3 className="font-display font-bold text-lg text-white">Monitor KDS & Comandas POS</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Timbre sonoro en tiempo real para tu cocina e impresión directa de tickets de comanda en impresoras térmicas POS.
+                Pantalla digital (KDS) interactiva de cocina con alertas sonoras en vivo e impresión directa de tickets a cualquier ticketera térmica.
               </p>
             </div>
           </div>
@@ -258,7 +258,7 @@ export default function LandingPage() {
                   <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
                     <span className="text-slate-200 flex items-center gap-2.5">
                       <Bell className="w-4 h-4 text-emerald-400 shrink-0" />
-                      Alertas Sonoras Cocina
+                      Monitor de Cocina KDS & Alertas
                     </span>
                     <span className="font-mono-tech font-bold text-emerald-400">+$7/mes</span>
                   </div>
@@ -272,7 +272,7 @@ export default function LandingPage() {
                   <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
                     <span className="text-slate-200 flex items-center gap-2.5">
                       <Database className="w-4 h-4 text-emerald-400 shrink-0" />
-                      Base de Datos CRM / Export
+                      Reportes, Ventas & CRM (Excel)
                     </span>
                     <span className="font-mono-tech font-bold text-emerald-400">+$5/mes</span>
                   </div>

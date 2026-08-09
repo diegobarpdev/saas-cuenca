@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Package, Settings, LogOut, ExternalLink, Store, ShieldAlert, Palette, ShoppingCart, Menu, X } from 'lucide-react';
+import { ShoppingBag, Package, Settings, LogOut, ExternalLink, Store, ShieldAlert, Palette, ShoppingCart, Menu, X, Tv } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -26,11 +26,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { label: 'Pedidos en Vivo', href: '/admin/dashboard', icon: ShoppingBag },
+    { label: 'Monitor Cocina KDS', href: '/admin/cocina', icon: Tv },
     { label: 'Productos y Categorías', href: '/admin/productos', icon: Package },
     { label: 'Apariencia & Branding', href: '/admin/apariencia', icon: Palette },
     { label: 'Marketplace Add-ons', href: '/admin/marketplace', icon: ShoppingCart },
     { label: 'Configuración Negocio', href: '/admin/configuracion', icon: Settings },
   ];
+
+  const isKDS = pathname === '/admin/cocina';
+
+  if (isKDS) {
+    return (
+      <div className="h-screen w-screen overflow-hidden bg-[#070A11] text-slate-100 font-sans flex flex-col relative">
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen max-h-screen overflow-hidden bg-[#070A11] text-slate-100 font-sans flex flex-col md:flex-row w-full relative">

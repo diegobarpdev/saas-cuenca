@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus, Download, Lock } from 'lucide-react';
+import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus, Download, Lock, Tv } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { Order, OrderStatus } from '@/lib/types/database';
 import { OrderBadge, PaymentBadge } from '@/components/ui/Badge';
@@ -22,20 +22,20 @@ export default function AdminDashboardPage() {
   const [selectedOrderForTicket, setSelectedOrderForTicket] = useState<(Order & { items?: any[] }) | null>(null);
   const [selectedComprobanteUrl, setSelectedComprobanteUrl] = useState<string | null>(null);
 
-  const handleToggleSound = () => {
+  const handleOpenKDS = () => {
     if (!business?.has_live_kitchen) {
-      toast.info('Módulo Cocina en Vivo & Alertas Sonoras no activo (+ $7/mes)', {
-        description: 'Activa este Add-on para recibir timbres sonoros en tiempo real.',
+      toast.info('Monitor de Cocina KDS no activo (+ $7/mes)', {
+        description: 'Activa el add-on Monitor KDS en el Marketplace para abrir la pantalla interactiva de cocina.',
       });
       return;
     }
-    setSoundEnabled(!soundEnabled);
+    window.open('/admin/cocina', '_blank');
   };
 
   const handleExportCRM = () => {
     if (!business?.has_crm_export) {
-      toast.info('Módulo de Exportación CRM no activo (+ $5/mes)', {
-        description: 'Activa este Add-on en tu suscripción para descargar tu base de clientes.',
+      toast.info('Módulo de Reportes & Ventas no activo (+ $5/mes)', {
+        description: 'Activa este Add-on en tu suscripción para descargar reportes de ventas e historial de clientes.',
       });
       return;
     }
@@ -220,29 +220,27 @@ export default function AdminDashboardPage() {
                 ? 'bg-zinc-800 border-zinc-700 text-sky-400 hover:bg-zinc-700'
                 : 'bg-zinc-950/80 border-zinc-800 text-zinc-500'
             }`}
-            title={business.has_crm_export ? 'Exportar base de datos de clientes a Excel/CSV' : 'Módulo CRM no contratado (+$5/mes)'}
+            title={business.has_crm_export ? 'Exportar reporte de ventas y clientes a Excel/CSV' : 'Módulo de Reportes y Ventas no contratado (+$5/mes)'}
           >
             {business.has_crm_export ? <Download className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-            <span>Exportar CRM (CSV)</span>
+            <span>Reportes y Ventas (CSV)</span>
           </button>
 
           <button
-            onClick={handleToggleSound}
+            onClick={handleOpenKDS}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-              soundEnabled && business.has_live_kitchen
-                ? 'bg-zinc-800 border-zinc-700 text-emerald-400'
+              business.has_live_kitchen
+                ? 'bg-zinc-800 border-zinc-700 text-purple-400 hover:bg-zinc-700'
                 : 'bg-zinc-950 border-zinc-800 text-zinc-500'
             }`}
           >
             {!business.has_live_kitchen ? (
               <Lock className="w-3.5 h-3.5 text-zinc-500" />
-            ) : soundEnabled ? (
-              <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
             ) : (
-              <VolumeX className="w-3.5 h-3.5" />
+              <Tv className="w-3.5 h-3.5 text-purple-400" />
             )}
-            <span className="hidden sm:inline">
-              {!business.has_live_kitchen ? 'Alertas (+$7/m)' : soundEnabled ? 'Sonido Activo' : 'Silenciado'}
+            <span>
+              {!business.has_live_kitchen ? 'Abrir KDS (+$7/m)' : 'Abrir Pantalla KDS'}
             </span>
           </button>
         </div>

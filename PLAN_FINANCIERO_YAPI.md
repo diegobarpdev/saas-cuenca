@@ -12,7 +12,7 @@
 | Criterio | 🛵 PedidosYa / Rappi / UberEats | 🚀 Yapi.ec (Plataforma SaaS) |
 | :--- | :--- | :--- |
 | **Comisión por venta** | **22% al 35% + IVA** de cada pedido 💸 | **0% de comisión** (El 100% de la venta es del local) 🛡️ |
-| **Modelo de cobro** | Recorte de margen por cada plato vendido | **Suscripción Fija Mensual** ($15 a $29 / mes) 💳 |
+| **Modelo de cobro** | Recorte de margen por cada plato vendido | **Suscripción Base** ($15/mes) + Add-ons a la carta 💳 |
 | **Precios al público** | Restaurante debe **subir precios 25%-30%** para no perder plata | **Precios reales de carta** (Más barato para el cliente final) |
 | **Propiedad de Clientes** | **La app oculta los datos** (No tienes telf/email de tus clientes) | **100% tuyos** (Base de datos con WhatsApp, RUC y direcciones) |
 | **Cobro del dinero** | Te pagan a los 7-15 días con retenciones | **Pago al instante** directo a tu Deuna! o PayPhone Pichincha |
@@ -34,16 +34,38 @@
 
 ## 📊 3. PROYECCIONES DE INGRESOS MENSUALES (MRR)
 
-| Fase / Escenario | Nro. de Locales | Precio Mensual PRO | Ingreso Bruto | Costos Nube | Utilidad Neta Mensual | Utilidad Anual |
+| Fase / Escenario | Nro. de Locales | Ticket Promedio / Local | Ingreso Bruto | Costos Nube | Utilidad Neta Mensual | Utilidad Anual |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Fase 1: Cuenca Inicial** | **30 locales** | $29.00 USD | $870 USD | -$35 USD | **$835 USD / mes** | **$10,020 USD** |
-| **Fase 2: Consolidación Azuay** | **100 locales** | $29.00 USD | $2,900 USD | -$80 USD | **$2,820 USD / mes** | **$33,840 USD** |
-| **Fase 3: Expansión Nacional** | **300 locales** | $29.00 USD | $8,700 USD | -$200 USD | **$8,500 USD / mes** | **$102,000 USD** |
+| **Fase 1: Cuenca Inicial** | **30 locales** | $25.00 USD | $750 USD | -$35 USD | **$715 USD / mes** | **$8,580 USD** |
+| **Fase 2: Consolidación Azuay** | **100 locales** | $25.00 USD | $2,500 USD | -$80 USD | **$2,420 USD / mes** | **$29,040 USD** |
+| **Fase 3: Expansión Nacional** | **300 locales** | $25.00 USD | $7,500 USD | -$200 USD | **$7,300 USD / mes** | **$87,600 USD** |
 
 ---
 
-## 💎 4. ESTRUCTURA DE PLANES COMERCIALES DE YAPI.EC
+## 💎 4. ESTRUCTURA DE PRECIOS Y ADD-ONS DE YAPI.EC
 
-1. **🟢 Plan Básico — $15 USD / mes:** Catálogo digital responsive, código QR para mesas, pedidos ilimitados directos a WhatsApp, cobros por Transferencia/Deuna! y Efectivo.
-2. **💜 Plan PRO — $29 USD / mes (Recomendado):** Todo lo del Plan Básico + Pasarela PayPhone integrada, impresión térmica POS de comandas de cocina en vivo, panel de administración con alertas sonoras en tiempo real y exportación de clientes.
-3. **👑 Plan Enterprise — $59 USD / mes:** Cadenas multi-sucursal con soporte técnico prioritario.
+Yapi.ec opera bajo un **Modelo SaaS Modular (A la carta)**. Los negocios pagan una suscripción base muy económica y solo añaden los módulos que realmente necesitan.
+
+### 1. 🟢 Plan Base Core — $15 USD / mes
+El motor fundamental para digitalizar cualquier local:
+* Catálogo digital HD responsivo y auto-comprimido.
+* Códigos QR dinámicos para mesas y vitrinas.
+* Pedidos ilimitados directos a WhatsApp del local.
+* Métodos de pago manuales (Efectivo, Transferencia, Deuna!).
+* **0% Comisiones por venta** (El 100% del dinero es para el negocio).
+
+### 2. 🔌 Módulos Add-ons (A la Carta)
+El negocio puede activar y desactivar estos módulos según crezca:
+* **💳 Pasarela PayPhone integrada (+$9 / mes):** Permite pagos automáticos con tarjetas de crédito/débito directamente en el catálogo.
+* **📺 Monitor de Cocina KDS & Alertas Sonoras (+$7 / mes):** Desbloquea la interfaz interactiva de cocina de pantalla completa para Tablets/Smart TVs con semáforo de tiempos y alarmas de pedidos en vivo.
+* **🖨️ Impresión Térmica POS (+$7 / mes):** Formatea e imprime las comandas directamente a ticketeras físicas en un clic.
+* **📊 Reportes de Ventas & Exportación (+$5 / mes):** Historial contable de pedidos y base de datos de clientes CRM para descargar a Excel.
+* **🌐 Dominio Personalizado (+$9 / mes):** Vincula el propio dominio del local (ej: pedidos.mi-restaurante.com) con certificado SSL gratis.
+
+---
+
+## ⚡ 5. PAQUETE ESPECIAL: PACK FULL COMBO — $35 USD / mes
+Para locales de alto volumen que quieren exprimir todo el potencial de la plataforma:
+* **Plan Base Core + Todos los 5 Add-ons** ilimitados.
+* Ahorro mensual de **$22/mes** en comparación a contratar los Add-ons por separado.
+* Soporte técnico prioritario VIP en Cuenca.

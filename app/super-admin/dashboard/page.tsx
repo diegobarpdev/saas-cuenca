@@ -432,7 +432,7 @@ export default function SuperAdminDashboardPage() {
                       onChange={(e) => setEditHasLiveKitchen(e.target.checked)}
                       className="rounded accent-emerald-500"
                     />
-                    <span className="flex items-center gap-1.5"><Bell className="w-3.5 h-3.5 text-emerald-400" /> Alertas Cocina (+$7/m)</span>
+                    <span className="flex items-center gap-1.5"><Bell className="w-3.5 h-3.5 text-emerald-400" /> Monitor Cocina KDS (+$7/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
                     <input
@@ -450,7 +450,7 @@ export default function SuperAdminDashboardPage() {
                       onChange={(e) => setEditHasCrmExport(e.target.checked)}
                       className="rounded accent-emerald-500"
                     />
-                    <span className="flex items-center gap-1.5"><Database className="w-3.5 h-3.5 text-emerald-400" /> CRM Exportación (+$5/m)</span>
+                    <span className="flex items-center gap-1.5"><Database className="w-3.5 h-3.5 text-emerald-400" /> Reportes & CRM (+$5/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700 sm:col-span-2">
                     <input

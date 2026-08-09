@@ -37,15 +37,15 @@ export default function AdminMarketplacePage() {
     },
     {
       id: 'live_kitchen',
-      title: 'Alertas Sonoras Cocina en Vivo',
+      title: 'Monitor de Cocina Digital (KDS) & Alertas',
       price: '+$7 / mes',
       icon: Volume2,
       active: !!business.has_live_kitchen,
-      description: 'Notificación con sonido de timbre fuerte en tiempo real cada vez que un cliente realiza un nuevo pedido en tu local.',
+      description: 'Sincroniza tu cocina con una pantalla interactiva (KDS). Recibe alertas sonoras en vivo y gestiona el flujo de platos (Pendiente ➔ Cocina ➔ Listo) para cero retrasos.',
       benefits: [
-        'Alertas sonoras instantáneas en pantalla',
-        'Flujo de estados en tiempo real (Pendiente -> Cocina -> Listo)',
-        'Sin refrescar la página manualmente',
+        'Alertas sonoras instantáneas con sonido de timbre fuerte',
+        'Consola KDS interactiva para controlar tiempos y despachos',
+        'Sincronización automática multidispositivo en tiempo real',
       ],
     },
     {
@@ -63,15 +63,15 @@ export default function AdminMarketplacePage() {
     },
     {
       id: 'crm_export',
-      title: 'Base de Datos CRM & Exportación Excel',
+      title: 'Reportes de Ventas & Exportación Excel (CRM)',
       price: '+$5 / mes',
       icon: Download,
       active: !!business.has_crm_export,
-      description: 'Descarga en Excel / CSV la base de datos completa de tus compradores (WhatsApp, Nombre, Email, RUC y Dirección).',
+      description: 'Descarga reportes completos de tus pedidos, historial de ventas para contabilidad y el directorio de contactos de clientes en formato CSV/Excel.',
       benefits: [
-        'Exportación en 1-clic a formato CSV/Excel',
-        'Tus clientes son 100% tuyos (Directorio completo)',
-        'Ideal para enviar ofertas y promociones masivas',
+        'Exportación en 1-clic de ventas y facturación a Excel',
+        'Historial de pedidos por fecha, estado y método de pago',
+        'Directorio CRM de clientes (WhatsApp, Dirección, RUC) para marketing',
       ],
     },
     {
@@ -192,7 +192,7 @@ export default function AdminMarketplacePage() {
             <div>
               <h3 className="font-display font-black text-lg text-white">Todos los Add-ons Incluidos</h3>
               <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                Obtén acceso ilimitado a PayPhone, Alertas de Cocina, Impresión POS, CRM y Dominio Propio ahorrando dinero mensual.
+                Obtén acceso ilimitado a PayPhone, Monitor KDS, Impresión POS, Reportes/CRM y Dominio Propio ahorrando dinero mensual.
               </p>
             </div>
 
