@@ -285,3 +285,46 @@ ALTER TABLE product_option_values ENABLE ROW LEVEL SECURITY;
 -- Políticas de desarrollo abiertas
 CREATE POLICY "Allow All Option Groups" ON product_option_groups FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow All Option Values" ON product_option_values FOR ALL USING (true) WITH CHECK (true);
+
+-- 14. CLIENTES POR NEGOCIO (CRM)
+CREATE TABLE IF NOT EXISTS business_customers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+  nombre TEXT NOT NULL,
+  telefono TEXT NOT NULL,
+  direccion TEXT,
+  notas TEXT,
+  total_pedidos INTEGER NOT NULL DEFAULT 0,
+  total_gastado NUMERIC(10,2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT unique_business_customer_phone UNIQUE (business_id, telefono)
+);
+
+-- Habilitar RLS
+ALTER TABLE business_customers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow All Business Customers" ON business_customers FOR ALL USING (true) WITH CHECK (true);
+
+-- Trigger de Sincronización Automática
+CREATE OR REPLACE FUNCTION sync_order_to_customers()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO business_customers (business_id, nombre, telefono, direccion, total_pedidos, total_gastado)
+  VALUES (NEW.business_id, NEW.cliente_nombre, NEW.cliente_telefono, NEW.cliente_direccion, 1, NEW.total)
+  ON CONFLICT (business_id, telefono) 
+  DO UPDATE SET
+    nombre = EXCLUDED.nombre,
+    direccion = COALESCE(EXCLUDED.direccion, business_customers.direccion),
+    total_pedidos = business_customers.total_pedidos + 1,
+    total_gastado = business_customers.total_gastado + EXCLUDED.total_gastado,
+    updated_at = NOW();
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_sync_order_to_customers ON orders;
+CREATE TRIGGER trg_sync_order_to_customers
+AFTER INSERT ON orders
+FOR EACH ROW
+EXECUTE FUNCTION sync_order_to_customers();
