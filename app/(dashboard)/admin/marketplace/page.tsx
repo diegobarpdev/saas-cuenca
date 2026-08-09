@@ -1,13 +1,27 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, CreditCard, Volume2, Printer, Download, Globe, Sparkles, CheckCircle2, ShieldCheck, RefreshCw, MessageSquare } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
+import { toast } from '@/lib/utils/toast';
 
 export default function AdminMarketplacePage() {
   const { business, loading } = useAdminBusiness();
+  const [authorized, setAuthorized] = useState(false);
 
-  if (loading || !business) {
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+      if (role !== 'dueño') {
+        toast.error('Acceso denegado: solo el Administrador (Dueño) puede acceder al Marketplace.');
+        window.location.href = '/admin/caja';
+      } else {
+        setAuthorized(true);
+      }
+    }
+  }, []);
+
+  if (loading || !business || !authorized) {
     return (
       <div className="p-12 text-center text-slate-400 font-display text-sm flex items-center justify-center gap-2">
         <RefreshCw className="w-5 h-5 animate-spin text-emerald-400" />

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus, Download, Lock, Tv } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus, Download, Lock, Tv, Unlock } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { Order, OrderStatus } from '@/lib/types/database';
 import { OrderBadge, PaymentBadge } from '@/components/ui/Badge';
@@ -21,6 +21,70 @@ export default function AdminDashboardPage() {
   const [activeFilter, setActiveFilter] = useState<string>('todos');
   const [selectedOrderForTicket, setSelectedOrderForTicket] = useState<(Order & { items?: any[] }) | null>(null);
   const [selectedComprobanteUrl, setSelectedComprobanteUrl] = useState<string | null>(null);
+  const [simulatedRole, setSimulatedRole] = useState<'dueño' | 'cajero-1' | 'cajero-2' | 'cocinero'>('dueño');
+
+  // Estados de navegación e historial financiero (Fase 3)
+  const [mainTab, setMainTab] = useState<'pedidos' | 'turnos'>('pedidos');
+  const [shiftsHistory, setShiftsHistory] = useState<any[]>([]);
+  const [loadingShifts, setLoadingShifts] = useState(false);
+  const [editingRegisterId, setEditingRegisterId] = useState<string | null>(null);
+  const [auditComment, setAuditComment] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const role = localStorage.getItem('yapi_simulated_role') as any || 'dueño';
+      setSimulatedRole(role);
+    }
+  }, []);
+
+  const loadShiftsHistory = async () => {
+    if (!business) return;
+    setLoadingShifts(true);
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('business_shifts')
+        .select('*, cash_registers(*)')
+        .eq('business_id', business.id)
+        .order('fecha_apertura', { ascending: false });
+
+      if (error) throw error;
+      setShiftsHistory(data || []);
+    } catch (err: any) {
+      console.error('Error cargando historial de turnos:', err);
+      toast.error('No se pudo cargar el historial de turnos.');
+    } finally {
+      setLoadingShifts(false);
+    }
+  };
+
+  useEffect(() => {
+    if (mainTab === 'turnos' && business) {
+      loadShiftsHistory();
+    }
+  }, [mainTab, business]);
+
+  const handleApproveAuditoria = async (registerId: string) => {
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('cash_registers')
+        .update({
+          estado_auditoria: 'aprobado_sin_novedad',
+          comentarios_auditoria: auditComment.trim() || 'Aprobado sin observaciones por el administrador.'
+        })
+        .eq('id', registerId);
+
+      if (error) throw error;
+      toast.success('Arqueo de caja auditado y aprobado correctamente.');
+      setEditingRegisterId(null);
+      setAuditComment('');
+      loadShiftsHistory();
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Error al guardar auditoría de caja.');
+    }
+  };
 
   const handleOpenKDS = () => {
     if (!business?.has_live_kitchen) {
@@ -111,6 +175,10 @@ export default function AdminDashboardPage() {
   };
 
   const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
+    if (simulatedRole === 'dueño') {
+      toast.error('Acceso denegado: El administrador ve el panel de pedidos en modo Solo Lectura.');
+      return;
+    }
     updateOrderStatusLocal(orderId, newStatus);
     const orderObj = orders.find((o) => o.id === orderId);
     const num = orderObj ? `#${orderObj.numero_pedido}` : '';
@@ -118,6 +186,10 @@ export default function AdminDashboardPage() {
   };
 
   const handleUpdatePaymentStatus = (orderId: string, newPaymentStatus: any) => {
+    if (simulatedRole === 'dueño') {
+      toast.error('Acceso denegado: El administrador ve el panel de pedidos en modo Solo Lectura.');
+      return;
+    }
     updatePaymentStatusLocal(orderId, newPaymentStatus);
     const orderObj = orders.find((o) => o.id === orderId);
     const num = orderObj ? `#${orderObj.numero_pedido}` : '';
@@ -201,8 +273,37 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-5 max-w-6xl mx-auto">
-      {/* Header Producción */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+
+      {/* Selector de Pestañas Principales (Solo Dueño) */}
+      {simulatedRole === 'dueño' && (
+        <div className="flex border-b border-zinc-800/80">
+          <button
+            onClick={() => setMainTab('pedidos')}
+            className={`px-6 py-3 font-display font-black text-xs uppercase tracking-wider transition-colors border-b-2 cursor-pointer ${
+              mainTab === 'pedidos'
+                ? 'border-emerald-500 text-white'
+                : 'border-transparent text-slate-400 hover:text-white'
+            }`}
+          >
+            Pedidos en Vivo
+          </button>
+          <button
+            onClick={() => setMainTab('turnos')}
+            className={`px-6 py-3 font-display font-black text-xs uppercase tracking-wider transition-colors border-b-2 cursor-pointer ${
+              mainTab === 'turnos'
+                ? 'border-emerald-500 text-white'
+                : 'border-transparent text-slate-400 hover:text-white'
+            }`}
+          >
+            Historial de Turnos & Cajas
+          </button>
+        </div>
+      )}
+
+      {mainTab === 'pedidos' ? (
+        <>
+          {/* Header Producción */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
         <div>
           <h1 className="text-xl font-bold text-zinc-100 tracking-tight flex items-center gap-2">
             <span>Pedidos en Tiempo Real</span>
@@ -303,22 +404,24 @@ export default function AdminDashboardPage() {
                   <span className="font-mono font-bold text-base text-zinc-100">{formatCurrency(order.total)}</span>
                   <div className="flex items-center gap-1.5 flex-wrap justify-end">
                     <PaymentBadge status={order.estado_pago} method={order.metodo_pago} />
-                    {order.estado_pago === 'pendiente' ? (
-                      <button
-                        onClick={() => handleUpdatePaymentStatus(order.id, 'pagado')}
-                        className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 transition-colors shadow-sm"
-                        title="Marcar como Pagado"
-                      >
-                        Marcar Pagado
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleUpdatePaymentStatus(order.id, 'pendiente')}
-                        className="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-400 border border-zinc-700 transition-colors"
-                        title="Marcar como Pendiente"
-                      >
-                        Marcar Pendiente
-                      </button>
+                    {simulatedRole !== 'dueño' && (
+                      order.estado_pago === 'pendiente' ? (
+                        <button
+                          onClick={() => handleUpdatePaymentStatus(order.id, 'pagado')}
+                          className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 transition-colors shadow-sm cursor-pointer"
+                          title="Marcar como Pagado"
+                        >
+                          Marcar Pagado
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleUpdatePaymentStatus(order.id, 'pendiente')}
+                          className="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-400 border border-zinc-700 transition-colors cursor-pointer"
+                          title="Marcar como Pendiente"
+                        >
+                          Marcar Pendiente
+                        </button>
+                      )
                     )}
                   </div>
                 </div>
@@ -401,29 +504,37 @@ export default function AdminDashboardPage() {
 
                 {/* Transición de Estado */}
                 <div className="flex items-center gap-1 ml-auto">
-                  {order.estado === 'pendiente' && (
-                    <button
-                      onClick={() => handleUpdateStatus(order.id, 'aceptado')}
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-sm transition-colors"
-                    >
-                      Aceptar Pedido
-                    </button>
-                  )}
-                  {order.estado === 'aceptado' && (
-                    <button
-                      onClick={() => handleUpdateStatus(order.id, 'en_preparacion')}
-                      className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-sm transition-colors"
-                    >
-                      En Preparación
-                    </button>
-                  )}
-                  {order.estado === 'en_preparacion' && (
-                    <button
-                      onClick={() => handleUpdateStatus(order.id, 'listo')}
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-sm transition-colors"
-                    >
-                      Marcar Listo
-                    </button>
+                  {simulatedRole === 'dueño' ? (
+                    <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-950 border border-white/5 px-2.5 py-1.5 rounded-xl">
+                      Solo Lectura
+                    </span>
+                  ) : (
+                    <>
+                      {order.estado === 'pendiente' && (
+                        <button
+                          onClick={() => handleUpdateStatus(order.id, 'aceptado')}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-sm transition-colors cursor-pointer"
+                        >
+                          Aceptar Pedido
+                        </button>
+                      )}
+                      {order.estado === 'aceptado' && (
+                        <button
+                          onClick={() => handleUpdateStatus(order.id, 'en_preparacion')}
+                          className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-sm transition-colors cursor-pointer"
+                        >
+                          En Preparación
+                        </button>
+                      )}
+                      {order.estado === 'en_preparacion' && (
+                        <button
+                          onClick={() => handleUpdateStatus(order.id, 'listo')}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-sm transition-colors cursor-pointer"
+                        >
+                          Marcar Listo
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -431,8 +542,178 @@ export default function AdminDashboardPage() {
           ))}
         </div>
       )}
+    </>
+  ) : (
+    /* HISTORIAL DE TURNOS */
+    <div className="space-y-4 animate-fade-in">
+      <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 flex justify-between items-center">
+        <div>
+          <h2 className="text-md font-display font-black text-white">Auditoría Financiera y Turnos</h2>
+          <p className="text-xs text-slate-400">Revisa la conciliación de caja física, descuadres e historial de apertura y cierre.</p>
+        </div>
+        <button
+          onClick={loadShiftsHistory}
+          className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-white/10 rounded-xl text-xs text-slate-300 font-bold cursor-pointer"
+        >
+          Recargar Historial
+        </button>
+      </div>
 
-      {/* Modal Impresión Ticket Thermal */}
+      {loadingShifts ? (
+        <div className="p-12 text-center text-slate-400 text-xs animate-pulse">
+          Cargando historial de turnos...
+        </div>
+      ) : shiftsHistory.length === 0 ? (
+        <div className="p-12 text-center rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/10 text-slate-500 text-xs">
+          No hay turnos registrados en este negocio.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {shiftsHistory.map((shift) => {
+            const reg = shift.cash_registers && shift.cash_registers[0];
+            const isOpen = shift.estado === 'abierto';
+            
+            return (
+              <div key={shift.id} className="p-5 rounded-2xl bg-[#0B0F1B] border border-white/5 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-display font-black text-white uppercase">
+                        {shift.rol_ejecutado === 'cajero-1' ? 'Cajero Principal (Cajero 1)' : shift.rol_ejecutado === 'cajero-2' ? 'Cajero Barra (Cajero 2)' : shift.rol_ejecutado}
+                      </span>
+                      {isOpen ? (
+                        <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                          Abierto
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-white/5">
+                          Cerrado
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-mono-tech mt-1">
+                      Apertura: {new Date(shift.fecha_apertura).toLocaleString()}
+                      {!isOpen && ` | Cierre: ${new Date(shift.fecha_cierre).toLocaleString()}`}
+                    </p>
+                  </div>
+
+                  {reg && (
+                    <span className="text-[11px] font-mono-tech font-bold text-slate-300 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-white/5">
+                      💼 {reg.nombre_caja}
+                    </span>
+                  )}
+                </div>
+
+                {reg && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                    <div>
+                      <span className="text-slate-500 block text-[9px] uppercase font-bold">Fondo Apertura</span>
+                      <span className="font-mono text-white font-bold">{formatCurrency(reg.monto_apertura)}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[9px] uppercase font-bold">Ventas Efectivo</span>
+                      <span className="font-mono text-white font-bold">{formatCurrency(reg.ventas_efectivo_calculado || 0)}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[9px] uppercase font-bold">Ingresos/Egresos</span>
+                      <span className={`font-mono font-bold ${Number(reg.ingresos_manuales_efectivo || 0) >= Number(reg.egresos_manuales_efectivo || 0) ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        +{formatCurrency(reg.ingresos_manuales_efectivo || 0)} / -{formatCurrency(reg.egresos_manuales_efectivo || 0)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[9px] uppercase font-bold">Efectivo Esperado</span>
+                      <span className="font-mono text-amber-400 font-bold">
+                        {formatCurrency(
+                          Number(reg.monto_apertura) + 
+                          Number(reg.ventas_efectivo_calculado || 0) + 
+                          Number(reg.ingresos_manuales_efectivo || 0) - 
+                          Number(reg.egresos_manuales_efectivo || 0)
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {reg && !isOpen && (
+                  <div className="pt-3 border-t border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-950/40 p-3.5 rounded-xl border border-white/5">
+                    <div className="space-y-1">
+                      <span className="text-[10px] text-slate-400 block font-bold">Cierre Declarado por Cajero:</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-mono font-black text-white">{formatCurrency(reg.monto_cierre_declarado)}</span>
+                        {reg.diferencia_efectivo === 0 ? (
+                          <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                            Caja Cuadrada
+                          </span>
+                        ) : reg.diferencia_efectivo < 0 ? (
+                          <span className="text-[9px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
+                            Faltante: {formatCurrency(reg.diferencia_efectivo)}
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                            Sobrante: +{formatCurrency(reg.diferencia_efectivo)}
+                          </span>
+                        )}
+                      </div>
+                      {reg.comentarios_auditoria && (
+                        <p className="text-[11px] text-slate-400 italic mt-1.5">
+                          Nota Cajero: "{reg.comentarios_auditoria}"
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Estado de auditoría */}
+                    <div>
+                      {reg.estado_auditoria === 'pendiente' ? (
+                        editingRegisterId === reg.id ? (
+                          <div className="flex flex-col gap-2 max-w-sm w-full">
+                            <input
+                              type="text"
+                              placeholder="Escribe comentarios de auditoría..."
+                              value={auditComment}
+                              onChange={(e) => setAuditComment(e.target.value)}
+                              className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none"
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleApproveAuditoria(reg.id)}
+                                className="flex-1 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-[10px] cursor-pointer"
+                              >
+                                Confirmar
+                              </button>
+                              <button
+                                onClick={() => { setEditingRegisterId(null); setAuditComment(''); }}
+                                className="px-2 py-1 rounded bg-slate-800 text-slate-400 text-[10px] cursor-pointer"
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => { setEditingRegisterId(reg.id); setAuditComment(''); }}
+                            className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-400 text-[11px] font-bold transition-all cursor-pointer"
+                          >
+                            Aprobar y Cerrar Turno
+                          </button>
+                        )
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-slate-900/60 px-3 py-2 rounded-xl border border-white/5">
+                          <Unlock className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Auditado & Aprobado</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  )}
+
+  {/* Modal Impresión Ticket Thermal */}
       {selectedOrderForTicket && (
         <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 max-w-md w-full space-y-4 shadow-2xl">

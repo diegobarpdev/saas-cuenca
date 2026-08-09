@@ -15,7 +15,11 @@ import {
   Clock,
   ArrowLeft,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Lock,
+  Unlock,
+  TrendingUp,
+  Coins
 } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { Product, Category, Order, CartItem } from '@/lib/types/database';
@@ -47,6 +51,292 @@ export default function CajaPOSPage() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Estados de Turnos y Caja Chica
+  const [activeShift, setActiveShift] = useState<any | null>(null);
+  const [activeRegister, setActiveRegister] = useState<any | null>(null);
+  const [showOpenShiftModal, setShowOpenShiftModal] = useState(false);
+  
+  // Formulario Apertura
+  const [nombreCaja, setNombreCaja] = useState('Caja 1');
+  const [montoApertura, setMontoApertura] = useState('50.00');
+  const [isSavingShift, setIsSavingShift] = useState(false);
+
+  // Formulario Caja Chica
+  const [showTxModal, setShowTxModal] = useState(false);
+  const [txTipo, setTxTipo] = useState<'ingreso' | 'egreso'>('egreso');
+  const [txMonto, setTxMonto] = useState('');
+  const [txMotivo, setTxMotivo] = useState('');
+  const [isSavingTx, setIsSavingTx] = useState(false);
+
+  // Formulario Cierre
+  const [showCloseModal, setShowCloseModal] = useState(false);
+  const [salesReport, setSalesReport] = useState<{
+    efectivo: number;
+    transferencia: number;
+    payphone: number;
+  }>({ efectivo: 0, transferencia: 0, payphone: 0 });
+  const [montoDeclarado, setMontoDeclarado] = useState('');
+  const [comentariosArqueo, setComentariosArqueo] = useState('');
+  const [isClosingShift, setIsClosingShift] = useState(false);
+
+  // Verificar turno activo
+  const checkActiveShift = async () => {
+    if (!business) return;
+    const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+    
+    if (role === 'dueño') {
+      setActiveShift({ id: 'mock-dueño-shift', rol_ejecutado: 'dueño' });
+      setActiveRegister({ id: 'mock-dueño-register', nombre_caja: 'Caja Admin' });
+      setShowOpenShiftModal(false);
+      return;
+    }
+
+    const supabase = createClient();
+    const { data: shiftData, error } = await supabase
+      .from('business_shifts')
+      .select('*, cash_registers(*)')
+      .eq('business_id', business.id)
+      .eq('rol_ejecutado', role)
+      .eq('estado', 'abierto')
+      .maybeSingle();
+
+    if (shiftData) {
+      setActiveShift(shiftData);
+      if (shiftData.cash_registers && shiftData.cash_registers.length > 0) {
+        setActiveRegister(shiftData.cash_registers[0]);
+      } else {
+        setActiveRegister(null);
+      }
+      setShowOpenShiftModal(false);
+    } else {
+      setActiveShift(null);
+      setActiveRegister(null);
+      setShowOpenShiftModal(true);
+    }
+  };
+
+  useEffect(() => {
+    if (business) {
+      checkActiveShift();
+    }
+  }, [business]);
+
+  // Establecer nombre de caja por defecto
+  useEffect(() => {
+    const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+    if (role === 'cajero-1') {
+      setNombreCaja('Caja Principal');
+    } else if (role === 'cajero-2') {
+      setNombreCaja('Caja Barra');
+    } else {
+      setNombreCaja('Caja 1');
+    }
+  }, []);
+
+  const handleOpenShift = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!business) return;
+    setIsSavingShift(true);
+
+    const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+
+    try {
+      const supabase = createClient();
+      
+      const { data: shiftData, error: shiftError } = await supabase
+        .from('business_shifts')
+        .insert({
+          business_id: business.id,
+          rol_ejecutado: role,
+          estado: 'abierto'
+        })
+        .select()
+        .single();
+
+      if (shiftError) throw shiftError;
+
+      const { data: registerData, error: registerError } = await supabase
+        .from('cash_registers')
+        .insert({
+          shift_id: shiftData.id,
+          nombre_caja: nombreCaja,
+          monto_apertura: Number(montoApertura)
+        })
+        .select()
+        .single();
+
+      if (registerError) throw registerError;
+
+      toast.success(`Turno abierto con éxito en ${nombreCaja}.`);
+      setActiveShift(shiftData);
+      setActiveRegister(registerData);
+      setShowOpenShiftModal(false);
+    } catch (err: any) {
+      console.error('Error al abrir turno:', err);
+      toast.error(`Error al abrir caja: ${err.message || err}`);
+    } finally {
+      setIsSavingShift(false);
+    }
+  };
+
+  const handleSaveTransaction = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeRegister || activeRegister.id === 'mock-dueño-register') {
+      toast.error('El administrador no registra movimientos manuales en modo simulación.');
+      setShowTxModal(false);
+      return;
+    }
+    if (Number(txMonto) <= 0) {
+      toast.error('El monto debe ser mayor a 0.');
+      return;
+    }
+    if (!txMotivo.trim()) {
+      toast.error('Por favor ingresa un motivo para el movimiento.');
+      return;
+    }
+
+    setIsSavingTx(true);
+
+    try {
+      const supabase = createClient();
+      
+      const { error: txError } = await supabase
+        .from('cash_transactions')
+        .insert({
+          register_id: activeRegister.id,
+          tipo: txTipo,
+          monto: Number(txMonto),
+          motivo: txMotivo.trim()
+        });
+
+      if (txError) throw txError;
+
+      const field = txTipo === 'ingreso' ? 'ingresos_manuales_efectivo' : 'egresos_manuales_efectivo';
+      const currentAmount = activeRegister[field] || 0;
+      const newAmount = Number(currentAmount) + Number(txMonto);
+
+      const { data: updatedRegister, error: updateError } = await supabase
+        .from('cash_registers')
+        .update({ [field]: newAmount })
+        .eq('id', activeRegister.id)
+        .select()
+        .single();
+
+      if (updateError) throw updateError;
+
+      toast.success('Movimiento de caja chica registrado con éxito.');
+      setActiveRegister(updatedRegister);
+      setShowTxModal(false);
+      setTxMonto('');
+      setTxMotivo('');
+    } catch (err: any) {
+      console.error('Error guardando transacción de caja:', err);
+      toast.error(`Error de base de datos: ${err.message || err}`);
+    } finally {
+      setIsSavingTx(false);
+    }
+  };
+
+  const prepareCloseShift = async () => {
+    if (!activeShift || !activeRegister) return;
+    if (activeShift.id === 'mock-dueño-shift') {
+      toast.error('El administrador no cierra turno en modo simulación.');
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const supabase = createClient();
+      
+      const { data: ordersData, error } = await supabase
+        .from('orders')
+        .select('total, metodo_pago')
+        .eq('shift_id', activeShift.id);
+
+      if (error) throw error;
+
+      let efectivo = 0;
+      let transferencia = 0;
+      let payphone = 0;
+
+      if (ordersData) {
+        ordersData.forEach((order: any) => {
+          if (order.metodo_pago === 'efectivo') efectivo += Number(order.total);
+          else if (order.metodo_pago === 'transferencia') transferencia += Number(order.total);
+          else if (order.metodo_pago === 'payphone') payphone += Number(order.total);
+        });
+      }
+
+      setSalesReport({ efectivo, transferencia, payphone });
+      setShowCloseModal(true);
+    } catch (err: any) {
+      console.error('Error calculando arqueo:', err);
+      toast.error(`Error al obtener ventas del turno: ${err.message || err}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseShift = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeShift || !activeRegister) return;
+    if (montoDeclarado === '') {
+      toast.error('Por favor ingresa el monto de efectivo contado.');
+      return;
+    }
+
+    setIsClosingShift(true);
+
+    const efectivoEsperado = 
+      Number(activeRegister.monto_apertura) + 
+      salesReport.efectivo + 
+      Number(activeRegister.ingresos_manuales_efectivo || 0) - 
+      Number(activeRegister.egresos_manuales_efectivo || 0);
+
+    const diferencia = Number(montoDeclarado) - efectivoEsperado;
+
+    try {
+      const supabase = createClient();
+      
+      const { error: shiftError } = await supabase
+        .from('business_shifts')
+        .update({
+          estado: 'cerrado',
+          fecha_cierre: new Date().toISOString()
+        })
+        .eq('id', activeShift.id);
+
+      if (shiftError) throw shiftError;
+
+      const { error: registerError } = await supabase
+        .from('cash_registers')
+        .update({
+          monto_cierre_declarado: Number(montoDeclarado),
+          ventas_efectivo_calculado: salesReport.efectivo,
+          ventas_transferencia_calculado: salesReport.transferencia,
+          ventas_payphone_calculado: salesReport.payphone,
+          diferencia_efectivo: diferencia,
+          comentarios_auditoria: comentariosArqueo.trim() || null
+        })
+        .eq('id', activeRegister.id);
+
+      if (registerError) throw registerError;
+
+      toast.success('¡Caja cerrada correctamente! Turno finalizado.');
+      
+      setShowCloseModal(false);
+      setMontoDeclarado('');
+      setComentariosArqueo('');
+      
+      await checkActiveShift();
+    } catch (err: any) {
+      console.error('Error cerrando turno:', err);
+      toast.error(`Error al guardar arqueo de caja: ${err.message || err}`);
+    } finally {
+      setIsClosingShift(false);
+    }
+  };
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -187,7 +477,8 @@ export default function CajaPOSPage() {
       total: total,
       metodo_pago: metodoPago,
       estado_pago: estadoPago,
-      estado: 'pendiente'
+      estado: 'pendiente',
+      shift_id: activeShift && activeShift.id !== 'mock-dueño-shift' ? activeShift.id : null
     };
 
     try {
@@ -299,6 +590,30 @@ export default function CajaPOSPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Movimientos de Caja Chica */}
+          {activeRegister && activeRegister.id !== 'mock-dueño-register' && (
+            <button
+              onClick={() => setShowTxModal(true)}
+              className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 text-amber-400 hover:text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+              title="Movimientos de Caja Chica (Gastos/Ingresos)"
+            >
+              <Coins className="w-4 h-4" />
+              <span className="hidden md:inline">Caja Chica</span>
+            </button>
+          )}
+
+          {/* Cerrar Caja */}
+          {activeShift && activeShift.id !== 'mock-dueño-shift' && (
+            <button
+              onClick={prepareCloseShift}
+              className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+              title="Cerrar Turno de Caja"
+            >
+              <Lock className="w-4 h-4" />
+              <span className="hidden md:inline">Cerrar Caja</span>
+            </button>
+          )}
+
           {/* Pantalla completa */}
           <button
             onClick={toggleFullscreen}
@@ -684,6 +999,282 @@ export default function CajaPOSPage() {
       </div>
 
     </div>
+
+    {/* ========================================== */}
+    {/* MODAL 1: APERTURA DE CAJA (LOCK SCREEN)    */}
+    {/* ========================================== */}
+    {showOpenShiftModal && (
+      <div className="fixed inset-0 z-50 bg-[#070A11]/95 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[#0B0F1B] border border-white/10 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl">
+          <div className="text-center space-y-2">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
+              <Lock className="w-6 h-6 animate-pulse" />
+            </div>
+            <h2 className="text-xl font-display font-black text-white tracking-tight">Caja Registradora Cerrada</h2>
+            <p className="text-xs text-slate-400">
+              Debes abrir turno e ingresar el fondo de caja inicial para comenzar a facturar en {business?.nombre}.
+            </p>
+          </div>
+
+          <form onSubmit={handleOpenShift} className="space-y-4">
+            <div>
+              <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Nombre / Identificador de Caja</label>
+              <input
+                type="text"
+                required
+                value={nombreCaja}
+                onChange={(e) => setNombreCaja(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Monto Inicial (Fondo de Caja en Efectivo)</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 text-sm">$</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  required
+                  min="0"
+                  placeholder="0.00"
+                  value={montoApertura}
+                  onChange={(e) => setMontoApertura(e.target.value)}
+                  className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white font-mono placeholder-slate-600 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1">
+                Ingresa el dinero físico fraccionario con el que cuentas en la gaveta para dar vueltos.
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSavingShift}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-display font-black text-xs tracking-wider uppercase disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-bold"
+            >
+              {isSavingShift ? 'Abriendo Caja...' : 'Iniciar Turno & Abrir Caja'}
+            </button>
+          </form>
+        </div>
+      </div>
+    )}
+
+    {/* ========================================== */}
+    {/* MODAL 2: CAJA CHICA (INGRESOS / EGRESOS)   */}
+    {/* ========================================== */}
+    {showTxModal && (
+      <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[#0B0F1B] border border-white/10 rounded-3xl p-6 space-y-6 shadow-2xl">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+            <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
+              <Coins className="w-4.5 h-4.5 text-amber-400" />
+              <span>Movimiento de Caja Chica</span>
+            </h3>
+            <button 
+              onClick={() => setShowTxModal(false)}
+              className="text-slate-400 hover:text-white text-xs font-bold bg-slate-900 px-2.5 py-1 rounded-lg border border-white/5 cursor-pointer"
+            >
+              Cerrar
+            </button>
+          </div>
+
+          <form onSubmit={handleSaveTransaction} className="space-y-4">
+            {/* Tipo de movimiento */}
+            <div>
+              <label className="block text-[10px] font-display font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                Tipo de Movimiento
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTxTipo('egreso')}
+                  className={`py-2 rounded-xl text-xs font-display font-bold border transition-all cursor-pointer ${
+                    txTipo === 'egreso'
+                      ? 'bg-rose-500/10 border-rose-500 text-rose-400'
+                      : 'bg-slate-950 border-slate-800 text-slate-400'
+                  }`}
+                >
+                  Gasto / Retiro (Egreso)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTxTipo('ingreso')}
+                  className={`py-2 rounded-xl text-xs font-display font-bold border transition-all cursor-pointer ${
+                    txTipo === 'ingreso'
+                      ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
+                      : 'bg-slate-950 border-slate-800 text-slate-400'
+                  }`}
+                >
+                  Ingresar Sencillo
+                </button>
+              </div>
+            </div>
+
+            {/* Monto */}
+            <div>
+              <label className="block text-[10px] font-display font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                Monto ($)
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 text-xs">$</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  required
+                  min="0.01"
+                  placeholder="0.00"
+                  value={txMonto}
+                  onChange={(e) => setTxMonto(e.target.value)}
+                  className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white font-mono focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+
+            {/* Motivo */}
+            <div>
+              <label className="block text-[10px] font-display font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                Motivo / Justificación
+              </label>
+              <textarea
+                required
+                rows={3}
+                placeholder="Ej: Compra de gas de repuesto o inyección de vuelto de $1.00"
+                value={txMotivo}
+                onChange={(e) => setTxMotivo(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 resize-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSavingTx}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-display font-black text-xs tracking-wider uppercase disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-bold"
+            >
+              {isSavingTx ? 'Guardando...' : 'Registrar Transacción'}
+            </button>
+          </form>
+        </div>
+      </div>
+    )}
+
+    {/* ========================================== */}
+    {/* MODAL 3: ARQUEO Y CIERRE DE CAJA           */}
+    {/* ========================================== */}
+    {showCloseModal && activeRegister && (
+      <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="w-full max-w-lg bg-[#0B0F1B] border border-white/10 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto scrollbar-thin">
+          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+            <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
+              <Lock className="w-4.5 h-4.5 text-rose-400 animate-pulse" />
+              <span>Arqueo y Cierre de Caja — {activeRegister.nombre_caja}</span>
+            </h3>
+            <button 
+              onClick={() => setShowCloseModal(false)}
+              className="text-slate-400 hover:text-white text-xs font-bold bg-slate-900 px-2.5 py-1 rounded-lg border border-white/5 cursor-pointer"
+            >
+              Cancelar
+            </button>
+          </div>
+
+          {/* Resumen confidencial de ventas */}
+          <div className="p-4 rounded-2xl bg-slate-950 border border-white/5 space-y-3.5">
+            <h4 className="text-[10px] font-mono-tech font-bold uppercase tracking-wider text-slate-400">Resumen Financiero del Turno</h4>
+            
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                <span className="text-slate-500 block text-[10px] uppercase font-bold">Fondo de Apertura</span>
+                <span className="text-white font-mono font-extrabold text-sm">{formatCurrency(activeRegister.monto_apertura)}</span>
+              </div>
+              <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                <span className="text-slate-500 block text-[10px] uppercase font-bold">Ventas en Efectivo</span>
+                <span className="text-white font-mono font-extrabold text-sm">{formatCurrency(salesReport.efectivo)}</span>
+              </div>
+              <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                <span className="text-slate-500 block text-[10px] uppercase font-bold">Ingresos Manuales</span>
+                <span className="text-emerald-400 font-mono font-extrabold text-sm">+{formatCurrency(activeRegister.ingresos_manuales_efectivo || 0)}</span>
+              </div>
+              <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                <span className="text-slate-500 block text-[10px] uppercase font-bold">Egresos (Gastos)</span>
+                <span className="text-rose-400 font-mono font-extrabold text-sm">-{formatCurrency(activeRegister.egresos_manuales_efectivo || 0)}</span>
+              </div>
+            </div>
+
+            <div className="border-t border-white/5 pt-3.5 flex justify-between items-center">
+              <div>
+                <span className="text-slate-400 text-xs font-bold block">Efectivo Neto Esperado:</span>
+                <span className="text-[10px] text-slate-500">Apertura + Ventas + Ingresos - Egresos</span>
+              </div>
+              <span className="text-md font-mono-tech font-extrabold text-amber-400">
+                {formatCurrency(
+                  Number(activeRegister.monto_apertura) + 
+                  salesReport.efectivo + 
+                  Number(activeRegister.ingresos_manuales_efectivo || 0) - 
+                  Number(activeRegister.egresos_manuales_efectivo || 0)
+                )}
+              </span>
+            </div>
+
+            <div className="border-t border-white/5 pt-3 space-y-1.5 text-[11px] text-slate-400">
+              <div className="flex justify-between">
+                <span>Ventas por Transferencia / Deuna:</span>
+                <span className="font-mono text-white">{formatCurrency(salesReport.transferencia)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Ventas por PayPhone:</span>
+                <span className="font-mono text-white">{formatCurrency(salesReport.payphone)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Formulario de Arqueo */}
+          <form onSubmit={handleCloseShift} className="space-y-4">
+            <div>
+              <label className="block text-xs font-display font-semibold text-slate-300 mb-1">
+                Efectivo Físico Contado en Caja ($)
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 text-xs">$</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  required
+                  min="0"
+                  placeholder="0.00"
+                  value={montoDeclarado}
+                  onChange={(e) => setMontoDeclarado(e.target.value)}
+                  className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white font-mono focus:outline-none focus:border-rose-500"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1">
+                Cuenta físicamente todos los billetes y monedas en la gaveta y digita el total.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-display font-semibold text-slate-300 mb-1">
+                Comentarios / Novedades del Turno
+              </label>
+              <textarea
+                rows={2}
+                placeholder="Ej: Faltó $1.00 por vuelto mal dado en mesa 3"
+                value={comentariosArqueo}
+                onChange={(e) => setComentariosArqueo(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-rose-500 resize-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isClosingShift}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-400 hover:to-rose-500 text-white font-display font-black text-xs tracking-wider uppercase disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-bold"
+            >
+              {isClosingShift ? 'Guardando Arqueo...' : 'Finalizar Turno & Cerrar Caja'}
+            </button>
+          </form>
+        </div>
+      </div>
+    )}
   </div>
   );
 }

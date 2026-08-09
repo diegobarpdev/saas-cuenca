@@ -11,11 +11,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { business, loading } = useAdminBusiness();
   const [isSuperAdmin, setIsSuperAdmin] = React.useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const [simulatedRole, setSimulatedRole] = React.useState<'dueño' | 'cajero-1' | 'cajero-2' | 'cocinero'>('dueño');
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const isLogged = sessionStorage.getItem('is_super_admin_impersonating') === 'true';
       setIsSuperAdmin(isLogged);
+      
+      const role = localStorage.getItem('yapi_simulated_role') as any;
+      if (role) {
+        setSimulatedRole(role);
+      }
     }
   }, []);
 
@@ -24,15 +30,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setIsSidebarOpen(false);
   }, [pathname]);
 
+  const handleSwitchRole = (newRole: 'dueño' | 'cajero-1' | 'cajero-2' | 'cocinero') => {
+    setSimulatedRole(newRole);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('yapi_simulated_role', newRole);
+      if (newRole === 'cocinero') {
+        window.location.href = '/admin/cocina';
+      } else if (newRole.startsWith('cajero')) {
+        window.location.href = '/admin/caja';
+      } else {
+        window.location.href = '/admin/dashboard';
+      }
+    }
+  };
+
   const navItems = [
-    { label: 'Pedidos en Vivo', href: '/admin/dashboard', icon: ShoppingBag },
-    { label: 'Caja POS (Toma Pedidos)', href: '/admin/caja', icon: Store },
-    { label: 'Monitor Cocina KDS', href: '/admin/cocina', icon: Tv },
-    { label: 'Productos y Categorías', href: '/admin/productos', icon: Package },
-    { label: 'Apariencia & Branding', href: '/admin/apariencia', icon: Palette },
-    { label: 'Marketplace Add-ons', href: '/admin/marketplace', icon: ShoppingCart },
-    { label: 'Configuración Negocio', href: '/admin/configuracion', icon: Settings },
-  ];
+    { label: 'Pedidos en Vivo', href: '/admin/dashboard', icon: ShoppingBag, roles: ['dueño', 'cajero-1', 'cajero-2'] },
+    { label: 'Caja POS (Toma Pedidos)', href: '/admin/caja', icon: Store, roles: ['dueño', 'cajero-1', 'cajero-2'] },
+    { label: 'Monitor Cocina KDS', href: '/admin/cocina', icon: Tv, roles: ['dueño', 'cocinero'] },
+    { label: 'Productos y Categorías', href: '/admin/productos', icon: Package, roles: ['dueño'] },
+    { label: 'Apariencia & Branding', href: '/admin/apariencia', icon: Palette, roles: ['dueño'] },
+    { label: 'Marketplace Add-ons', href: '/admin/marketplace', icon: ShoppingCart, roles: ['dueño'] },
+    { label: 'Configuración Negocio', href: '/admin/configuracion', icon: Settings, roles: ['dueño'] },
+  ].filter((item) => item.roles.includes(simulatedRole));
 
   const isKDSOrPOS = pathname === '/admin/cocina' || pathname === '/admin/caja';
 
@@ -40,6 +60,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
       <div className="h-screen w-screen overflow-hidden bg-[#070A11] text-slate-100 font-sans flex flex-col relative">
         {children}
+        
+        {/* Selector de Roles flotante para vistas de pantalla completa (POS/KDS) */}
+        <div className="fixed bottom-4 right-4 z-50 bg-[#0B0F1B]/95 backdrop-blur-md border border-white/10 rounded-2xl p-2.5 shadow-2xl flex items-center gap-2">
+          <span className="text-[10px] font-mono-tech font-bold text-amber-400">⚡ Simulador:</span>
+          <select
+            value={simulatedRole}
+            onChange={(e) => handleSwitchRole(e.target.value as any)}
+            className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-[11px] text-white focus:outline-none focus:border-amber-400 cursor-pointer"
+          >
+            <option value="dueño">Dueño / Admin</option>
+            <option value="cajero-1">Cajero 1 (Principal)</option>
+            <option value="cajero-2">Cajero 2 (Barra)</option>
+            <option value="cocinero">Cocinero (KDS)</option>
+          </select>
+        </div>
       </div>
     );
   }
@@ -164,6 +199,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <LogOut className="w-4 h-4" /> Cerrar Sesión
           </Link>
+
+          {/* Simulador de Perfiles (Solo Desarrollo/Pruebas) */}
+          <div className="pt-4 border-t border-white/10 mt-3.5 space-y-2">
+            <label className="block text-[9px] font-mono-tech font-bold uppercase tracking-wider text-amber-400">
+              ⚡ Simulador de Roles
+            </label>
+            <select
+              value={simulatedRole}
+              onChange={(e) => handleSwitchRole(e.target.value as any)}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400 cursor-pointer"
+            >
+              <option value="dueño">Dueño / Admin</option>
+              <option value="cajero-1">Cajero 1 (Principal)</option>
+              <option value="cajero-2">Cajero 2 (Barra)</option>
+              <option value="cocinero">Cocinero (KDS)</option>
+            </select>
+          </div>
         </div>
       </aside>
 

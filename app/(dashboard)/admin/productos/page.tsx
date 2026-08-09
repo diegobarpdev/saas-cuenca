@@ -14,6 +14,19 @@ import { getProductPriceInfo } from '@/lib/utils/promo';
 
 export default function AdminProductsPage() {
   const { business, loading: loadingBusiness } = useAdminBusiness();
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+      if (role !== 'dueño') {
+        toast.error('Acceso denegado: solo el Administrador (Dueño) puede gestionar productos.');
+        window.location.href = '/admin/caja';
+      } else {
+        setAuthorized(true);
+      }
+    }
+  }, []);
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -351,7 +364,7 @@ export default function AdminProductsPage() {
     return p.category_id === selectedCategoryFilter;
   });
 
-  if (loadingBusiness || loading) {
+  if (loadingBusiness || loading || !authorized) {
     return (
       <div className="p-12 text-center text-zinc-400 text-xs flex items-center justify-center gap-2">
         <RefreshCw className="w-4 h-4 animate-spin text-zinc-400" />

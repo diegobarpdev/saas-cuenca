@@ -110,6 +110,19 @@ const PRESET_THEMES = [
 
 export default function AdminBrandingPage() {
   const { business, loading } = useAdminBusiness();
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+      if (role !== 'dueño') {
+        toast.error('Acceso denegado: solo el Administrador (Dueño) puede gestionar la apariencia del negocio.');
+        window.location.href = '/admin/caja';
+      } else {
+        setAuthorized(true);
+      }
+    }
+  }, []);
 
   // Estados de Branding
   const [logoUrl, setLogoUrl] = useState('');
@@ -259,7 +272,7 @@ export default function AdminBrandingPage() {
     }
   };
 
-  if (loading || !business) {
+  if (loading || !business || !authorized) {
     return (
       <div className="p-12 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
         <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
