@@ -93,7 +93,7 @@ export default function AdminDashboardPage() {
       });
       return;
     }
-    window.open('/admin/cocina', '_blank');
+    window.open('/cocina', '_blank');
   };
 
   const handleExportCRM = () => {

@@ -36,9 +36,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (typeof window !== 'undefined') {
       localStorage.setItem('yapi_simulated_role', newRole);
       if (newRole === 'cocinero') {
-        window.location.href = '/admin/cocina';
+        window.location.href = '/cocina';
       } else if (newRole.startsWith('cajero')) {
-        window.location.href = '/admin/caja';
+        window.location.href = '/caja';
       } else {
         window.location.href = '/admin/dashboard';
       }
@@ -47,40 +47,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { label: 'Pedidos en Vivo', href: '/admin/dashboard', icon: ShoppingBag, roles: ['dueño', 'cajero-1', 'cajero-2'] },
-    { label: 'Caja POS (Toma Pedidos)', href: '/admin/caja', icon: Store, roles: ['dueño', 'cajero-1', 'cajero-2'] },
-    { label: 'Monitor Cocina KDS', href: '/admin/cocina', icon: Tv, roles: ['dueño', 'cocinero'] },
+    { label: 'Caja POS (Toma Pedidos)', href: '/caja', icon: Store, roles: ['dueño', 'cajero-1', 'cajero-2'] },
+    { label: 'Monitor Cocina KDS', href: '/cocina', icon: Tv, roles: ['dueño', 'cocinero'] },
     { label: 'Productos y Categorías', href: '/admin/productos', icon: Package, roles: ['dueño'] },
     { label: 'Apariencia & Branding', href: '/admin/apariencia', icon: Palette, roles: ['dueño'] },
     { label: 'Marketplace Add-ons', href: '/admin/marketplace', icon: ShoppingCart, roles: ['dueño'] },
     { label: 'Configuración Negocio', href: '/admin/configuracion', icon: Settings, roles: ['dueño'] },
   ].filter((item) => item.roles.includes(simulatedRole));
-
-  const isKDSOrPOS = pathname === '/admin/cocina' || pathname === '/admin/caja';
-
-  if (isKDSOrPOS) {
-    return (
-      <div className="h-screen w-screen overflow-hidden bg-[#070A11] text-slate-100 font-sans flex flex-col relative">
-        {children}
-        
-        {/* Selector de Roles flotante para vistas de pantalla completa (POS/KDS) */}
-        <div className="fixed bottom-4 right-4 z-50 bg-[#0B0F1B]/95 backdrop-blur-md border border-white/10 rounded-2xl p-2.5 shadow-2xl flex items-center gap-2">
-          <span className="text-[10px] font-mono-tech font-bold text-amber-400 shrink-0">⚡ Simulador:</span>
-          <CustomSelect
-            options={[
-              { value: 'dueño', label: 'Dueño / Admin' },
-              { value: 'cajero-1', label: 'Cajero 1 (Principal)' },
-              { value: 'cajero-2', label: 'Cajero 2 (Barra)' },
-              { value: 'cocinero', label: 'Cocinero (KDS)' }
-            ]}
-            value={simulatedRole}
-            onChange={(val) => handleSwitchRole(val as any)}
-            accentColor="amber"
-            className="w-44 text-[11px]"
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="h-screen max-h-screen overflow-hidden bg-[#070A11] text-slate-100 font-sans flex flex-col md:flex-row w-full relative">

@@ -14,7 +14,7 @@ export default function AdminMarketplacePage() {
       const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
       if (role !== 'dueño') {
         toast.error('Acceso denegado: solo el Administrador (Dueño) puede acceder al Marketplace.');
-        window.location.href = '/admin/caja';
+        window.location.href = '/caja';
       } else {
         setAuthorized(true);
       }

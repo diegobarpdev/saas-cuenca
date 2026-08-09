@@ -35,6 +35,15 @@ export default function CajaPOSPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [simulatedRole, setSimulatedRole] = useState<'dueño' | 'cajero-1' | 'cajero-2' | 'cocinero'>('cajero-1');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const role = (localStorage.getItem('yapi_simulated_role') || 'dueño') as any;
+      setSimulatedRole(role);
+    }
+  }, []);
+
   // Filtros y búsqueda
   const [activeCategory, setActiveCategory] = useState<string>('todas');
   const [searchQuery, setSearchQuery] = useState('');
@@ -572,13 +581,15 @@ export default function CajaPOSPage() {
       {/* Header de Caja POS */}
       <header className="h-16 border-b border-white/10 bg-[#0B0F1B] px-6 flex items-center justify-between shrink-0 z-10 w-full">
         <div className="flex items-center gap-3">
-          <Link
-            href="/admin/dashboard"
-            className="p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-            title="Volver al panel"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
+          {simulatedRole === 'dueño' && (
+            <Link
+              href="/admin/dashboard"
+              className="p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Volver al panel"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+          )}
           <div className="flex items-center gap-2">
             <Store className="w-5 h-5 text-emerald-400" />
             <h1 className="font-display font-black text-sm md:text-base tracking-tight text-white">
@@ -1272,6 +1283,34 @@ export default function CajaPOSPage() {
         </div>
       </div>
     )}
+
+    {/* Selector de Roles flotante para vistas de pantalla completa (POS/KDS) */}
+    <div className="fixed bottom-4 right-4 z-50 bg-[#0B0F1B]/95 backdrop-blur-md border border-white/10 rounded-2xl p-2.5 shadow-2xl flex items-center gap-2">
+      <span className="text-[10px] font-mono-tech font-bold text-amber-400 shrink-0">⚡ Simulador:</span>
+      <CustomSelect
+        options={[
+          { value: 'dueño', label: 'Dueño / Admin' },
+          { value: 'cajero-1', label: 'Cajero 1 (Principal)' },
+          { value: 'cajero-2', label: 'Cajero 2 (Barra)' },
+          { value: 'cocinero', label: 'Cocinero (KDS)' }
+        ]}
+        value={simulatedRole}
+        onChange={(val) => {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('yapi_simulated_role', val);
+            if (val === 'cocinero') {
+              window.location.href = '/cocina';
+            } else if (val.startsWith('cajero')) {
+              window.location.href = '/caja';
+            } else {
+              window.location.href = '/admin/dashboard';
+            }
+          }
+        }}
+        accentColor="amber"
+        className="w-44 text-[11px]"
+      />
+    </div>
   </div>
   );
 }
