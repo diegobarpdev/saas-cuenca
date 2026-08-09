@@ -26,6 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { label: 'Pedidos en Vivo', href: '/admin/dashboard', icon: ShoppingBag },
+    { label: 'Caja POS (Toma Pedidos)', href: '/admin/caja', icon: Store },
     { label: 'Monitor Cocina KDS', href: '/admin/cocina', icon: Tv },
     { label: 'Productos y Categorías', href: '/admin/productos', icon: Package },
     { label: 'Apariencia & Branding', href: '/admin/apariencia', icon: Palette },
