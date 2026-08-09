@@ -251,3 +251,37 @@ CREATE POLICY "Allow All Cash Transactions" ON cash_transactions FOR ALL USING (
 
 -- Agregar relación a orders
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS shift_id UUID REFERENCES business_shifts(id) ON DELETE SET NULL;
+
+-- 11. GRUPO DE OPCIONES DE PRODUCTO
+CREATE TABLE IF NOT EXISTS product_option_groups (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  nombre TEXT NOT NULL,
+  seleccion_minima INTEGER NOT NULL DEFAULT 1 CHECK (seleccion_minima >= 0),
+  seleccion_maxima INTEGER NOT NULL DEFAULT 1 CHECK (seleccion_maxima >= 1),
+  orden INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 12. VALORES DE OPCIONES / MODIFICADORES
+CREATE TABLE IF NOT EXISTS product_option_values (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  group_id UUID NOT NULL REFERENCES product_option_groups(id) ON DELETE CASCADE,
+  nombre TEXT NOT NULL,
+  precio_adicional NUMERIC(10,2) NOT NULL DEFAULT 0.00 CHECK (precio_adicional >= 0),
+  disponible BOOLEAN DEFAULT true,
+  orden INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 13. ACTUALIZACIÓN EN DETALLES DEL PEDIDO
+ALTER TABLE order_items ADD COLUMN IF NOT EXISTS opciones_seleccionadas JSONB DEFAULT '[]'::jsonb;
+
+-- Habilitar RLS para las nuevas tablas de personalización
+ALTER TABLE product_option_groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE product_option_values ENABLE ROW LEVEL SECURITY;
+
+-- Políticas de desarrollo abiertas
+CREATE POLICY "Allow All Option Groups" ON product_option_groups FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow All Option Values" ON product_option_values FOR ALL USING (true) WITH CHECK (true);
