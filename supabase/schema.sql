@@ -198,3 +198,56 @@ CREATE POLICY "Allow All Business Users" ON business_users FOR ALL USING (true) 
 
 -- Habilitar Supabase Realtime para la tabla de pedidos
 ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+
+-- 8. TURNOS Y APERTURA DE CAJA
+CREATE TABLE IF NOT EXISTS business_shifts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  rol_ejecutado TEXT NOT NULL CHECK (rol_ejecutado IN ('dueño', 'cajero', 'cocinero', 'cajero-1', 'cajero-2')),
+  fecha_apertura TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  fecha_cierre TIMESTAMPTZ,
+  estado TEXT NOT NULL DEFAULT 'abierto' CHECK (estado IN ('abierto', 'cerrado')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 9. CAJAS REGISTRADORAS Y ARQUEOS
+CREATE TABLE IF NOT EXISTS cash_registers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  shift_id UUID NOT NULL REFERENCES business_shifts(id) ON DELETE CASCADE,
+  nombre_caja TEXT NOT NULL DEFAULT 'Caja 1',
+  monto_apertura NUMERIC(10,2) NOT NULL CHECK (monto_apertura >= 0),
+  monto_cierre_declarado NUMERIC(10,2),
+  ventas_efectivo_calculado NUMERIC(10,2) DEFAULT 0.00,
+  ventas_transferencia_calculado NUMERIC(10,2) DEFAULT 0.00,
+  ventas_payphone_calculado NUMERIC(10,2) DEFAULT 0.00,
+  ingresos_manuales_efectivo NUMERIC(10,2) DEFAULT 0.00,
+  egresos_manuales_efectivo NUMERIC(10,2) DEFAULT 0.00,
+  diferencia_efectivo NUMERIC(10,2) DEFAULT 0.00,
+  estado_auditoria TEXT NOT NULL DEFAULT 'pendiente' CHECK (estado_auditoria IN ('pendiente', 'aprobado_sin_novedad', 'ajustado_con_observacion')),
+  comentarios_auditoria TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 10. TRANSACCIONES MANUALES DE CAJA CHICA
+CREATE TABLE IF NOT EXISTS cash_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  register_id UUID NOT NULL REFERENCES cash_registers(id) ON DELETE CASCADE,
+  tipo TEXT NOT NULL CHECK (tipo IN ('ingreso', 'egreso')),
+  monto NUMERIC(10,2) NOT NULL CHECK (monto > 0),
+  motivo TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Habilitar RLS para las nuevas tablas
+ALTER TABLE business_shifts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cash_registers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cash_transactions ENABLE ROW LEVEL SECURITY;
+
+-- Políticas de RLS permisivas
+CREATE POLICY "Allow All Business Shifts" ON business_shifts FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow All Cash Registers" ON cash_registers FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow All Cash Transactions" ON cash_transactions FOR ALL USING (true) WITH CHECK (true);
+
+-- Agregar relación a orders
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS shift_id UUID REFERENCES business_shifts(id) ON DELETE SET NULL;
