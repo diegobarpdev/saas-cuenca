@@ -731,19 +731,13 @@ export default function CajaPOSPage() {
                   </div>
 
                   {/* Precio & Acción */}
-                  <div className="flex items-center justify-between pt-1 border-t border-white/5 mt-auto">
-                    <span className="text-[11px] sm:text-xs font-mono font-bold text-emerald-400">
+                  <div className="flex items-center justify-between pt-1.5 border-t border-white/5 mt-auto text-slate-500 group-hover:text-emerald-400 transition-colors">
+                    <span className="text-[11px] sm:text-xs font-mono font-black text-emerald-400">
                       {formatCurrency(displayPrice)}
                     </span>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addToCart(p);
-                      }}
-                      className="w-6 h-6 rounded-md bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                    </button>
+                    <span className="text-[8px] font-display font-black tracking-wider uppercase opacity-0 group-hover:opacity-100 transition-all transform translate-x-1 group-hover:translate-x-0">
+                      + AÑADIR
+                    </span>
                   </div>
                 </div>
               );
