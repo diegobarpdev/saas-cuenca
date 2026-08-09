@@ -156,7 +156,7 @@ export default function AdminKDSPage() {
   // Filtrar pedidos activos para cocina (pendiente, aceptado, en_preparacion, listo)
   const activeKitchenOrders = orders
     .filter((o) => o.estado === 'pendiente' || o.estado === 'aceptado' || o.estado === 'en_preparacion' || o.estado === 'listo')
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); // Del más antiguo al más nuevo
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()); // Del más nuevo al más antiguo
 
   return (
     <div className="h-full flex flex-col bg-[#070A11] text-slate-100 overflow-hidden w-full select-none">
