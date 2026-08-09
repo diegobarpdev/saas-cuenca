@@ -189,10 +189,6 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
       <main className="max-w-2xl mx-auto px-4 pt-6 space-y-6 relative z-10">
         {/* Banner de Estado del Pedido */}
         <div className="glass-card p-6 md:p-8 rounded-3xl border border-white/10 text-center space-y-5 shadow-2xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono-tech">
-            <Sparkles className="w-3.5 h-3.5" /> Transmisión en Tiempo Real Activa
-          </div>
-
           <div>
             <OrderBadge status={order.estado} className="text-sm px-4 py-1.5 mb-3" />
             <h2 className="text-3xl font-display font-black text-white tracking-tight">
