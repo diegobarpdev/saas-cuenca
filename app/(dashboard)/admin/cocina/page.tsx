@@ -16,6 +16,7 @@ export default function AdminKDSPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [now, setNow] = useState(new Date());
   const [lastFinishedOrder, setLastFinishedOrder] = useState<{ id: string; num: number; prevStatus: OrderStatus } | null>(null);
+  const [orderToCancel, setOrderToCancel] = useState<{ id: string; num: number } | null>(null);
 
   // Actualizar el tiempo actual para los contadores
   useEffect(() => {
@@ -73,11 +74,7 @@ export default function AdminKDSPage() {
   };
 
   const handleCancelOrder = (orderId: string, orderNum: number) => {
-    const confirmCancel = window.confirm(`¿Seguro que deseas RECHAZAR/CANCELAR el pedido #${String(orderNum).padStart(4, '0')}?`);
-    if (confirmCancel) {
-      updateOrderStatusLocal(orderId, 'cancelado');
-      toast.info(`Pedido #${String(orderNum).padStart(4, '0')} cancelado.`);
-    }
+    setOrderToCancel({ id: orderId, num: orderNum });
   };
 
   if (loadingBusiness) {
@@ -389,6 +386,47 @@ export default function AdminKDSPage() {
           >
             Cerrar
           </button>
+        </div>
+      )}
+
+      {/* Modal Dialog para Confirmar Cancelación/Rechazo */}
+      {orderToCancel && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0D1322] border border-red-500/30 p-6 rounded-3xl max-w-sm w-full space-y-6 shadow-2xl relative overflow-hidden animate-zoom-in">
+            {/* Glow background */}
+            <div className="absolute -top-10 -right-10 w-24 h-24 bg-red-500/10 rounded-full blur-2xl"></div>
+            
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-base font-display font-black text-white">¿Rechazar Pedido #{String(orderToCancel.num).padStart(4, '0')}?</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Esta acción cancelará el pedido de forma definitiva en el sistema y se notificará el cambio de estado al cliente. No podrás revertir esta acción.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={() => setOrderToCancel(null)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white text-xs font-bold transition-all cursor-pointer"
+              >
+                No, mantener
+              </button>
+              <button
+                onClick={() => {
+                  updateOrderStatusLocal(orderToCancel.id, 'cancelado');
+                  toast.info(`Pedido #${String(orderToCancel.num).padStart(4, '0')} ha sido rechazado.`);
+                  setOrderToCancel(null);
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-all shadow-lg shadow-red-600/20 cursor-pointer border border-red-500/30"
+              >
+                Sí, rechazar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
