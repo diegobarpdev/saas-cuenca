@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { 
   Store, 
   ShoppingCart, 
@@ -29,8 +29,10 @@ import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 
-export default function CajaPOSPage() {
-  const { business, loading: loadingBusiness } = useAdminBusiness();
+export default function CajaPOSPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = use(params);
+  const slug = resolvedParams.slug;
+  const { business, loading: loadingBusiness } = useAdminBusiness(slug);
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1299,9 +1301,9 @@ export default function CajaPOSPage() {
           if (typeof window !== 'undefined') {
             localStorage.setItem('yapi_simulated_role', val);
             if (val === 'cocinero') {
-              window.location.href = '/cocina';
+              window.location.href = `/${slug}/cocina`;
             } else if (val.startsWith('cajero')) {
-              window.location.href = '/caja';
+              window.location.href = `/${slug}/caja`;
             } else {
               window.location.href = '/admin/dashboard';
             }

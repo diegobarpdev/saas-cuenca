@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Business } from '@/lib/types/database';
 
-export function useAdminBusiness() {
+export function useAdminBusiness(slug?: string) {
   const [business, setBusiness] = useState<Business | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -12,8 +12,40 @@ export function useAdminBusiness() {
     async function loadBusiness() {
       try {
         const supabase = createClient();
-        const activeBusinessId = typeof window !== 'undefined' ? localStorage.getItem('yapi_admin_business_id') : null;
 
+        if (slug) {
+          const res = await supabase
+            .from('businesses')
+            .select('*')
+            .eq('slug', slug)
+            .single();
+
+          if (res.data) {
+            const savedId = typeof window !== 'undefined' ? localStorage.getItem('yapi_admin_business_id') : null;
+            
+            if (savedId && savedId !== res.data.id) {
+              console.warn('Acceso denegado: tu cuenta no pertenece a ' + res.data.nombre);
+              if (typeof window !== 'undefined') {
+                alert('Acceso denegado: No tienes credenciales autorizadas para ingresar a la gestión de ' + res.data.nombre);
+                window.location.href = '/admin/login';
+                return;
+              }
+            }
+
+            setBusiness(res.data as Business);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('yapi_admin_business_id', res.data.id);
+            }
+          } else {
+            if (typeof window !== 'undefined') {
+              window.location.href = '/';
+            }
+          }
+          setLoading(false);
+          return;
+        }
+
+        const activeBusinessId = typeof window !== 'undefined' ? localStorage.getItem('yapi_admin_business_id') : null;
         let data: Business | null = null;
         let error: any = null;
 
@@ -55,7 +87,7 @@ export function useAdminBusiness() {
     }
 
     loadBusiness();
-  }, []);
+  }, [slug]);
 
   return { business, loading };
 }

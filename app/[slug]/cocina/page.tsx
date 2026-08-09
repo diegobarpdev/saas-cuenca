@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { Volume2, VolumeX, Maximize2, Minimize2, ArrowLeft, Clock, CheckCircle2, MessageSquare, Tv, ChefHat, AlertCircle, RefreshCw } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { useRealtimeOrders } from '@/hooks/useRealtimeOrders';
@@ -10,8 +10,10 @@ import { toast } from '@/lib/utils/toast';
 import Link from 'next/link';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 
-export default function AdminKDSPage() {
-  const { business, loading: loadingBusiness } = useAdminBusiness();
+export default function AdminKDSPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = use(params);
+  const slug = resolvedParams.slug;
+  const { business, loading: loadingBusiness } = useAdminBusiness(slug);
   const { orders, soundEnabled, setSoundEnabled, updateOrderStatusLocal } = useRealtimeOrders(business?.id || '');
 
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -475,9 +477,9 @@ export default function AdminKDSPage() {
             if (typeof window !== 'undefined') {
               localStorage.setItem('yapi_simulated_role', val);
               if (val === 'cocinero') {
-                window.location.href = '/cocina';
+                window.location.href = `/${slug}/cocina`;
               } else if (val.startsWith('cajero')) {
-                window.location.href = '/caja';
+                window.location.href = `/${slug}/caja`;
               } else {
                 window.location.href = '/admin/dashboard';
               }
