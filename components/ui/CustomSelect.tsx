@@ -42,6 +42,23 @@ export function CustomSelect({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Calcular si debe abrirse hacia arriba (dropup) por falta de espacio
+  const [openUpward, setOpenUpward] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const dropdownHeight = 240; // max-h-60 de Tailwind equivale a 240px
+      
+      if (windowHeight - rect.bottom < dropdownHeight) {
+        setOpenUpward(true);
+      } else {
+        setOpenUpward(false);
+      }
+    }
+  }, [isOpen]);
+
   const borderGlowMap = {
     amber: 'focus:border-amber-500 border-slate-800 hover:border-amber-500/40',
     purple: 'focus:border-purple-500 border-slate-800 hover:border-purple-500/40',
@@ -78,7 +95,9 @@ export function CustomSelect({
 
       {/* Menú Desplegable Flotante Personalizado */}
       {isOpen && (
-        <div className="absolute z-50 left-0 right-0 mt-2 p-1.5 rounded-2xl bg-[#0B0F19]/95 backdrop-blur-2xl border border-white/10 shadow-2xl space-y-1 max-h-60 overflow-y-auto scrollbar-none animate-in fade-in zoom-in-95 duration-150">
+        <div className={`absolute z-50 left-0 right-0 p-1.5 rounded-2xl bg-[#0B0F1B]/95 backdrop-blur-2xl border border-white/10 shadow-2xl space-y-1 max-h-60 overflow-y-auto scrollbar-none animate-in fade-in zoom-in-95 duration-150 ${
+          openUpward ? 'bottom-full mb-2' : 'top-full mt-2'
+        }`}>
           {options.map((opt) => {
             const isSelected = opt.value === value;
             return (
