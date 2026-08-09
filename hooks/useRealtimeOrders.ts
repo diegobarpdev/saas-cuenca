@@ -23,9 +23,10 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
         
         broadcastRef.current.onmessage = (event) => {
           if (event.data?.type === 'ORDER_STATUS_CHANGED') {
+            const timestampKey = `${event.data.newStatus}_at`;
             setOrders((prev) =>
               prev.map((order) =>
-                order.id === event.data.orderId ? { ...order, estado: event.data.newStatus } : order
+                order.id === event.data.orderId ? { ...order, estado: event.data.newStatus, [timestampKey]: event.data.timestamp } : order
               )
             );
           } else if (event.data?.type === 'ORDER_PAYMENT_STATUS_CHANGED') {
@@ -139,8 +140,9 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
           (payload: any) => {
             const data = payload.payload;
             if (data && data.orderId) {
+              const timestampKey = `${data.newStatus}_at`;
               setOrders((prev) =>
-                prev.map((order) => (order.id === data.orderId ? { ...order, estado: data.newStatus } : order))
+                prev.map((order) => (order.id === data.orderId ? { ...order, estado: data.newStatus, [timestampKey]: data.timestamp } : order))
               );
             }
           }
@@ -179,8 +181,11 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
 
   // Actualizar estado localmente y en Supabase Realtime
   const updateOrderStatusLocal = async (orderId: string, status: OrderStatus) => {
+    const timestampKey = `${status}_at`;
+    const nowStr = new Date().toISOString();
+
     setOrders((prev) =>
-      prev.map((order) => (order.id === orderId ? { ...order, estado: status } : order))
+      prev.map((order) => (order.id === orderId ? { ...order, estado: status, [timestampKey]: nowStr } : order))
     );
 
     if (broadcastRef.current) {
@@ -188,15 +193,19 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
         type: 'ORDER_STATUS_CHANGED',
         orderId,
         newStatus: status,
+        timestamp: nowStr,
       });
     }
 
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
       try {
         const supabase = createClient();
+        const updateData: any = { estado: status };
+        updateData[timestampKey] = nowStr;
+
         await supabase
           .from('orders')
-          .update({ estado: status })
+          .update(updateData)
           .eq('id', orderId);
 
         // Emitir broadcast Supabase Realtime directamente sobre el canal activo
@@ -204,7 +213,7 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
           await channelRef.current.send({
             type: 'broadcast',
             event: 'ORDER_STATUS_CHANGED',
-            payload: { orderId, newStatus: status },
+            payload: { orderId, newStatus: status, timestamp: nowStr },
           });
         }
       } catch (err) {

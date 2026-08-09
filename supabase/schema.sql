@@ -96,6 +96,11 @@ CREATE TABLE IF NOT EXISTS orders (
   requiere_factura BOOLEAN DEFAULT false,
   datos_facturacion JSONB DEFAULT '{}'::jsonb,
   estado TEXT NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'aceptado', 'en_preparacion', 'listo', 'entregado', 'cancelado')),
+  aceptado_at TIMESTAMPTZ,
+  en_preparacion_at TIMESTAMPTZ,
+  listo_at TIMESTAMPTZ,
+  entregado_at TIMESTAMPTZ,
+  cancelado_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

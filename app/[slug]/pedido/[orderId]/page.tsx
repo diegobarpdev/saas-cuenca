@@ -85,8 +85,8 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
           },
           (payload: any) => {
             const updated = payload.new as Order;
-            if (updated && updated.id === orderId && updated.estado) {
-              setOrder((prev) => (prev ? { ...prev, estado: updated.estado } : prev));
+            if (updated && updated.id === orderId) {
+              setOrder((prev) => (prev ? { ...prev, ...updated } : prev));
             }
           }
         )
@@ -96,7 +96,8 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
           (payload: any) => {
             const data = payload.payload;
             if (data && data.orderId === orderId) {
-              setOrder((prev) => (prev ? { ...prev, estado: data.newStatus as OrderStatus } : prev));
+              const timestampKey = `${data.newStatus}_at`;
+              setOrder((prev) => (prev ? { ...prev, estado: data.newStatus as OrderStatus, [timestampKey]: data.timestamp } : prev));
             }
           }
         )
@@ -111,7 +112,8 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
       const channel = new BroadcastChannel('saas-cuenca-orders-channel');
       channel.onmessage = (event) => {
         if (event.data?.type === 'ORDER_STATUS_CHANGED' && event.data?.orderId === orderId) {
-          setOrder((prev) => (prev ? { ...prev, estado: event.data.newStatus as OrderStatus } : prev));
+          const timestampKey = `${event.data.newStatus}_at`;
+          setOrder((prev) => (prev ? { ...prev, estado: event.data.newStatus as OrderStatus, [timestampKey]: event.data.timestamp } : prev));
         }
       };
       return () => {
@@ -120,15 +122,33 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
     }
   }, [order?.business_id, orderId]);
 
+  const formatTime = (isoString?: string | null) => {
+    if (!isoString) return '';
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit', hour12: false });
+    } catch {
+      return '';
+    }
+  };
+
+  if (!order) {
+    return (
+      <div className="min-h-screen bg-[#070A11] text-white flex flex-col items-center justify-center p-6 text-center space-y-4">
+        <Clock className="w-8 h-8 text-amber-400 animate-spin" />
+        <h2 className="text-sm font-display font-bold text-slate-300">Cargando detalles de tu pedido en tiempo real...</h2>
+      </div>
+    );
+  }
+
   const steps = [
-    { key: 'pendiente', label: 'Recibido', icon: Clock },
-    { key: 'aceptado', label: 'Aceptado', icon: CheckCircle2 },
-    { key: 'en_preparacion', label: 'En preparación', icon: Package },
-    { key: 'listo', label: 'Listo / En camino', icon: Truck },
+    { key: 'pendiente', label: 'Recibido', icon: Clock, timestamp: order.created_at },
+    { key: 'aceptado', label: 'Aceptado', icon: CheckCircle2, timestamp: order.aceptado_at },
+    { key: 'en_preparacion', label: 'En preparación', icon: Package, timestamp: order.en_preparacion_at },
+    { key: 'listo', label: 'Listo / En camino', icon: Truck, timestamp: order.listo_at || order.entregado_at },
   ];
 
   const getCurrentStepIndex = () => {
-    if (!order) return 0;
     switch (order.estado) {
       case 'pendiente':
         return 0;
@@ -143,15 +163,6 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
         return 0;
     }
   };
-
-  if (!order) {
-    return (
-      <div className="min-h-screen bg-[#070A11] text-white flex flex-col items-center justify-center p-6 text-center space-y-4">
-        <Clock className="w-8 h-8 text-amber-400 animate-spin" />
-        <h2 className="text-sm font-display font-bold text-slate-300">Cargando detalles de tu pedido en tiempo real...</h2>
-      </div>
-    );
-  }
 
   const currentStep = getCurrentStepIndex();
 
@@ -215,6 +226,11 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
                   >
                     {step.label}
                   </span>
+                  {step.timestamp && isCompleted && (
+                    <span className="text-[10px] text-slate-400 font-mono font-bold mt-0.5">
+                      {formatTime(step.timestamp)}
+                    </span>
+                  )}
                 </div>
               );
             })}

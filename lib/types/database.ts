@@ -171,6 +171,11 @@ export interface Order {
   requiere_factura: boolean;
   datos_facturacion: BillingData | null;
   estado: OrderStatus;
+  aceptado_at?: string | null;
+  en_preparacion_at?: string | null;
+  listo_at?: string | null;
+  entregado_at?: string | null;
+  cancelado_at?: string | null;
   created_at: string;
 }
 

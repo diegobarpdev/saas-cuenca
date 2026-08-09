@@ -153,9 +153,9 @@ export default function AdminKDSPage() {
     );
   }
 
-  // Filtrar pedidos activos para cocina (pendiente, aceptado, en_preparacion)
+  // Filtrar pedidos activos para cocina (pendiente, aceptado, en_preparacion, listo)
   const activeKitchenOrders = orders
-    .filter((o) => o.estado === 'pendiente' || o.estado === 'aceptado' || o.estado === 'en_preparacion')
+    .filter((o) => o.estado === 'pendiente' || o.estado === 'aceptado' || o.estado === 'en_preparacion' || o.estado === 'listo')
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); // Del más antiguo al más nuevo
 
   return (
@@ -354,6 +354,24 @@ export default function AdminKDSPage() {
                       className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-display font-black text-xs tracking-tight shadow-lg shadow-emerald-500/15"
                     >
                       PEDIDO LISTO
+                    </button>
+                  </div>
+                )}
+
+                {order.estado === 'listo' && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleUpdateStatus(order.id, 'en_preparacion', order.numero_pedido, order.estado)}
+                      className="px-3.5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 text-slate-400 hover:text-slate-200 text-xs font-bold transition-all cursor-pointer"
+                      title="Regresar a Preparación"
+                    >
+                      Regresar
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus(order.id, 'entregado', order.numero_pedido, order.estado)}
+                      className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-display font-black text-xs tracking-tight shadow-lg shadow-emerald-500/15"
+                    >
+                      ENTREGAR PEDIDO
                     </button>
                   </div>
                 )}
