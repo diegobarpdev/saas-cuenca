@@ -34,9 +34,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: 'Configuración Negocio', href: '/admin/configuracion', icon: Settings },
   ];
 
-  const isKDS = pathname === '/admin/cocina';
+  const isKDSOrPOS = pathname === '/admin/cocina' || pathname === '/admin/caja';
 
-  if (isKDS) {
+  if (isKDSOrPOS) {
     return (
       <div className="h-screen w-screen overflow-hidden bg-[#070A11] text-slate-100 font-sans flex flex-col relative">
         {children}

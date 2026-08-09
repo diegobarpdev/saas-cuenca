@@ -12,13 +12,17 @@ import {
   Phone, 
   Receipt, 
   AlertCircle,
-  Clock
+  Clock,
+  ArrowLeft,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { Product, Category, Order, CartItem } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { createClient } from '@/lib/supabase/client';
+import Link from 'next/link';
 
 export default function CajaPOSPage() {
   const { business, loading: loadingBusiness } = useAdminBusiness();
@@ -42,6 +46,27 @@ export default function CajaPOSPage() {
   const [estadoPago, setEstadoPago] = useState<'pendiente' | 'pagado'>('pagado');
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error al activar pantalla completa: ${err.message}`);
+      });
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   // Cargar categorías y productos de la base de datos
   const loadData = async () => {
@@ -250,37 +275,72 @@ export default function CajaPOSPage() {
   }
 
   return (
-    <div className="flex flex-col xl:flex-row gap-6 w-full h-[calc(100vh-130px)] select-none">
+    <div className="h-screen w-screen flex flex-col bg-[#070A11] text-slate-100 overflow-hidden w-full select-none">
       
-      {/* SECCIÓN IZQUIERDA: Búsqueda, Categorías y Catálogo */}
-      <div className="flex-1 flex flex-col space-y-4 min-w-0">
-        
-        {/* Cabecera Caja & Filtros */}
-        <div className="bg-[#0B0F1B] border border-white/10 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-              <Store className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-md font-display font-black text-white leading-none">Caja & Facturación Manual</h1>
-              <span className="text-[10px] font-mono-tech text-slate-400">PUNTO DE VENTA (POS)</span>
-            </div>
-          </div>
-
-          {/* Barra de búsqueda */}
-          <div className="relative max-w-md w-full md:w-72">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-              <Search className="w-4 h-4" />
+      {/* Header de Caja POS */}
+      <header className="h-16 border-b border-white/10 bg-[#0B0F1B] px-6 flex items-center justify-between shrink-0 z-10 w-full">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/dashboard"
+            className="p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Volver al panel"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div className="flex items-center gap-2">
+            <Store className="w-5 h-5 text-emerald-400" />
+            <h1 className="font-display font-black text-sm md:text-base tracking-tight text-white">
+              Caja & Facturación Manual (POS)
+            </h1>
+            <span className="hidden sm:inline-block text-[10px] font-mono-tech font-bold text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
+              {business?.nombre}
             </span>
-            <input
-              type="text"
-              placeholder="Buscar producto..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-            />
           </div>
         </div>
+
+        <div className="flex items-center gap-3">
+          {/* Pantalla completa */}
+          <button
+            onClick={toggleFullscreen}
+            className="p-2.5 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+            title={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+          >
+            {isFullscreen ? (
+              <>
+                <Minimize2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Pantalla Normal</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Pantalla Completa</span>
+              </>
+            )}
+          </button>
+        </div>
+      </header>
+
+      {/* Main Workspace */}
+      <div className="flex-1 flex flex-col xl:flex-row gap-6 p-6 overflow-hidden min-h-0 w-full">
+        
+        {/* SECCIÓN IZQUIERDA: Búsqueda, Categorías y Catálogo */}
+        <div className="flex-1 flex flex-col space-y-4 min-w-0">
+          
+          {/* Barra de Búsqueda y Filtros */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="relative flex-1 max-w-md">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Search className="w-4 h-4" />
+              </span>
+              <input
+                type="text"
+                placeholder="Buscar producto..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2.5 bg-[#0B0F1B] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+          </div>
 
         {/* Categorías Scroller Horizontal */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
@@ -624,5 +684,6 @@ export default function CajaPOSPage() {
       </div>
 
     </div>
+  </div>
   );
 }
