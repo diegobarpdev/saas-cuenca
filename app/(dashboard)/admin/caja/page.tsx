@@ -699,10 +699,10 @@ export default function CajaPOSPage() {
                 <div 
                   key={p.id}
                   onClick={() => addToCart(p)}
-                  className="bg-[#0B0F1B] border border-white/5 hover:border-emerald-500/40 rounded-xl p-2.5 flex flex-col justify-between space-y-2 cursor-pointer group active:scale-95 transition-all shadow-md relative overflow-hidden h-full"
+                  className="bg-[#0B0F1B] border border-white/5 hover:border-emerald-500/40 rounded-xl p-2 flex flex-col justify-between cursor-pointer group active:scale-95 transition-all shadow-md relative overflow-hidden h-40 sm:h-48"
                 >
                   {/* Foto o fallback */}
-                  <div className="w-full h-24 sm:h-28 rounded-lg bg-slate-950 flex items-center justify-center overflow-hidden relative border border-white/5 shrink-0">
+                  <div className="w-full h-18 sm:h-24 rounded-lg bg-slate-950 flex items-center justify-center overflow-hidden relative border border-white/5 shrink-0">
                     {p.imagen_url ? (
                       <img 
                         src={p.imagen_url} 
@@ -714,14 +714,14 @@ export default function CajaPOSPage() {
                     )}
 
                     {p.en_oferta && (
-                      <div className="absolute top-1.5 left-1.5 px-1 py-0.5 rounded bg-amber-500 text-slate-950 text-[8px] font-black uppercase tracking-wider">
+                      <div className="absolute top-1 left-1 px-1 py-0.5 rounded bg-amber-500 text-slate-950 text-[8px] font-black uppercase tracking-wider">
                         PROMO
                       </div>
                     )}
                   </div>
 
                   {/* Detalles */}
-                  <div className="space-y-0.5 flex-1 min-w-0">
+                  <div className="space-y-0.5 py-1 min-w-0 flex-1 overflow-hidden">
                     <h4 className="text-[11px] sm:text-xs font-display font-extrabold text-white line-clamp-1 group-hover:text-emerald-400 transition-colors leading-tight">
                       {p.nombre}
                     </h4>
@@ -731,7 +731,7 @@ export default function CajaPOSPage() {
                   </div>
 
                   {/* Precio & Acción */}
-                  <div className="flex items-center justify-between pt-1.5 border-t border-white/5 mt-auto text-slate-500 group-hover:text-emerald-400 transition-colors">
+                  <div className="flex items-center justify-between pt-1 border-t border-white/5 mt-auto text-slate-500 group-hover:text-emerald-400 transition-colors shrink-0">
                     <span className="text-[11px] sm:text-xs font-mono font-black text-emerald-400">
                       {formatCurrency(displayPrice)}
                     </span>
