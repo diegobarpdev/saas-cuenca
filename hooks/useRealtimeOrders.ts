@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Order, OrderStatus, PaymentStatus } from '@/lib/types/database';
 import { MOCK_INITIAL_ORDERS } from '@/lib/supabase/mock-data';
+import { toast } from '@/lib/utils/toast';
 
 export function useRealtimeOrders(businessId: string, initialOrders: Order[] = []) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
@@ -203,21 +204,29 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
         const updateData: any = { estado: status };
         updateData[timestampKey] = nowStr;
 
-        await supabase
+        const { error } = await supabase
           .from('orders')
           .update(updateData)
           .eq('id', orderId);
 
-        // Emitir broadcast Supabase Realtime directamente sobre el canal activo
-        if (channelRef.current) {
-          await channelRef.current.send({
-            type: 'broadcast',
-            event: 'ORDER_STATUS_CHANGED',
-            payload: { orderId, newStatus: status, timestamp: nowStr },
+        if (error) {
+          console.error('Error en Supabase orders.update:', error);
+          toast.error(`Error en base de datos: ${error.message}`, {
+            description: 'Es probable que debas agregar las nuevas columnas a la tabla orders en Supabase.',
           });
+        } else {
+          // Emitir broadcast Supabase Realtime directamente sobre el canal activo
+          if (channelRef.current) {
+            await channelRef.current.send({
+              type: 'broadcast',
+              event: 'ORDER_STATUS_CHANGED',
+              payload: { orderId, newStatus: status, timestamp: nowStr },
+            });
+          }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error actualizando estado en Supabase:', err);
+        toast.error(`Excepción en base de datos: ${err.message || err}`);
       }
     }
   };
