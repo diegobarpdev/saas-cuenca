@@ -540,42 +540,42 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="space-y-5 max-w-6xl mx-auto">
-      {/* Header Producción */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+      {/* Header Producción (Optimizado Móvil) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
         <div>
-          <h1 className="text-xl font-bold text-zinc-100 tracking-tight flex items-center gap-2">
-            <Package className="w-5 h-5 text-zinc-400" />
-            <span>Productos y Categorías — {business?.nombre}</span>
+          <h1 className="text-lg sm:text-xl font-bold text-zinc-100 tracking-tight flex items-center gap-2">
+            <Package className="w-5 h-5 text-emerald-400 shrink-0" />
+            <span className="truncate">Productos — {business?.nombre}</span>
           </h1>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Administra el catálogo de productos y organiza las secciones visibles para tus clientes.
+            Administra el catálogo de productos y organiza las secciones visibles.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
           <button
             onClick={() => setIsCategoryModalOpen(true)}
-            className="px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-800 flex items-center gap-1.5 transition-colors"
+            className="px-3 py-2.5 sm:px-3.5 sm:py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-800 flex items-center justify-center gap-1.5 transition-all active:scale-95"
           >
-            <Tag className="w-3.5 h-3.5 text-zinc-400" />
-            <span>Gestionar Categorías ({categories.length})</span>
+            <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="truncate">Categorías ({categories.length})</span>
           </button>
 
           {planLimits.puedeAgregarProducto(products.length) ? (
             <button
               onClick={handleOpenCreateProduct}
-              className="px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
+              className="px-3 py-2.5 sm:px-3.5 sm:py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4 shrink-0" />
               <span>Añadir Producto</span>
             </button>
           ) : (
             <button
               disabled
               title={`Límite del plan demo: máximo ${planLimits.maxProductos} productos`}
-              className="px-3.5 py-1.5 rounded-lg bg-zinc-900 border border-amber-500/30 text-amber-400/60 text-xs font-semibold flex items-center gap-1.5 cursor-not-allowed"
+              className="px-3 py-2.5 sm:px-3.5 sm:py-1.5 rounded-xl bg-zinc-900 border border-amber-500/30 text-amber-400/60 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-not-allowed"
             >
-              <Lock className="w-3.5 h-3.5" />
+              <Lock className="w-3.5 h-3.5 shrink-0" />
               <span>Límite alcanzado</span>
             </button>
           )}
@@ -597,14 +597,14 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
         </div>
       )}
 
-      {/* Pestañas de Filtro */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+      {/* Pestañas de Filtro (Scroller Táctil para Móviles) */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
         <button
           onClick={() => setSelectedCategoryFilter('todas')}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+          className={`px-3.5 py-2 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all active:scale-95 shrink-0 ${
             selectedCategoryFilter === 'todas'
-              ? 'bg-zinc-100 text-zinc-950 font-semibold'
-              : 'bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 border border-zinc-800/80'
+              ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+              : 'bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 border border-zinc-800'
           }`}
         >
           Todas ({products.length})
@@ -617,10 +617,10 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
             <button
               key={cat.id}
               onClick={() => setSelectedCategoryFilter(cat.id)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all active:scale-95 shrink-0 ${
                 isActive
-                  ? 'bg-zinc-100 text-zinc-950 font-semibold'
-                  : 'bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 border border-zinc-800/80'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                  : 'bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 border border-zinc-800'
               }`}
             >
               {cat.nombre} ({count})
@@ -631,10 +631,10 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
         {products.some((p) => !p.category_id) && (
           <button
             onClick={() => setSelectedCategoryFilter('sin_categoria')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all active:scale-95 shrink-0 ${
               selectedCategoryFilter === 'sin_categoria'
-                ? 'bg-zinc-100 text-zinc-950 font-semibold'
-                : 'bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 border border-zinc-800/80'
+                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                : 'bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 border border-zinc-800'
             }`}
           >
             Sin Categoría ({products.filter((p) => !p.category_id).length})
@@ -642,26 +642,26 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
         )}
       </div>
 
-      {/* Grid de Productos */}
+      {/* Grid de Productos (Optimizado Tarjetas Móviles) */}
       {filteredProducts.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl border border-zinc-800/80 bg-zinc-900/30 text-zinc-500 text-xs font-medium">
+        <div className="p-12 text-center rounded-2xl border border-zinc-800 bg-zinc-900/30 text-zinc-500 text-xs font-medium">
           No hay productos registrados en esta categoría.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProducts.map((p) => {
             const catObj = categories.find((c) => c.id === p.category_id);
             return (
               <div
                 key={p.id}
-                className={`p-4 rounded-xl border transition-all flex flex-col justify-between gap-3 ${
+                className={`p-4 rounded-2xl border transition-all flex flex-col justify-between gap-3 shadow-lg ${
                   p.disponible
-                    ? 'bg-zinc-900/50 hover:bg-zinc-900 border-zinc-800/80 hover:border-zinc-700'
-                    : 'bg-zinc-950 border-zinc-900 opacity-60'
+                    ? 'bg-[#0B0F1B] hover:bg-zinc-900/90 border-zinc-800/80 hover:border-zinc-700'
+                    : 'bg-zinc-950/80 border-zinc-900 opacity-60'
                 }`}
               >
                 <div className="flex items-start gap-3.5">
-                  <div className="w-16 h-16 rounded-lg bg-zinc-950 overflow-hidden flex-shrink-0 border border-zinc-800">
+                  <div className="w-18 h-18 sm:w-16 sm:h-16 rounded-xl bg-zinc-950 overflow-hidden flex-shrink-0 border border-zinc-800">
                     {p.imagen_url ? (
                       <img src={p.imagen_url} alt={p.nombre} className="w-full h-full object-cover" />
                     ) : (
@@ -671,32 +671,32 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
 
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-semibold text-sm text-zinc-100 leading-snug truncate">{p.nombre}</h3>
-                      <div className="text-right flex-shrink-0 font-mono">
+                      <h3 className="font-bold text-sm text-zinc-100 leading-tight line-clamp-1">{p.nombre}</h3>
+                      <div className="text-right flex-shrink-0 font-mono-tech">
                         {p.en_oferta && p.precio_oferta && p.precio_oferta < p.precio ? (
                           <div className="flex flex-col items-end">
                             <span className="text-[10px] text-zinc-500 line-through">
                               {formatCurrency(p.precio)}
                             </span>
-                            <span className="font-bold text-sm text-amber-400">
+                            <span className="font-black text-sm text-emerald-400">
                               {formatCurrency(p.precio_oferta)}
                             </span>
                           </div>
                         ) : (
-                          <span className="font-semibold text-sm text-zinc-200">{formatCurrency(p.precio)}</span>
+                          <span className="font-black text-sm text-emerald-400">{formatCurrency(p.precio)}</span>
                         )}
                       </div>
                     </div>
 
                     {p.en_oferta && p.precio_oferta && (
-                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30">
+                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-300 text-[10px] font-black border border-amber-500/30">
                         <Flame className="w-3 h-3 fill-amber-400" />
-                        <span>{p.etiqueta_promo || 'OFERTA'}</span>
+                        <span>{p.etiqueta_promo || 'PROMO'}</span>
                       </div>
                     )}
 
                     {catObj && (
-                      <span className="inline-block text-[10px] font-mono text-zinc-300 bg-zinc-800 px-1.5 py-0.2 rounded border border-zinc-700">
+                      <span className="inline-block text-[10px] font-mono-tech text-slate-400 bg-slate-900 px-2 py-0.5 rounded-md border border-white/5">
                         {catObj.nombre}
                       </span>
                     )}
@@ -706,10 +706,10 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                 </div>
 
                 {/* Footer Acciones */}
-                <div className="pt-2 border-t border-zinc-800 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between gap-2 mt-auto">
                   <button
                     onClick={() => handleToggleDisponible(p)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all active:scale-95 ${
                       p.disponible
                         ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
                         : 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
@@ -718,21 +718,21 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                     {p.disponible ? 'Disponible' : 'Pausado'}
                   </button>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleOpenEditProduct(p)}
-                      className="p-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition-colors"
+                      className="p-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition-all active:scale-95"
                       title="Editar Producto"
                     >
-                      <Edit className="w-3.5 h-3.5" />
+                      <Edit className="w-4 h-4" />
                     </button>
 
                     <button
                       onClick={() => handleDeleteProduct(p)}
-                      className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
+                      className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-all active:scale-95"
                       title="Eliminar Producto"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
