@@ -875,257 +875,398 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
         </div>
       )}
 
-      {/* Modal Formulario Crear / Editar Producto */}
+      {/* Modal Formulario Crear / Editar Producto (Rediseño 2 Columnas) */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 max-w-md w-full space-y-4 shadow-2xl">
-            <div className="flex justify-between items-center pb-2 border-b border-zinc-800">
-              <h3 className="font-semibold text-zinc-100 text-sm">
-                {editingProduct ? 'Editar Producto' : 'Añadir Producto'}
-              </h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-1 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100">
-                <X className="w-4 h-4" />
+        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-zinc-900 p-6 md:p-8 rounded-3xl border border-zinc-800 max-w-4xl w-full space-y-6 shadow-2xl my-auto animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center pb-3 border-b border-zinc-800">
+              <div>
+                <h3 className="font-display font-bold text-zinc-100 text-base">
+                  {editingProduct ? 'Editar Producto' : 'Añadir Nuevo Producto'}
+                </h3>
+                <p className="text-xs text-zinc-400">
+                  Configura los detalles principales, fotos, promociones y variantes adicionales.
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="p-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 border border-zinc-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveProduct} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1">Nombre del Producto *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ej: Humita Especial"
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100"
-                />
-              </div>
+            <form onSubmit={handleSaveProduct} className="space-y-6">
+              {/* Layout en 2 Columnas */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[70vh] overflow-y-auto pr-1">
+                
+                {/* COLUMNA 1: Datos Básicos & Fotografía */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                    1. Información General
+                  </h4>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-zinc-300 mb-1">Precio Normal ($ USD) *</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    required
-                    placeholder="2.50"
-                    value={precio}
-                    onChange={(e) => setPrecio(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-zinc-300 mb-1">Categoría</label>
-                  <CustomSelect
-                    options={categoryOptions}
-                    value={categoryId}
-                    onChange={(val) => setCategoryId(val)}
-                    accentColor="emerald"
-                  />
-                </div>
-              </div>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-300 mb-1">Nombre del Producto *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ej: Humita Especial"
+                      value={nombre}
+                      onChange={(e) => setNombre(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500/60"
+                    />
+                  </div>
 
-              {/* Sección de Ofertas & Promociones */}
-              <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-amber-500/30 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-display font-bold text-amber-400 flex items-center gap-1.5">
-                    <Flame className="w-4 h-4 text-amber-400 fill-amber-400/20" />
-                    ¿Activar Precio de Oferta / Promo?
-                  </span>
-                  <CustomCheckbox
-                    checked={enOferta}
-                    onChange={setEnOferta}
-                    label=""
-                    accentColor="amber"
-                  />
-                </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-zinc-300 mb-1">Precio Normal ($ USD) *</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        required
+                        placeholder="2.50"
+                        value={precio}
+                        onChange={(e) => setPrecio(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono focus:outline-none focus:border-emerald-500/60"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-zinc-300 mb-1">Categoría</label>
+                      <CustomSelect
+                        options={categoryOptions}
+                        value={categoryId}
+                        onChange={(val) => setCategoryId(val)}
+                        accentColor="emerald"
+                        size="compact"
+                      />
+                    </div>
+                  </div>
 
-                {enOferta && (
-                  <div className="space-y-3 pt-2 border-t border-zinc-800 animate-in fade-in">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[11px] font-display font-medium text-zinc-300 mb-1">
-                          Precio Oferta ($ USD) *
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          placeholder="Ej: 1.75"
-                          value={precioOferta}
-                          onChange={(e) => setPrecioOferta(e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 font-mono"
-                        />
-                      </div>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-300 mb-1">Descripción</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Detalles del producto (ingredientes, porciones...)"
+                      value={descripcion}
+                      onChange={(e) => setDescripcion(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500/60 resize-none"
+                    />
+                  </div>
 
-                      <div>
-                        <label className="block text-[11px] font-display font-medium text-zinc-300 mb-1">
-                          Badge / Etiqueta Promo
-                        </label>
-                        <input
-                          type="text"
-                          list="promo-labels-list"
-                          placeholder="Ej: 20% OFF / PROMO"
-                          value={etiquetaPromo}
-                          onChange={(e) => setEtiquetaPromo(e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100"
-                        />
-                        <datalist id="promo-labels-list">
-                          <option value="20% OFF" />
-                          <option value="PROMO DEL DÍA" />
-                          <option value="2X1 ESPECIAL" />
-                          <option value="MÁS VENDIDO" />
-                          <option value="COMBO DESTACADO" />
-                        </datalist>
-                      </div>
+                  {/* Subidor de Foto */}
+                  <div className="space-y-2 pt-2 border-t border-zinc-800">
+                    <label className="block text-xs font-medium text-zinc-300">
+                      Foto del Producto
+                    </label>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setImageMode('upload')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors ${
+                          imageMode === 'upload'
+                            ? 'bg-zinc-800 text-zinc-100 border border-zinc-700'
+                            : 'bg-zinc-950 text-zinc-400 border border-zinc-800'
+                        }`}
+                      >
+                        <UploadCloud className="w-3.5 h-3.5" />
+                        <span>Subir de mi Equipo</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setImageMode('url')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors ${
+                          imageMode === 'url'
+                            ? 'bg-zinc-800 text-zinc-100 border border-zinc-700'
+                            : 'bg-zinc-950 text-zinc-400 border border-zinc-800'
+                        }`}
+                      >
+                        <LinkIcon className="w-3.5 h-3.5" />
+                        <span>URL Web</span>
+                      </button>
                     </div>
 
-                    {precio && precioOferta && parseFloat(precio) > parseFloat(precioOferta) && (
-                      <p className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
-                        <span>
-                          ¡Tu cliente ahorrará ${(parseFloat(precio) - parseFloat(precioOferta)).toFixed(2)} (
-                          {Math.round(((parseFloat(precio) - parseFloat(precioOferta)) / parseFloat(precio)) * 100)}% OFF)!
-                        </span>
-                      </p>
+                    {imageMode === 'upload' ? (
+                      <div className="space-y-1.5">
+                        {imagenUrl ? (
+                          <div className="relative w-full h-32 rounded-xl bg-zinc-950 overflow-hidden border border-zinc-800 group">
+                            <img src={imagenUrl} alt="Vista previa" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-zinc-950/80 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-all">
+                              <label className="px-2.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold cursor-pointer flex items-center gap-1">
+                                <UploadCloud className="w-3.5 h-3.5" />
+                                <span>Cambiar</span>
+                                <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => setImagenUrl('')}
+                                className="p-1.5 rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 border border-rose-500/30"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <label className="w-full h-28 rounded-xl bg-zinc-950 border border-dashed border-zinc-800 hover:border-zinc-700 flex flex-col items-center justify-center p-3 cursor-pointer transition-colors">
+                            {uploadingImage ? (
+                              <div className="flex items-center gap-2 text-zinc-400 text-xs font-medium">
+                                <Loader2 className="w-4 h-4 animate-spin text-zinc-200" />
+                                <span>Subiendo imagen...</span>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center gap-1 text-center">
+                                <UploadCloud className="w-4 h-4 text-zinc-400" />
+                                <p className="text-xs font-medium text-zinc-300">
+                                  Seleccionar foto desde equipo
+                                </p>
+                                <p className="text-[10px] text-zinc-500">
+                                  Compresión automática WebP
+                                </p>
+                              </div>
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              disabled={uploadingImage}
+                              onChange={handleFileUpload}
+                            />
+                          </label>
+                        )}
+
+                        {uploadError && (
+                          <p className="text-[11px] text-rose-400">{uploadError}</p>
+                        )}
+                      </div>
+                    ) : (
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="https://..."
+                          value={imagenUrl}
+                          onChange={(e) => setImagenUrl(e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                        />
+                      </div>
                     )}
                   </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1">Descripción</label>
-                <textarea
-                  rows={2}
-                  placeholder="Detalles del producto..."
-                  value={descripcion}
-                  onChange={(e) => setDescripcion(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100"
-                />
-              </div>
-
-              {/* Sección de Variantes y Opciones Adicionales */}
-              <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-xs font-bold text-zinc-100">Opciones & Variantes</h4>
-                    <p className="text-[10px] text-zinc-400">Tamaños, Sabores, Extras, Exclusiones</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setProductOptionGroups((prev) => [
-                        ...prev,
-                        {
-                          id: `temp-${Date.now()}`,
-                          nombre: '',
-                          tipo: 'radio',
-                          requerido: true,
-                          values: [{ id: `val-${Date.now()}`, nombre: '', precio_adicional: 0 }],
-                        },
-                      ]);
-                    }}
-                    className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>+ Grupo de Opciones</span>
-                  </button>
                 </div>
 
-                {loadingOptions ? (
-                  <div className="flex items-center justify-center py-4 text-xs text-zinc-500">
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" /> Cargando variantes...
-                  </div>
-                ) : productOptionGroups.length === 0 ? (
-                  <p className="text-[11px] text-zinc-500 italic text-center py-2">
-                    Sin variantes registradas. Ej: "Tamaño (1L, 2L)" o "Sabor (Coca, Fanta)".
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    {productOptionGroups.map((group, gIdx) => (
-                      <div key={group.id || gIdx} className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 space-y-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <input
-                            type="text"
-                            placeholder="Nombre del grupo (Ej: Selección de Sabor)"
-                            value={group.nombre}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setProductOptionGroups((prev) =>
-                                prev.map((g, idx) => (idx === gIdx ? { ...g, nombre: val } : g))
-                              );
-                            }}
-                            className="flex-1 px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-bold"
-                          />
-                          
-                          <select
-                            value={group.tipo}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setProductOptionGroups((prev) =>
-                                prev.map((g, idx) => (idx === gIdx ? { ...g, tipo: val } : g))
-                              );
-                            }}
-                            className="px-2 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-300 font-semibold"
-                          >
-                            <option value="radio">Única (Radio)</option>
-                            <option value="checkbox">Múltiple (Check)</option>
-                          </select>
+                {/* COLUMNA 2: Ofertas & Variantes */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                    2. Promociones & Variantes
+                  </h4>
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setProductOptionGroups((prev) => prev.filter((_, idx) => idx !== gIdx));
-                            }}
-                            className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/30"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                  {/* Sección de Ofertas & Promociones */}
+                  <div className="p-3.5 rounded-2xl bg-zinc-950/80 border border-amber-500/30 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-display font-bold text-amber-400 flex items-center gap-1.5">
+                        <Flame className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+                        ¿Activar Precio de Oferta / Promo?
+                      </span>
+                      <CustomCheckbox
+                        checked={enOferta}
+                        onChange={setEnOferta}
+                        label=""
+                        accentColor="amber"
+                      />
+                    </div>
+
+                    {enOferta && (
+                      <div className="space-y-3 pt-2 border-t border-zinc-800 animate-in fade-in">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-display font-medium text-zinc-300 mb-1">
+                              Precio Oferta ($ USD) *
+                            </label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              placeholder="Ej: 1.75"
+                              value={precioOferta}
+                              onChange={(e) => setPrecioOferta(e.target.value)}
+                              className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-display font-medium text-zinc-300 mb-1">
+                              Badge / Etiqueta Promo
+                            </label>
+                            <input
+                              type="text"
+                              list="promo-labels-list"
+                              placeholder="Ej: 20% OFF / PROMO"
+                              value={etiquetaPromo}
+                              onChange={(e) => setEtiquetaPromo(e.target.value)}
+                              className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100"
+                            />
+                            <datalist id="promo-labels-list">
+                              <option value="20% OFF" />
+                              <option value="PROMO DEL DÍA" />
+                              <option value="2X1 ESPECIAL" />
+                              <option value="MÁS VENDIDO" />
+                              <option value="COMBO DESTACADO" />
+                            </datalist>
+                          </div>
                         </div>
 
-                        {/* Opciones del grupo */}
-                        <div className="space-y-2 pl-2 border-l-2 border-zinc-800">
-                          {group.values?.map((valItem: any, vIdx: number) => (
-                            <div key={valItem.id || vIdx} className="flex items-center gap-2">
+                        {precio && precioOferta && parseFloat(precio) > parseFloat(precioOferta) && (
+                          <p className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
+                            <span>
+                              ¡Tu cliente ahorrará ${(parseFloat(precio) - parseFloat(precioOferta)).toFixed(2)} (
+                              {Math.round(((parseFloat(precio) - parseFloat(precioOferta)) / parseFloat(precio)) * 100)}% OFF)!
+                            </span>
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sección de Variantes y Opciones Adicionales */}
+                  <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-xs font-bold text-zinc-100">Opciones & Variantes</h4>
+                        <p className="text-[10px] text-zinc-400">Tamaños, Sabores, Extras, Exclusiones</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProductOptionGroups((prev) => [
+                            ...prev,
+                            {
+                              id: `temp-${Date.now()}`,
+                              nombre: '',
+                              tipo: 'radio',
+                              requerido: true,
+                              values: [{ id: `val-${Date.now()}`, nombre: '', precio_adicional: 0 }],
+                            },
+                          ]);
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>+ Grupo</span>
+                      </button>
+                    </div>
+
+                    {loadingOptions ? (
+                      <div className="flex items-center justify-center py-4 text-xs text-zinc-500">
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" /> Cargando variantes...
+                      </div>
+                    ) : productOptionGroups.length === 0 ? (
+                      <p className="text-[11px] text-zinc-500 italic text-center py-2">
+                        Sin variantes registradas. Ej: "Tamaño (1L, 2L)" o "Sabor (Coca, Fanta)".
+                      </p>
+                    ) : (
+                      <div className="space-y-4">
+                        {productOptionGroups.map((group, gIdx) => (
+                          <div key={group.id || gIdx} className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 space-y-3">
+                            <div className="flex items-center justify-between gap-2">
                               <input
                                 type="text"
-                                placeholder="Opción (Ej: 1 Litro / Extra Queso)"
-                                value={valItem.nombre}
+                                placeholder="Nombre grupo (Ej: Sabor)"
+                                value={group.nombre}
                                 onChange={(e) => {
-                                  const text = e.target.value;
+                                  const val = e.target.value;
                                   setProductOptionGroups((prev) =>
-                                    prev.map((g, idx) => {
-                                      if (idx !== gIdx) return g;
-                                      const updatedVals = g.values.map((v: any, vi: number) =>
-                                        vi === vIdx ? { ...v, nombre: text } : v
-                                      );
-                                      return { ...g, values: updatedVals };
-                                    })
+                                    prev.map((g, idx) => (idx === gIdx ? { ...g, nombre: val } : g))
                                   );
                                 }}
-                                className="flex-1 px-2.5 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-200"
+                                className="flex-1 px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-bold"
                               />
+                              
+                              <select
+                                value={group.tipo}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setProductOptionGroups((prev) =>
+                                    prev.map((g, idx) => (idx === gIdx ? { ...g, tipo: val } : g))
+                                  );
+                                }}
+                                className="px-2 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-300 font-semibold"
+                              >
+                                <option value="radio">Única (Radio)</option>
+                                <option value="checkbox">Múltiple (Check)</option>
+                              </select>
 
-                              <div className="flex items-center gap-1 shrink-0">
-                                <span className="text-[10px] text-zinc-500">+$</span>
-                                <input
-                                  type="number"
-                                  step="0.01"
-                                  placeholder="0.00"
-                                  value={valItem.precio_adicional}
-                                  onChange={(e) => {
-                                    const cost = e.target.value;
-                                    setProductOptionGroups((prev) =>
-                                      prev.map((g, idx) => {
-                                        if (idx !== gIdx) return g;
-                                        const updatedVals = g.values.map((v: any, vi: number) =>
-                                          vi === vIdx ? { ...v, precio_adicional: cost } : v
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setProductOptionGroups((prev) => prev.filter((_, idx) => idx !== gIdx));
+                                }}
+                                className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/30"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            {/* Opciones del grupo */}
+                            <div className="space-y-2 pl-2 border-l-2 border-zinc-800">
+                              {group.values?.map((valItem: any, vIdx: number) => (
+                                <div key={valItem.id || vIdx} className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    placeholder="Opción (Ej: 1 Litro / Extra)"
+                                    value={valItem.nombre}
+                                    onChange={(e) => {
+                                      const text = e.target.value;
+                                      setProductOptionGroups((prev) =>
+                                        prev.map((g, idx) => {
+                                          if (idx !== gIdx) return g;
+                                          const updatedVals = g.values.map((v: any, vi: number) =>
+                                            vi === vIdx ? { ...v, nombre: text } : v
+                                          );
+                                          return { ...g, values: updatedVals };
+                                        })
+                                      );
+                                    }}
+                                    className="flex-1 px-2.5 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-200"
+                                  />
+
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    <span className="text-[10px] text-zinc-500">+$</span>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      placeholder="0.00"
+                                      value={valItem.precio_adicional}
+                                      onChange={(e) => {
+                                        const cost = e.target.value;
+                                        setProductOptionGroups((prev) =>
+                                          prev.map((g, idx) => {
+                                            if (idx !== gIdx) return g;
+                                            const updatedVals = g.values.map((v: any, vi: number) =>
+                                              vi === vIdx ? { ...v, precio_adicional: cost } : v
+                                            );
+                                            return { ...g, values: updatedVals };
+                                          })
                                         );
-                                        return { ...g, values: updatedVals };
-                                      })
-                                    );
-                                  }}
-                                  className="w-16 px-2 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
-                                />
-                              </div>
+                                      }}
+                                      className="w-16 px-2 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                                    />
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setProductOptionGroups((prev) =>
+                                        prev.map((g, idx) => {
+                                          if (idx !== gIdx) return g;
+                                          return { ...g, values: g.values.filter((_: any, vi: number) => vi !== vIdx) };
+                                        })
+                                      );
+                                    }}
+                                    className="text-zinc-500 hover:text-rose-400 text-xs px-1"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              ))}
 
                               <button
                                 type="button"
@@ -1133,147 +1274,45 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                   setProductOptionGroups((prev) =>
                                     prev.map((g, idx) => {
                                       if (idx !== gIdx) return g;
-                                      return { ...g, values: g.values.filter((_: any, vi: number) => vi !== vIdx) };
+                                      return {
+                                        ...g,
+                                        values: [...g.values, { id: `val-${Date.now()}`, nombre: '', precio_adicional: 0 }],
+                                      };
                                     })
                                   );
                                 }}
-                                className="text-zinc-500 hover:text-rose-400 text-xs px-1"
+                                className="text-[11px] text-emerald-400 font-semibold hover:underline flex items-center gap-1 pt-1"
                               >
-                                <X className="w-3.5 h-3.5" />
+                                <Plus className="w-3 h-3" /> Añadir opción
                               </button>
                             </div>
-                          ))}
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setProductOptionGroups((prev) =>
-                                prev.map((g, idx) => {
-                                  if (idx !== gIdx) return g;
-                                  return {
-                                    ...g,
-                                    values: [...g.values, { id: `val-${Date.now()}`, nombre: '', precio_adicional: 0 }],
-                                  };
-                                })
-                              );
-                            }}
-                            className="text-[11px] text-emerald-400 font-semibold hover:underline flex items-center gap-1 pt-1"
-                          >
-                            <Plus className="w-3 h-3" /> Añadir valor a este grupo
-                          </button>
-                        </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
-
-              {/* Subidor de Foto */}
-              <div className="space-y-2">
-                <label className="block text-xs font-medium text-zinc-300">
-                  Foto del Producto
-                </label>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setImageMode('upload')}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors ${
-                      imageMode === 'upload'
-                        ? 'bg-zinc-800 text-zinc-100 border border-zinc-700'
-                        : 'bg-zinc-950 text-zinc-400 border border-zinc-800'
-                    }`}
-                  >
-                    <UploadCloud className="w-3.5 h-3.5" />
-                    <span>Subir de mi Equipo</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setImageMode('url')}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors ${
-                      imageMode === 'url'
-                        ? 'bg-zinc-800 text-zinc-100 border border-zinc-700'
-                        : 'bg-zinc-950 text-zinc-400 border border-zinc-800'
-                    }`}
-                  >
-                    <LinkIcon className="w-3.5 h-3.5" />
-                    <span>URL Web</span>
-                  </button>
                 </div>
 
-                {imageMode === 'upload' ? (
-                  <div className="space-y-1.5">
-                    {imagenUrl ? (
-                      <div className="relative w-full h-32 rounded-lg bg-zinc-950 overflow-hidden border border-zinc-800 group">
-                        <img src={imagenUrl} alt="Vista previa" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-zinc-950/80 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-all">
-                          <label className="px-2.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold cursor-pointer flex items-center gap-1">
-                            <UploadCloud className="w-3.5 h-3.5" />
-                            <span>Cambiar</span>
-                            <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => setImagenUrl('')}
-                            className="p-1.5 rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 border border-rose-500/30"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <label className="w-full h-28 rounded-lg bg-zinc-950 border border-dashed border-zinc-800 hover:border-zinc-700 flex flex-col items-center justify-center p-3 cursor-pointer transition-colors">
-                        {uploadingImage ? (
-                          <div className="flex items-center gap-2 text-zinc-400 text-xs font-medium">
-                            <Loader2 className="w-4 h-4 animate-spin text-zinc-200" />
-                            <span>Subiendo imagen...</span>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center gap-1 text-center">
-                            <UploadCloud className="w-4 h-4 text-zinc-400" />
-                            <p className="text-xs font-medium text-zinc-300">
-                              Seleccionar foto desde equipo
-                            </p>
-                            <p className="text-[10px] text-zinc-500">
-                              Compresión automática WebP
-                            </p>
-                          </div>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          disabled={uploadingImage}
-                          onChange={handleFileUpload}
-                        />
-                      </label>
-                    )}
-
-                    {uploadError && (
-                      <p className="text-[11px] text-rose-400">{uploadError}</p>
-                    )}
-                  </div>
-                ) : (
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="https://..."
-                      value={imagenUrl}
-                      onChange={(e) => setImagenUrl(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
-                    />
-                  </div>
-                )}
               </div>
 
-              <button
-                type="submit"
-                disabled={isSaving || uploadingImage}
-                className="w-full py-2.5 px-4 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs shadow-sm transition-colors"
-              >
-                {isSaving ? 'Guardando...' : 'Guardar Producto'}
-              </button>
+              {/* Footer Acciones de Modal */}
+              <div className="pt-4 border-t border-zinc-800 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-zinc-400 font-semibold text-xs border border-zinc-800 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving || uploadingImage}
+                  className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{isSaving ? 'Guardando Producto...' : 'Guardar Producto'}</span>
+                </button>
+              </div>
             </form>
           </div>
         </div>
