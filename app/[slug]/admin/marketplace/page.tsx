@@ -90,19 +90,6 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
         'Directorio CRM de clientes (WhatsApp, Dirección, RUC) para marketing',
       ],
     },
-    {
-      id: 'custom_domain',
-      title: 'Dominio Web Personalizado',
-      price: '+$9 / mes',
-      icon: Globe,
-      active: !!business.has_custom_domain,
-      description: 'Conecta la dirección web propia de tu restaurante (ej: pedidos.mi-local.com) con certificado SSL de seguridad gratuito.',
-      benefits: [
-        'Dirección web exclusiva de tu restaurante',
-        'Candado SSL (HTTPS) de seguridad activa',
-        'Mayor posicionamiento de marca e imagen',
-      ],
-    },
   ];
 
   return (

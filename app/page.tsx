@@ -275,13 +275,6 @@ export default function LandingPage() {
                   </div>
                   <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
                     <span className="text-slate-200 flex items-center gap-2.5">
-                      <Globe className="w-4 h-4 text-emerald-400 shrink-0" />
-                      Dominio Web Personalizado
-                    </span>
-                    <span className="font-mono-tech font-bold text-emerald-400">+$9/mes</span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
-                    <span className="text-slate-200 flex items-center gap-2.5">
                       <Database className="w-4 h-4 text-emerald-400 shrink-0" />
                       Reportes Ventas & Exportación (CRM)
                     </span>
