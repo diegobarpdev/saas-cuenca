@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Check, X, Package, Tag, RefreshCw, FolderPlus, Save, UploadCloud, Link as LinkIcon, Loader2, Flame } from 'lucide-react';
+import { Plus, Edit, Trash2, Check, X, Package, Tag, RefreshCw, FolderPlus, Save, UploadCloud, Link as LinkIcon, Loader2, Flame, AlertTriangle, Lock } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { Product, Category } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
+import { usePlanLimits } from '@/hooks/usePlanLimits';
 import { createClient } from '@/lib/supabase/client';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 import { CustomCheckbox } from '@/components/ui/CustomCheckbox';
@@ -14,6 +15,7 @@ import { getProductPriceInfo } from '@/lib/utils/promo';
 
 export default function AdminProductsPage() {
   const { business, loading: loadingBusiness } = useAdminBusiness();
+  const planLimits = usePlanLimits(business);
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
@@ -173,6 +175,14 @@ export default function AdminProductsPage() {
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!business || !nombre || !precio) return;
+
+    // Verificar límite del plan solo para productos nuevos
+    if (!editingProduct && !planLimits.puedeAgregarProducto(products.length)) {
+      toast.error(`Plan Demo: Límite de ${planLimits.maxProductos} productos alcanzado.`, {
+        description: 'Contacta a Yapi.ec para activar un plan completo.',
+      });
+      return;
+    }
 
     setIsSaving(true);
     const numPrecio = parseFloat(precio);
@@ -404,15 +414,41 @@ export default function AdminProductsPage() {
             <span>Gestionar Categorías ({categories.length})</span>
           </button>
 
-          <button
-            onClick={handleOpenCreateProduct}
-            className="px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Añadir Producto</span>
-          </button>
+          {planLimits.puedeAgregarProducto(products.length) ? (
+            <button
+              onClick={handleOpenCreateProduct}
+              className="px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Añadir Producto</span>
+            </button>
+          ) : (
+            <button
+              disabled
+              title={`Límite del plan demo: máximo ${planLimits.maxProductos} productos`}
+              className="px-3.5 py-1.5 rounded-lg bg-zinc-900 border border-amber-500/30 text-amber-400/60 text-xs font-semibold flex items-center gap-1.5 cursor-not-allowed"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>Límite alcanzado</span>
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Banner de límite de plan */}
+      {planLimits.isDemo && planLimits.maxProductos !== null && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-amber-300">
+              Cuenta Demo — Plan Trial
+            </p>
+            <p className="text-[11px] text-amber-400/70">
+              {products.length}/{planLimits.maxProductos} productos usados · Para eliminar el límite, contrata un plan en Yapi.ec
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Pestañas de Filtro */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
