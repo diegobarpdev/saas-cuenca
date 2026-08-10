@@ -123,8 +123,8 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
 
         <div className="bg-slate-900/90 p-4 rounded-2xl border border-white/10 text-right shrink-0">
           <span className="text-[10px] text-slate-400 uppercase font-mono-tech font-bold block">Tu Plan Actual</span>
-          <span className="text-base font-display font-black text-emerald-400">PLAN BASE ($15/mes)</span>
-          <span className="block text-[11px] text-emerald-300 font-mono-tech">0% Comisiones por venta</span>
+          <span className="text-base font-display font-black text-emerald-400">PLAN BASE ($20/mes)</span>
+          <span className="block text-[11px] text-emerald-300 font-mono-tech">Incluye Caja POS & 0% Comisiones</span>
         </div>
       </div>
 

@@ -195,13 +195,17 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-display font-black text-white">$15</span>
+                    <span className="text-4xl font-display font-black text-white">$20</span>
                     <span className="text-slate-400 text-xs font-medium">/ mes</span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">Ideal para cafeterías, restaurantes y locales en digitalización.</p>
+                  <p className="text-xs text-slate-400 mt-1">Ideal para restaurantes, cafeterías y locales con venta presencial o delivery.</p>
                 </div>
 
                 <ul className="space-y-3 text-xs text-slate-300 pt-2 border-t border-white/10">
+                  <li className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="font-bold text-white">Sistema de Caja POS & Comandas incluido</span>
+                  </li>
                   <li className="flex items-center gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Catálogo Digital HD ilimitado</span>
@@ -227,9 +231,9 @@ export default function LandingPage() {
 
               <Link
                 href="/admin/login"
-                className="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-display font-bold text-xs text-center border border-slate-700 transition-all block cursor-pointer active:scale-95"
+                className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs text-center transition-all block cursor-pointer active:scale-95 shadow-lg shadow-emerald-500/20"
               >
-                Comenzar con Plan Base $15/mes
+                Comenzar con Plan Base $20/mes
               </Link>
             </div>
 
