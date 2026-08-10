@@ -1238,13 +1238,13 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                             </div>
 
                             {/* Opciones del grupo */}
-                            <div className="space-y-2 pt-2 border-t border-zinc-800/80">
-                              <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                            <div className="space-y-2.5 pt-3 border-t border-zinc-800">
+                              <span className="block text-xs font-bold text-zinc-300">
                                 Opciones para el cliente:
                               </span>
 
                               {group.values?.map((valItem: any, vIdx: number) => (
-                                <div key={valItem.id || vIdx} className="flex items-center gap-2">
+                                <div key={valItem.id || vIdx} className="flex items-center gap-2 w-full">
                                   <input
                                     type="text"
                                     placeholder="Nombre opción (Ej: 1 Litro / Extra Queso)"
@@ -1261,11 +1261,11 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                         })
                                       );
                                     }}
-                                    className="flex-1 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500/60"
+                                    className="flex-1 min-w-0 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500/60"
                                   />
 
-                                  <div className="relative w-24 shrink-0">
-                                    <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-zinc-500 text-xs pointer-events-none font-mono">+</span>
+                                  <div className="relative w-20 sm:w-24 shrink-0">
+                                    <span className="absolute inset-y-0 left-0 pl-2 flex items-center text-zinc-500 text-xs pointer-events-none font-mono">+</span>
                                     <input
                                       type="number"
                                       step="0.01"
@@ -1283,7 +1283,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                           })
                                         );
                                       }}
-                                      className="w-full pl-6 pr-2 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-emerald-400 font-mono focus:outline-none focus:border-emerald-500/60"
+                                      className="w-full pl-5 pr-2 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-emerald-400 font-mono focus:outline-none focus:border-emerald-500/60"
                                     />
                                   </div>
 
@@ -1297,7 +1297,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                         })
                                       );
                                     }}
-                                    className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                                    className="p-2 rounded-xl text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors shrink-0"
                                     title="Eliminar opción"
                                   >
                                     <X className="w-4 h-4" />
