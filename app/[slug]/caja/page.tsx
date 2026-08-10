@@ -29,6 +29,8 @@ import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 import { ProductVariantsDrawer } from '@/components/catalog/ProductVariantsDrawer';
+import { useRealtimeOrders } from '@/hooks/useRealtimeOrders';
+import { Clock, CheckCircle2, AlertTriangle, Truck, ShoppingBag, Eye } from 'lucide-react';
 
 export default function CajaPOSPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
@@ -50,6 +52,12 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   // Filtros y búsqueda
   const [activeCategory, setActiveCategory] = useState<string>('todas');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Pestaña activa dentro de la Caja: 'pos' (Toma de pedidos) o 'pedidos' (Monitor Pedidos en Vivo)
+  const [activeTab, setActiveTab] = useState<'pos' | 'pedidos'>('pos');
+
+  // Suscripción Realtime a Pedidos
+  const { orders: liveOrders, updateOrderStatus, updatePaymentStatus } = useRealtimeOrders(business?.id || '');
 
   // Estado del Carrito POS
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -615,7 +623,40 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               {business?.nombre}
             </span>
           </div>
+
+          {/* Switcher de Pestañas Rápidas: POS vs Pedidos en Vivo */}
+          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-white/10 ml-4">
+            <button
+              onClick={() => setActiveTab('pos')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold flex items-center gap-1.5 transition-all ${
+                activeTab === 'pos'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Store className="w-3.5 h-3.5" />
+              <span>Nueva Comanda</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('pedidos')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold flex items-center gap-1.5 transition-all relative ${
+                activeTab === 'pedidos'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>Pedidos en Vivo</span>
+              {liveOrders.filter(o => o.estado !== 'entregado' && o.estado !== 'cancelado').length > 0 && (
+                <span className="w-4 h-4 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black flex items-center justify-center">
+                  {liveOrders.filter(o => o.estado !== 'entregado' && o.estado !== 'cancelado').length}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
+
 
         <div className="flex items-center gap-3">
           {/* Movimientos de Caja Chica */}
@@ -663,11 +704,119 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
         </div>
       </header>
 
-      {/* Main Workspace */}
-      <div className="flex-1 flex flex-col xl:flex-row gap-6 p-6 overflow-hidden min-h-0 w-full">
-        
-        {/* SECCIÓN IZQUIERDA: Búsqueda, Categorías y Catálogo */}
-        <div className="flex-1 flex flex-col space-y-4 min-w-0">
+      {/* Main Workspace: Condicional según la pestaña seleccionada */}
+      {activeTab === 'pedidos' ? (
+        /* VISTA: MONITOR DE PEDIDOS EN VIVO DENTRO DE CAJA */
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-display font-black text-white flex items-center gap-2">
+                <Clock className="w-5 h-5 text-emerald-400" />
+                Monitor de Pedidos en Vivo
+              </h2>
+              <p className="text-xs text-slate-400">
+                Supervisa y actualiza el estado de las comandas recibidas en tiempo real.
+              </p>
+            </div>
+            <button
+              onClick={() => setActiveTab('pos')}
+              className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Nueva Comanda POS</span>
+            </button>
+          </div>
+
+          {liveOrders.length === 0 ? (
+            <div className="bg-[#0B0F1B] border border-white/10 rounded-2xl p-12 text-center text-slate-500">
+              <ShoppingBag className="w-10 h-10 mx-auto mb-2 text-slate-700 animate-pulse" />
+              <p className="text-sm font-bold text-slate-400">No hay pedidos registrados hoy.</p>
+              <p className="text-xs text-slate-600 mt-1">Los nuevos pedidos ingresados desde la Caja o la Web aparecerán aquí en vivo.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {liveOrders.map((order) => {
+                const getStatusColor = (st: string) => {
+                  switch (st) {
+                    case 'pendiente': return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                    case 'en_preparacion': return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
+                    case 'listo': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                    case 'entregado': return 'bg-slate-800 text-slate-400 border-slate-700';
+                    default: return 'bg-rose-500/10 text-rose-400 border-rose-500/30';
+                  }
+                };
+
+                return (
+                  <div key={order.id} className="bg-[#0B0F1B] border border-white/10 rounded-2xl p-4 space-y-3 flex flex-col justify-between shadow-lg">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono-tech font-black text-sm text-emerald-400">
+                          #{String(order.numero_pedido).padStart(4, '0')}
+                        </span>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono-tech font-bold uppercase border ${getStatusColor(order.estado)}`}>
+                          {order.estado.replace('_', ' ')}
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-slate-300">
+                        <p className="font-bold text-white">{order.cliente_nombre}</p>
+                        <p className="text-[11px] text-slate-400">{order.tipo_entrega === 'mesa' ? `Mesa: ${order.numero_mesa || 'N/A'}` : order.tipo_entrega}</p>
+                      </div>
+
+                      {/* Items */}
+                      <div className="border-t border-white/5 pt-2 space-y-1">
+                        {order.items?.map((it, idx) => (
+                          <div key={idx} className="flex justify-between text-[11px] text-slate-300">
+                            <span>{it.cantidad}x {it.product?.nombre || 'Producto'}</span>
+                            <span className="font-mono text-slate-400">{formatCurrency((it.precio_unitario || 0) * it.cantidad)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="border-t border-white/10 pt-3 flex items-center justify-between">
+                      <span className="font-mono-tech font-bold text-sm text-emerald-400">{formatCurrency(order.total)}</span>
+                      
+                      {/* Botones de acción de estado rápido */}
+                      <div className="flex gap-1.5">
+                        {order.estado === 'pendiente' && (
+                          <button
+                            onClick={() => updateOrderStatus(order.id, 'en_preparacion')}
+                            className="px-2.5 py-1 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/40 text-[10px] font-bold"
+                          >
+                            Cocinar
+                          </button>
+                        )}
+                        {order.estado === 'en_preparacion' && (
+                          <button
+                            onClick={() => updateOrderStatus(order.id, 'listo')}
+                            className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold"
+                          >
+                            Marcar Listo
+                          </button>
+                        )}
+                        {order.estado === 'listo' && (
+                          <button
+                            onClick={() => updateOrderStatus(order.id, 'entregado')}
+                            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 text-[10px] font-bold"
+                          >
+                            Entregar
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* VISTA: POS - SECCIÓN DE COMANDAS */
+        <div className="flex-1 flex flex-col xl:flex-row gap-6 p-6 overflow-hidden min-h-0 w-full">
+          
+          {/* SECCIÓN IZQUIERDA: Búsqueda, Categorías y Catálogo */}
+          <div className="flex-1 flex flex-col space-y-4 min-w-0">
           
           {/* Barra de Búsqueda y Filtros */}
           <div className="flex items-center justify-between gap-4">
@@ -1033,6 +1182,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           </div>
         </form>
       </div>
+      )}
 
     </div>
 
