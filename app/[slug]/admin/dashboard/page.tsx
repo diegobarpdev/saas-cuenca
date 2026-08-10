@@ -1,787 +1,250 @@
 'use client';
 
 import React, { use, useState, useEffect } from 'react';
-import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus, Download, Lock, Tv, Unlock } from 'lucide-react';
-import { toast } from '@/lib/utils/toast';
-import { Order, OrderStatus } from '@/lib/types/database';
-import { OrderBadge, PaymentBadge } from '@/components/ui/Badge';
-import { formatCurrency, formatDeliveryType } from '@/lib/utils/currency';
-import { TicketThermal } from '@/components/ticket/TicketThermal';
-import { useRealtimeOrders } from '@/hooks/useRealtimeOrders';
+import { 
+  TrendingUp, 
+  DollarSign, 
+  ShoppingBag, 
+  Users, 
+  Clock, 
+  Calendar, 
+  ArrowUpRight, 
+  CheckCircle2, 
+  AlertTriangle,
+  Award,
+  Layers,
+  Coins
+} from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
-
+import { formatCurrency } from '@/lib/utils/currency';
 import { createClient } from '@/lib/supabase/client';
+import Link from 'next/link';
 
-export default function AdminDashboardPage({ params }: { params: Promise<{ slug: string }> }) {
+export default function AdminDashboardAnalyticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const { business, loading: loadingBusiness } = useAdminBusiness(slug);
 
-  const { orders, soundEnabled, setSoundEnabled, addOrderLocal, updateOrderStatusLocal, updatePaymentStatusLocal } =
-    useRealtimeOrders(business?.id || '');
-
-  const [activeFilter, setActiveFilter] = useState<string>('todos');
-  const [selectedOrderForTicket, setSelectedOrderForTicket] = useState<(Order & { items?: any[] }) | null>(null);
-  const [selectedComprobanteUrl, setSelectedComprobanteUrl] = useState<string | null>(null);
-  const [simulatedRole, setSimulatedRole] = useState<'dueño' | 'cajero-1' | 'cajero-2' | 'cocinero'>('dueño');
-
-  // Estados de navegación e historial financiero (Fase 3)
-  const [mainTab, setMainTab] = useState<'pedidos' | 'turnos'>('pedidos');
-  const [shiftsHistory, setShiftsHistory] = useState<any[]>([]);
-  const [loadingShifts, setLoadingShifts] = useState(false);
-  const [editingRegisterId, setEditingRegisterId] = useState<string | null>(null);
-  const [auditComment, setAuditComment] = useState('');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const role = localStorage.getItem('yapi_simulated_role') as any || 'dueño';
-      setSimulatedRole(role);
-    }
-  }, []);
-
-  const loadShiftsHistory = async () => {
-    if (!business) return;
-    setLoadingShifts(true);
-    try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('business_shifts')
-        .select('*, cash_registers(*)')
-        .eq('business_id', business.id)
-        .order('fecha_apertura', { ascending: false });
-
-      if (error) throw error;
-      setShiftsHistory(data || []);
-    } catch (err: any) {
-      console.error('Error cargando historial de turnos:', err);
-      toast.error('No se pudo cargar el historial de turnos.');
-    } finally {
-      setLoadingShifts(false);
-    }
-  };
-
-  useEffect(() => {
-    if (mainTab === 'turnos' && business) {
-      loadShiftsHistory();
-    }
-  }, [mainTab, business]);
-
-  const handleApproveAuditoria = async (registerId: string) => {
-    try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('cash_registers')
-        .update({
-          estado_auditoria: 'aprobado_sin_novedad',
-          comentarios_auditoria: auditComment.trim() || 'Aprobado sin observaciones por el administrador.'
-        })
-        .eq('id', registerId);
-
-      if (error) throw error;
-      toast.success('Arqueo de caja auditado y aprobado correctamente.');
-      setEditingRegisterId(null);
-      setAuditComment('');
-      loadShiftsHistory();
-    } catch (err: any) {
-      console.error(err);
-      toast.error('Error al guardar auditoría de caja.');
-    }
-  };
-
-  const handleOpenKDS = () => {
-    if (!business?.has_live_kitchen) {
-      toast.info('Monitor de Cocina KDS no activo (+ $7/mes)', {
-        description: 'Activa el add-on Monitor KDS en el Marketplace para abrir la pantalla interactiva de cocina.',
-      });
-      return;
-    }
-    window.open('/cocina', '_blank');
-  };
-
-  const handleExportCRM = () => {
-    if (!business?.has_crm_export) {
-      toast.info('Módulo de Reportes & Ventas no activo (+ $5/mes)', {
-        description: 'Activa este Add-on en tu suscripción para descargar reportes de ventas e historial de clientes.',
-      });
-      return;
-    }
-
-    if (orders.length === 0) {
-      toast.error('No hay pedidos registrados para exportar clientes.');
-      return;
-    }
-
-    const uniqueCustomers = new Map();
-    orders.forEach((o) => {
-      if (o.cliente_telefono && !uniqueCustomers.has(o.cliente_telefono)) {
-        uniqueCustomers.set(o.cliente_telefono, {
-          nombre: o.cliente_nombre,
-          telefono: o.cliente_telefono,
-          direccion: o.cliente_direccion || '',
-          email: o.datos_facturacion?.email || '',
-          ruc: o.datos_facturacion?.num_doc || '',
-        });
-      }
-    });
-
-    const csvRows = ['Nombre,WhatsApp,Email,RUC,Direccion'];
-    uniqueCustomers.forEach((c) => {
-      csvRows.push(`"${c.nombre}","${c.telefono}","${c.email}","${c.ruc}","${c.direccion}"`);
-    });
-
-    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `clientes_${business.slug}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success('¡Base de datos de clientes exportada exitosamente!');
-  };
-
-  const handleOpenTicketModal = async (order: Order) => {
-    if (!business?.has_pos_printing) {
-      toast.info('Módulo de Impresión POS no activo (+ $7/mes)', {
-        description: 'Activa este Add-on para imprimir comandas en tu ticketera de cocina.',
-      });
-      return;
-    }
-
-    if ((order as any).items && (order as any).items.length > 0) {
-      setSelectedOrderForTicket(order);
-      return;
-    }
-
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
-      try {
-        const supabase = createClient();
-        const { data: itemsData } = await supabase
-          .from('order_items')
-          .select('*, product:products(*)')
-          .eq('order_id', order.id);
-
-        if (itemsData && itemsData.length > 0) {
-          setSelectedOrderForTicket({
-            ...order,
-            items: itemsData as any,
-          });
-          return;
-        }
-      } catch (e) {
-        console.error('Error cargando items del pedido:', e);
-      }
-    }
-
-    setSelectedOrderForTicket(order);
-  };
-
-  const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
-    if (simulatedRole === 'dueño') {
-      toast.error('Acceso denegado: El administrador ve el panel de pedidos en modo Solo Lectura.');
-      return;
-    }
-    updateOrderStatusLocal(orderId, newStatus);
-    const orderObj = orders.find((o) => o.id === orderId);
-    const num = orderObj ? `#${orderObj.numero_pedido}` : '';
-    toast.success(`Pedido ${num} actualizado a: ${newStatus.toUpperCase()}`);
-  };
-
-  const handleUpdatePaymentStatus = (orderId: string, newPaymentStatus: any) => {
-    if (simulatedRole === 'dueño') {
-      toast.error('Acceso denegado: El administrador ve el panel de pedidos en modo Solo Lectura.');
-      return;
-    }
-    updatePaymentStatusLocal(orderId, newPaymentStatus);
-    const orderObj = orders.find((o) => o.id === orderId);
-    const num = orderObj ? `#${orderObj.numero_pedido}` : '';
-    if (newPaymentStatus === 'pagado') {
-      toast.success(`¡Pago del pedido ${num} marcado como PAGADO!`);
-    } else {
-      toast.info(`Pago del pedido ${num} marcado como PENDIENTE`);
-    }
-  };
-
-  const handleSimulateIncomingOrder = async () => {
-    if (!business) return;
-    const randomOrderNumber = Math.floor(Math.random() * 900) + 50;
-    const newMockOrder: Order = {
-      id: `ord-sim-${Date.now()}`,
-      business_id: business.id,
-      numero_pedido: randomOrderNumber,
-      cliente_nombre: 'María Augusta Vega',
-      cliente_telefono: '0998765432',
-      cliente_direccion: 'Calle Larga y Benigno Malo, Dpto 2A',
-      latitud: -2.901,
-      longitud: -79.005,
-      tipo_entrega: 'domicilio',
-      numero_mesa: null,
-      costo_envio: 1.50,
-      subtotal: 5.25,
-      total: 6.75,
-      metodo_pago: 'payphone',
-      estado_pago: 'pagado',
-      comprobante_pago_url: null,
-      payphone_transaction_id: `PYP-${Math.floor(Math.random() * 899999 + 100000)}`,
-      requiere_factura: true,
-      datos_facturacion: {
-        tipo_doc: 'CEDULA',
-        num_doc: '0104591284',
-        razon_social: 'MARIA AUGUSTA VEGA',
-        email: 'maria.vega@gmail.com',
-        direccion: 'Cuenca, Ecuador',
-      },
-      estado: 'pendiente',
-      created_at: new Date().toISOString(),
-    };
-
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
-      try {
-        const supabase = createClient();
-        const { data, error } = await supabase.from('orders').insert(newMockOrder).select().single();
-        if (data && !error) {
-          addOrderLocal(data as Order);
-        } else {
-          addOrderLocal(newMockOrder);
-        }
-      } catch (err) {
-        addOrderLocal(newMockOrder);
-      }
-    } else {
-      addOrderLocal(newMockOrder);
-    }
-
-    toast.info(`¡Nuevo pedido entrante #${randomOrderNumber}!`, {
-      description: 'Cliente: María Augusta Vega ($6.75)',
-    });
-  };
-
-  const filteredOrders = orders.filter((o) => {
-    if (activeFilter === 'todos') return true;
-    return o.estado === activeFilter;
+  const [stats, setStats] = useState({
+    ventasHoy: 0,
+    pedidosHoy: 0,
+    ticketPromedio: 0,
+    clientesNuevosHoy: 0,
   });
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [topProducts, setTopProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (loadingBusiness || !business) {
+  useEffect(() => {
+    async function loadAnalytics() {
+      if (!business) return;
+      setLoading(true);
+      try {
+        const supabase = createClient();
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        // 1. Pedidos de hoy
+        const { data: ordersToday } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('business_id', business.id)
+          .gte('created_at', startOfDay.toISOString())
+          .order('created_at', { ascending: false });
+
+        const ordersList = ordersToday || [];
+        const ventasSum = ordersList.reduce((acc, o) => acc + Number(o.total || 0), 0);
+        const count = ordersList.length;
+
+        setStats({
+          ventasHoy: ventasSum,
+          pedidosHoy: count,
+          ticketPromedio: count > 0 ? ventasSum / count : 0,
+          clientesNuevosHoy: new Set(ordersList.map(o => o.cliente_telefono || o.cliente_nombre)).size,
+        });
+
+        setRecentOrders(ordersList.slice(0, 5));
+
+        // 2. Productos más vendidos
+        const { data: orderItems } = await supabase
+          .from('order_items')
+          .select('nombre_producto, cantidad, subtotal')
+          .order('cantidad', { ascending: false })
+          .limit(20);
+
+        if (orderItems) {
+          const map: Record<string, { nombre: string; cantidad: number; total: number }> = {};
+          orderItems.forEach((item: any) => {
+            if (!map[item.nombre_producto]) {
+              map[item.nombre_producto] = { nombre: item.nombre_producto, cantidad: 0, total: 0 };
+            }
+            map[item.nombre_producto].cantidad += item.cantidad;
+            map[item.nombre_producto].total += Number(item.subtotal || 0);
+          });
+          const sorted = Object.values(map).sort((a, b) => b.cantidad - a.cantidad).slice(0, 4);
+          setTopProducts(sorted);
+        }
+      } catch (err) {
+        console.error('Error cargando analíticas:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadAnalytics();
+  }, [business?.id]);
+
+  if (loadingBusiness || loading) {
     return (
-      <div className="p-12 text-center text-zinc-400 text-xs">
-        Cargando pedidos en tiempo real...
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-3">
+        <TrendingUp className="w-8 h-8 text-emerald-400 animate-pulse" />
+        <p className="text-slate-400 text-xs font-medium">Cargando métricas del negocio...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-5 max-w-6xl mx-auto">
-
-      {/* Selector de Pestañas Principales (Solo Dueño) */}
-      {simulatedRole === 'dueño' && (
-        <div className="flex border-b border-zinc-800/80">
-          <button
-            onClick={() => setMainTab('pedidos')}
-            className={`px-6 py-3 font-display font-black text-xs uppercase tracking-wider transition-colors border-b-2 cursor-pointer ${
-              mainTab === 'pedidos'
-                ? 'border-emerald-500 text-white'
-                : 'border-transparent text-slate-400 hover:text-white'
-            }`}
-          >
-            Pedidos en Vivo
-          </button>
-          <button
-            onClick={() => setMainTab('turnos')}
-            className={`px-6 py-3 font-display font-black text-xs uppercase tracking-wider transition-colors border-b-2 cursor-pointer ${
-              mainTab === 'turnos'
-                ? 'border-emerald-500 text-white'
-                : 'border-transparent text-slate-400 hover:text-white'
-            }`}
-          >
-            Historial de Turnos & Cajas
-          </button>
-        </div>
-      )}
-
-      {mainTab === 'pedidos' ? (
-        <>
-          {/* Header Producción */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Header General */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#0B0F1B] border border-white/10 shadow-2xl">
         <div>
-          <h1 className="text-xl font-bold text-zinc-100 tracking-tight flex items-center gap-2">
-            <span>Pedidos en Tiempo Real</span>
-            <span className="text-xs font-mono font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              {business.nombre}
-            </span>
+          <span className="text-[10px] font-mono-tech font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+            Resumen de Negocio
+          </span>
+          <h1 className="text-xl font-display font-black text-white tracking-tight mt-2">
+            Panel Ejecutivo — {business?.nombre}
           </h1>
+          <p className="text-xs text-slate-400 mt-1">
+            Analítica de ventas, volumen de pedidos y productos más vendidos en tiempo real.
+          </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleExportCRM}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-              business.has_crm_export
-                ? 'bg-zinc-800 border-zinc-700 text-sky-400 hover:bg-zinc-700'
-                : 'bg-zinc-950/80 border-zinc-800 text-zinc-500'
-            }`}
-            title={business.has_crm_export ? 'Exportar reporte de ventas y clientes a Excel/CSV' : 'Módulo de Reportes y Ventas no contratado (+$5/mes)'}
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/${slug}/caja`}
+            className="px-4 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
           >
-            {business.has_crm_export ? <Download className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-            <span>Reportes y Ventas (CSV)</span>
-          </button>
-
-          <button
-            onClick={handleOpenKDS}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-              business.has_live_kitchen
-                ? 'bg-zinc-800 border-zinc-700 text-purple-400 hover:bg-zinc-700'
-                : 'bg-zinc-950 border-zinc-800 text-zinc-500'
-            }`}
-          >
-            {!business.has_live_kitchen ? (
-              <Lock className="w-3.5 h-3.5 text-zinc-500" />
-            ) : (
-              <Tv className="w-3.5 h-3.5 text-purple-400" />
-            )}
-            <span>
-              {!business.has_live_kitchen ? 'Abrir KDS (+$7/m)' : 'Abrir Pantalla KDS'}
-            </span>
-          </button>
+            <ShoppingBag className="w-4 h-4" />
+            <span>Ir a Caja POS</span>
+          </Link>
         </div>
       </div>
 
-      {/* Filtros por Estado */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-        {[
-          { id: 'todos', label: 'Todos' },
-          { id: 'pendiente', label: 'Pendientes' },
-          { id: 'aceptado', label: 'Aceptados' },
-          { id: 'en_preparacion', label: 'En Preparación' },
-          { id: 'listo', label: 'Listos / En Camino' },
-        ].map((tab) => {
-          const count = tab.id === 'todos' ? orders.length : orders.filter((o) => o.estado === tab.id).length;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveFilter(tab.id)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                activeFilter === tab.id
-                  ? 'bg-zinc-100 text-zinc-950 font-semibold'
-                  : 'bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 border border-zinc-800/80'
-              }`}
-            >
-              {tab.label} ({count})
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Grid de Pedidos */}
-      {filteredOrders.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl border border-zinc-800/80 bg-zinc-900/30 text-zinc-500 text-xs font-medium">
-          No hay pedidos registrados en este estado.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {filteredOrders.map((order) => (
-            <div
-              key={order.id}
-              className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all flex flex-col justify-between gap-3"
-            >
-              {/* Header de Tarjeta */}
-              <div className="flex items-start justify-between gap-3 border-b border-zinc-800 pb-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-base text-zinc-100">
-                      #{String(order.numero_pedido).padStart(4, '0')}
-                    </span>
-                    <OrderBadge status={order.estado} />
-                  </div>
-                  <p className="text-xs text-zinc-400 mt-0.5 flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-zinc-500" />
-                    <span>Entrega: <strong className="text-zinc-200 font-semibold">{formatDeliveryType(order.tipo_entrega)}</strong></span>
-                  </p>
-                </div>
-
-                <div className="text-right flex flex-col items-end gap-1">
-                  <span className="font-mono font-bold text-base text-zinc-100">{formatCurrency(order.total)}</span>
-                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                    <PaymentBadge status={order.estado_pago} method={order.metodo_pago} />
-                    {simulatedRole !== 'dueño' && (
-                      order.estado_pago === 'pendiente' ? (
-                        <button
-                          onClick={() => handleUpdatePaymentStatus(order.id, 'pagado')}
-                          className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 transition-colors shadow-sm cursor-pointer"
-                          title="Marcar como Pagado"
-                        >
-                          Marcar Pagado
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleUpdatePaymentStatus(order.id, 'pendiente')}
-                          className="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-400 border border-zinc-700 transition-colors cursor-pointer"
-                          title="Marcar como Pendiente"
-                        >
-                          Marcar Pendiente
-                        </button>
-                      )
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Datos de Cliente */}
-              <div className="space-y-1 text-xs text-zinc-300">
-                <p><strong className="text-zinc-200">Cliente:</strong> {order.cliente_nombre} ({order.cliente_telefono})</p>
-                {order.cliente_direccion && (
-                  <p><strong className="text-zinc-200">Dirección:</strong> {order.cliente_direccion}</p>
-                )}
-                {order.numero_mesa && (
-                  <p><strong className="text-zinc-200">Mesa:</strong> {order.numero_mesa}</p>
-                )}
-              </div>
-
-              {/* Productos del Pedido */}
-              {(order as any).items && (order as any).items.length > 0 && (
-                <div className="p-2.5 rounded-lg bg-zinc-950/80 border border-zinc-800/80 text-xs space-y-1">
-                  <p className="font-semibold text-zinc-300 text-[11px]">Detalle de Productos:</p>
-                  <ul className="divide-y divide-zinc-800/50">
-                    {(order as any).items.map((item: any, idx: number) => (
-                      <li key={item.id || idx} className="py-1 flex justify-between items-center text-zinc-300">
-                        <span>
-                          <span className="font-mono font-bold text-amber-400 mr-1.5">{item.cantidad}x</span>
-                          {item.product?.nombre || item.product_name || 'Producto'}
-                          {item.notas && <span className="text-zinc-400 text-[10px] block italic">({item.notas})</span>}
-                        </span>
-                        <span className="font-mono text-zinc-400 text-[11px]">{formatCurrency((item.precio_unitario || 0) * item.cantidad)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Facturación ECUADOR */}
-              <div className="p-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] space-y-0.5">
-                <p className="font-semibold text-zinc-300">Datos Facturación Ecuador:</p>
-                {order.requiere_factura && order.datos_facturacion ? (
-                  <div className="text-zinc-400 space-y-0.5">
-                    <p><span className="text-zinc-200">{order.datos_facturacion.tipo_doc}:</span> {order.datos_facturacion.num_doc}</p>
-                    <p><span className="text-zinc-200">Razón Social:</span> {order.datos_facturacion.razon_social}</p>
-                    <p><span className="text-zinc-200">Email:</span> {order.datos_facturacion.email}</p>
-                  </div>
-                ) : (
-                  <p className="text-zinc-500 italic">Consumidor Final</p>
-                )}
-              </div>
-
-              {/* Comprobante */}
-              {order.comprobante_pago_url && (
-                <button
-                  onClick={() => setSelectedComprobanteUrl(order.comprobante_pago_url)}
-                  className="w-full py-1.5 px-3 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-sky-400 text-xs font-medium border border-zinc-800 flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Ver Comprobante Transferencia / Deuna!</span>
-                </button>
-              )}
-
-              {/* Acciones del Pedido */}
-              <div className="pt-2 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-2">
-                <button
-                  onClick={() => handleOpenTicketModal(order)}
-                  className="px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-800 flex items-center gap-1.5 transition-colors"
-                >
-                  <Printer className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>Imprimir Ticket</span>
-                </button>
-
-                <a
-                  href={`https://wa.me/${order.cliente_telefono}?text=Hola%20${encodeURIComponent(order.cliente_nombre)},%20tu%20pedido%20%23${order.numero_pedido}%20en%20${encodeURIComponent(business.nombre)}%20ha%20cambiado%20a:%20${order.estado}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-emerald-400 text-xs font-medium border border-zinc-800 flex items-center gap-1.5 transition-colors"
-                >
-                  <MessageSquare className="w-3.5 h-3.5" />
-                  <span>Avisar WA</span>
-                </a>
-
-                {/* Transición de Estado */}
-                <div className="flex items-center gap-1 ml-auto">
-                  {simulatedRole === 'dueño' ? (
-                    <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-950 border border-white/5 px-2.5 py-1.5 rounded-xl">
-                      Solo Lectura
-                    </span>
-                  ) : (
-                    <>
-                      {order.estado === 'pendiente' && (
-                        <button
-                          onClick={() => handleUpdateStatus(order.id, 'aceptado')}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-sm transition-colors cursor-pointer"
-                        >
-                          Aceptar Pedido
-                        </button>
-                      )}
-                      {order.estado === 'aceptado' && (
-                        <button
-                          onClick={() => handleUpdateStatus(order.id, 'en_preparacion')}
-                          className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-sm transition-colors cursor-pointer"
-                        >
-                          En Preparación
-                        </button>
-                      )}
-                      {order.estado === 'en_preparacion' && (
-                        <button
-                          onClick={() => handleUpdateStatus(order.id, 'listo')}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-sm transition-colors cursor-pointer"
-                        >
-                          Marcar Listo
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-3 shadow-lg relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-400">Ventas de Hoy</span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <DollarSign className="w-4 h-4" />
             </div>
-          ))}
+          </div>
+          <p className="text-2xl font-mono-tech font-black text-emerald-400">
+            {formatCurrency(stats.ventasHoy)}
+          </p>
+          <span className="text-[10px] text-slate-500">Ingresos brutos del día</span>
         </div>
-      )}
-    </>
-  ) : (
-    /* HISTORIAL DE TURNOS */
-    <div className="space-y-4 animate-fade-in">
-      <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 flex justify-between items-center">
-        <div>
-          <h2 className="text-md font-display font-black text-white">Auditoría Financiera y Turnos</h2>
-          <p className="text-xs text-slate-400">Revisa la conciliación de caja física, descuadres e historial de apertura y cierre.</p>
+
+        <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-3 shadow-lg relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-400">Pedidos Procesados</span>
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+              <ShoppingBag className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-mono-tech font-black text-white">
+            {stats.pedidosHoy}
+          </p>
+          <span className="text-[10px] text-slate-500">Comandas registradas hoy</span>
         </div>
-        <button
-          onClick={loadShiftsHistory}
-          className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 border border-white/10 rounded-xl text-xs text-slate-300 font-bold cursor-pointer"
-        >
-          Recargar Historial
-        </button>
+
+        <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-3 shadow-lg relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-400">Ticket Promedio</span>
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+              <TrendingUp className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-mono-tech font-black text-amber-400">
+            {formatCurrency(stats.ticketPromedio)}
+          </p>
+          <span className="text-[10px] text-slate-500">Gasto promedio por comanda</span>
+        </div>
+
+        <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-3 shadow-lg relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-400">Clientes Atendidos</span>
+            <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+              <Users className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-mono-tech font-black text-purple-400">
+            {stats.clientesNuevosHoy}
+          </p>
+          <span className="text-[10px] text-slate-500">Clientes únicos hoy</span>
+        </div>
       </div>
 
-      {loadingShifts ? (
-        <div className="p-12 text-center text-slate-400 text-xs animate-pulse">
-          Cargando historial de turnos...
-        </div>
-      ) : shiftsHistory.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/10 text-slate-500 text-xs">
-          No hay turnos registrados en este negocio.
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {shiftsHistory.map((shift) => {
-            const reg = shift.cash_registers && shift.cash_registers[0];
-            const isOpen = shift.estado === 'abierto';
-            
-            return (
-              <div key={shift.id} className="p-5 rounded-2xl bg-[#0B0F1B] border border-white/5 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
+      {/* Tablas de resumen */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Últimos pedidos */}
+        <div className="lg:col-span-2 bg-[#0B0F1B] border border-white/10 rounded-3xl p-6 space-y-4 shadow-xl">
+          <div className="flex items-center justify-between">
+            <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-emerald-400" />
+              Últimas Comandas del Día
+            </h3>
+            <Link href={`/${slug}/caja`} className="text-xs font-bold text-emerald-400 hover:underline flex items-center gap-1">
+              Ver todas en Caja POS <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {recentOrders.length === 0 ? (
+            <p className="text-xs text-slate-500 py-6 text-center">No hay pedidos registrados hoy.</p>
+          ) : (
+            <div className="space-y-2">
+              {recentOrders.map((ord) => (
+                <div key={ord.id} className="flex items-center justify-between p-3 rounded-2xl bg-slate-950/70 border border-white/5 text-xs">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-display font-black text-white uppercase">
-                        {shift.rol_ejecutado === 'cajero-1' ? 'Cajero Principal (Cajero 1)' : shift.rol_ejecutado === 'cajero-2' ? 'Cajero Barra (Cajero 2)' : shift.rol_ejecutado}
-                      </span>
-                      {isOpen ? (
-                        <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                          Abierto
-                        </span>
-                      ) : (
-                        <span className="text-[9px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-white/5">
-                          Cerrado
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-mono-tech mt-1">
-                      Apertura: {new Date(shift.fecha_apertura).toLocaleString()}
-                      {!isOpen && ` | Cierre: ${new Date(shift.fecha_cierre).toLocaleString()}`}
-                    </p>
+                    <span className="font-mono-tech font-bold text-emerald-400">#{String(ord.numero_pedido).padStart(4, '0')}</span>
+                    <span className="text-white font-medium ml-2">{ord.cliente_nombre}</span>
                   </div>
-
-                  {reg && (
-                    <span className="text-[11px] font-mono-tech font-bold text-slate-300 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-white/5">
-                      💼 {reg.nombre_caja}
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">
+                      {ord.tipo_entrega}
                     </span>
-                  )}
+                    <span className="font-mono-tech font-bold text-white">{formatCurrency(ord.total)}</span>
+                  </div>
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-                {reg && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                    <div>
-                      <span className="text-slate-500 block text-[9px] uppercase font-bold">Fondo Apertura</span>
-                      <span className="font-mono text-white font-bold">{formatCurrency(reg.monto_apertura)}</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 block text-[9px] uppercase font-bold">Ventas Efectivo</span>
-                      <span className="font-mono text-white font-bold">{formatCurrency(reg.ventas_efectivo_calculado || 0)}</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 block text-[9px] uppercase font-bold">Ingresos/Egresos</span>
-                      <span className={`font-mono font-bold ${Number(reg.ingresos_manuales_efectivo || 0) >= Number(reg.egresos_manuales_efectivo || 0) ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        +{formatCurrency(reg.ingresos_manuales_efectivo || 0)} / -{formatCurrency(reg.egresos_manuales_efectivo || 0)}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 block text-[9px] uppercase font-bold">Efectivo Esperado</span>
-                      <span className="font-mono text-amber-400 font-bold">
-                        {formatCurrency(
-                          Number(reg.monto_apertura) + 
-                          Number(reg.ventas_efectivo_calculado || 0) + 
-                          Number(reg.ingresos_manuales_efectivo || 0) - 
-                          Number(reg.egresos_manuales_efectivo || 0)
-                        )}
-                      </span>
-                    </div>
+        {/* Top productos */}
+        <div className="bg-[#0B0F1B] border border-white/10 rounded-3xl p-6 space-y-4 shadow-xl">
+          <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
+            <Award className="w-4 h-4 text-amber-400" />
+            Top Productos
+          </h3>
+
+          {topProducts.length === 0 ? (
+            <p className="text-xs text-slate-500 py-6 text-center">Sin datos de productos.</p>
+          ) : (
+            <div className="space-y-3">
+              {topProducts.map((prod, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 rounded-2xl bg-slate-950/70 border border-white/5 text-xs">
+                  <div className="min-w-0 pr-2">
+                    <p className="font-bold text-white truncate">{prod.nombre}</p>
+                    <p className="text-[10px] text-slate-500 font-mono">{prod.cantidad} unidades vendidas</p>
                   </div>
-                )}
-
-                {reg && !isOpen && (
-                  <div className="pt-3 border-t border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-950/40 p-3.5 rounded-xl border border-white/5">
-                    <div className="space-y-1">
-                      <span className="text-[10px] text-slate-400 block font-bold">Cierre Declarado por Cajero:</span>
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-mono font-black text-white">{formatCurrency(reg.monto_cierre_declarado)}</span>
-                        {reg.diferencia_efectivo === 0 ? (
-                          <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                            Caja Cuadrada
-                          </span>
-                        ) : reg.diferencia_efectivo < 0 ? (
-                          <span className="text-[9px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
-                            Faltante: {formatCurrency(reg.diferencia_efectivo)}
-                          </span>
-                        ) : (
-                          <span className="text-[9px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                            Sobrante: +{formatCurrency(reg.diferencia_efectivo)}
-                          </span>
-                        )}
-                      </div>
-                      {reg.comentarios_auditoria && (
-                        <p className="text-[11px] text-slate-400 italic mt-1.5">
-                          Nota Cajero: "{reg.comentarios_auditoria}"
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Estado de auditoría */}
-                    <div>
-                      {reg.estado_auditoria === 'pendiente' ? (
-                        editingRegisterId === reg.id ? (
-                          <div className="flex flex-col gap-2 max-w-sm w-full">
-                            <input
-                              type="text"
-                              placeholder="Escribe comentarios de auditoría..."
-                              value={auditComment}
-                              onChange={(e) => setAuditComment(e.target.value)}
-                              className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none"
-                            />
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleApproveAuditoria(reg.id)}
-                                className="flex-1 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-[10px] cursor-pointer"
-                              >
-                                Confirmar
-                              </button>
-                              <button
-                                onClick={() => { setEditingRegisterId(null); setAuditComment(''); }}
-                                className="px-2 py-1 rounded bg-slate-800 text-slate-400 text-[10px] cursor-pointer"
-                              >
-                                Cancelar
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => { setEditingRegisterId(reg.id); setAuditComment(''); }}
-                            className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-400 text-[11px] font-bold transition-all cursor-pointer"
-                          >
-                            Aprobar y Cerrar Turno
-                          </button>
-                        )
-                      ) : (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-slate-900/60 px-3 py-2 rounded-xl border border-white/5">
-                          <Unlock className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>Auditado & Aprobado</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  <span className="font-mono-tech font-bold text-amber-400 shrink-0">{formatCurrency(prod.total)}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  )}
-
-  {/* Modal Impresión Ticket Thermal */}
-      {selectedOrderForTicket && (
-        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 max-w-md w-full space-y-4 shadow-2xl">
-            <div className="flex justify-between items-center pb-2 border-b border-zinc-800">
-              <h3 className="font-semibold text-zinc-100 text-sm">Vista Previa Ticket POS (58/80mm)</h3>
-              <button
-                onClick={() => setSelectedOrderForTicket(null)}
-                className="p-1 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="bg-white p-2 rounded-lg overflow-hidden">
-              <TicketThermal order={selectedOrderForTicket} business={business} />
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <button
-                onClick={() => setSelectedOrderForTicket(null)}
-                className="flex-1 py-2 rounded-lg border border-zinc-700 text-zinc-300 text-xs font-medium hover:bg-zinc-800 transition-colors"
-              >
-                Cerrar
-              </button>
-              <button
-                onClick={handlePrint}
-                className="flex-1 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Imprimir Ticket</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Ver Comprobante */}
-      {selectedComprobanteUrl && (
-        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-zinc-900 p-5 rounded-2xl border border-zinc-800 max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex justify-between items-center pb-2 border-b border-zinc-800">
-              <h3 className="font-semibold text-zinc-100 text-sm">Comprobante de Pago Subido por Cliente</h3>
-              <button
-                onClick={() => setSelectedComprobanteUrl(null)}
-                className="p-1 rounded-lg bg-zinc-800 text-zinc-400 hover:text-zinc-100"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="relative w-full h-80 rounded-lg overflow-hidden border border-zinc-800 bg-zinc-950">
-              <img
-                src={selectedComprobanteUrl}
-                alt="Comprobante"
-                className="w-full h-full object-contain"
-              />
-            </div>
-
-            <button
-              onClick={() => setSelectedComprobanteUrl(null)}
-              className="w-full py-2 rounded-lg bg-zinc-800 text-zinc-200 text-xs font-medium hover:bg-zinc-700 transition-colors"
-            >
-              Cerrar Vista
-            </button>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

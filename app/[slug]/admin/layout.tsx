@@ -3,7 +3,7 @@
 import React, { use } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ShoppingBag, Package, Settings, LogOut, ExternalLink, Store, ShieldAlert, Palette, ShoppingCart, Menu, X, Tv } from 'lucide-react';
+import { ShoppingBag, Package, Settings, LogOut, ExternalLink, Store, ShieldAlert, Palette, ShoppingCart, Menu, X, Tv, TrendingUp } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 
@@ -55,6 +55,7 @@ export default function AdminLayout({
   };
 
   const navItems = [
+    { label: 'Dashboard & Analíticas',   href: `/${slug}/admin/dashboard`,     icon: TrendingUp,  roles: ['dueño'] },
     { label: 'Caja POS (Toma & Pedidos)', href: `/${slug}/caja`,                icon: Store,       roles: ['dueño', 'cajero-1', 'cajero-2'] },
     { label: 'Monitor Cocina KDS',        href: `/${slug}/cocina`,              icon: Tv,          roles: ['dueño', 'cocinero'] },
     { label: 'Productos y Categorías',    href: `/${slug}/admin/productos`,      icon: Package,     roles: ['dueño'] },
