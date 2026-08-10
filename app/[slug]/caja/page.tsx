@@ -28,6 +28,7 @@ import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { CustomSelect } from '@/components/ui/CustomSelect';
+import { ProductVariantsDrawer } from '@/components/catalog/ProductVariantsDrawer';
 
 export default function CajaPOSPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
@@ -63,6 +64,9 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
   const [isSaving, setIsSaving] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Estado del drawer de variantes/opciones
+  const [selectedProductForDrawer, setSelectedProductForDrawer] = useState<Product | null>(null);
 
   // Estados de Turnos y Caja Chica
   const [activeShift, setActiveShift] = useState<any | null>(null);
@@ -395,17 +399,26 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     loadData();
   }, [business]);
 
-  // Agregar producto al carrito
+  // Abrir drawer de opciones o agregar directo al carrito
   const addToCart = (product: Product) => {
+    // Abrimos siempre el drawer para opciones/notas/cantidad
+    setSelectedProductForDrawer(product);
+  };
+
+  // Agregar con opciones seleccionadas desde el drawer
+  const addToCartWithOptions = (product: Product, qty: number, notas: string, opciones?: CartItem['opciones_seleccionadas']) => {
     setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
+      const key = JSON.stringify({ id: product.id, notas, opciones: opciones || [] });
+      const existing = prev.find((item) => JSON.stringify({ id: item.product.id, notas: item.notas, opciones: item.opciones_seleccionadas || [] }) === key);
       if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id ? { ...item, cantidad: item.cantidad + 1 } : item
-        );
+        return prev.map((item) => {
+          const itemKey = JSON.stringify({ id: item.product.id, notas: item.notas, opciones: item.opciones_seleccionadas || [] });
+          return itemKey === key ? { ...item, cantidad: item.cantidad + qty } : item;
+        });
       }
-      return [...prev, { product, cantidad: 1, notas: '' }];
+      return [...prev, { product, cantidad: qty, notas, opciones_seleccionadas: opciones }];
     });
+    setSelectedProductForDrawer(null);
   };
 
   // Decrementar o remover cantidad
@@ -443,7 +456,8 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   const getSubtotal = () => {
     return cart.reduce((acc, item) => {
       const price = item.product.en_oferta && item.product.precio_oferta ? item.product.precio_oferta : item.product.precio;
-      return acc + price * item.cantidad;
+      const optionsCost = item.opciones_seleccionadas?.reduce((sum, opt) => sum + Number(opt.precio_adicional || 0), 0) || 0;
+      return acc + (price + optionsCost) * item.cantidad;
     }, 0);
   };
 
@@ -781,19 +795,31 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               <p className="text-xs">Selecciona productos a la izquierda para armar la comanda.</p>
             </div>
           ) : (
-            cart.map((item) => {
+            cart.map((item, idx) => {
               const price = item.product.en_oferta && item.product.precio_oferta ? item.product.precio_oferta : item.product.precio;
+              const optionsCost = item.opciones_seleccionadas?.reduce((sum, opt) => sum + Number(opt.precio_adicional || 0), 0) || 0;
+              const unitPrice = price + optionsCost;
               return (
-                <div key={item.product.id} className="p-3 bg-slate-950/70 border border-white/5 rounded-2xl space-y-2">
+                <div key={idx} className="p-3 bg-slate-950/70 border border-white/5 rounded-2xl space-y-2">
                   <div className="flex justify-between items-start">
                     <div className="min-w-0 pr-2">
                       <h4 className="text-xs font-bold text-white truncate">{item.product.nombre}</h4>
+                      {/* Opciones seleccionadas */}
+                      {item.opciones_seleccionadas && item.opciones_seleccionadas.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {item.opciones_seleccionadas.map((opt, i) => (
+                            <span key={i} className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
+                              {opt.opcion_nombre}{opt.precio_adicional > 0 ? ` +${formatCurrency(opt.precio_adicional)}` : ''}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                       <p className="text-[10px] text-slate-400 font-mono-tech mt-0.5">
-                        {formatCurrency(price)} c/u
+                        {formatCurrency(unitPrice)} c/u
                       </p>
                     </div>
                     <span className="text-xs font-mono font-bold text-emerald-400 whitespace-nowrap">
-                      {formatCurrency(price * item.cantidad)}
+                      {formatCurrency(unitPrice * item.cantidad)}
                     </span>
                   </div>
 
@@ -1285,6 +1311,14 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
         </div>
       </div>
     )}
+
+    {/* Drawer de variantes de producto */}
+    <ProductVariantsDrawer
+      product={selectedProductForDrawer}
+      onClose={() => setSelectedProductForDrawer(null)}
+      onAddToCart={addToCartWithOptions}
+      primaryColor="#10b981"
+    />
 
     {/* Selector de Roles flotante para vistas de pantalla completa (POS/KDS) */}
     <div className="fixed bottom-4 right-4 z-50 bg-[#0B0F1B]/95 backdrop-blur-md border border-white/10 rounded-2xl p-2.5 shadow-2xl flex items-center gap-2">

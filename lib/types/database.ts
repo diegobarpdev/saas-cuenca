@@ -190,10 +190,16 @@ export interface OrderItem {
   precio_unitario: number;
   notas: string | null;
   product?: Product;
+  opciones_seleccionadas?: any;
 }
 
 export interface CartItem {
   product: Product;
   cantidad: number;
   notas?: string;
+  opciones_seleccionadas?: {
+    grupo_nombre: string;
+    opcion_nombre: string;
+    precio_adicional: number;
+  }[];
 }

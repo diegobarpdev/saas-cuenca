@@ -30,30 +30,42 @@ export function useCart(businessSlug: string) {
     }
   }, [items, isLoaded, STORAGE_KEY]);
 
-  const addItem = (product: Product, quantity = 1, notas = '') => {
+  const addItem = (product: Product, quantity = 1, notas = '', opcionesSeleccionadas?: CartItem['opciones_seleccionadas']) => {
     setItems((prev) => {
-      const existingIndex = prev.findIndex((item) => item.product.id === product.id && item.notas === notas);
+      const existingIndex = prev.findIndex((item) => 
+        item.product.id === product.id && 
+        item.notas === notas &&
+        JSON.stringify(item.opciones_seleccionadas || []) === JSON.stringify(opcionesSeleccionadas || [])
+      );
       if (existingIndex > -1) {
         const updated = [...prev];
         updated[existingIndex].cantidad += quantity;
         return updated;
       }
-      return [...prev, { product, cantidad: quantity, notas }];
+      return [...prev, { product, cantidad: quantity, notas, opciones_seleccionadas: opcionesSeleccionadas }];
     });
   };
 
-  const removeItem = (productId: string, notas?: string) => {
-    setItems((prev) => prev.filter((item) => !(item.product.id === productId && (notas === undefined || item.notas === notas))));
+  const removeItem = (productId: string, notas?: string, opcionesSeleccionadas?: CartItem['opciones_seleccionadas']) => {
+    setItems((prev) => prev.filter((item) => !(
+      item.product.id === productId && 
+      (notas === undefined || item.notas === notas) &&
+      (opcionesSeleccionadas === undefined || JSON.stringify(item.opciones_seleccionadas || []) === JSON.stringify(opcionesSeleccionadas || []))
+    )));
   };
 
-  const updateQuantity = (productId: string, cantidad: number, notas?: string) => {
+  const updateQuantity = (productId: string, cantidad: number, notas?: string, opcionesSeleccionadas?: CartItem['opciones_seleccionadas']) => {
     if (cantidad <= 0) {
-      removeItem(productId, notas);
+      removeItem(productId, notas, opcionesSeleccionadas);
       return;
     }
     setItems((prev) =>
       prev.map((item) => {
-        if (item.product.id === productId && (notas === undefined || item.notas === notas)) {
+        if (
+          item.product.id === productId && 
+          (notas === undefined || item.notas === notas) &&
+          (opcionesSeleccionadas === undefined || JSON.stringify(item.opciones_seleccionadas || []) === JSON.stringify(opcionesSeleccionadas || []))
+        ) {
           return { ...item, cantidad };
         }
         return item;
@@ -70,7 +82,8 @@ export function useCart(businessSlug: string) {
 
   const subtotal = items.reduce((sum, item) => {
     const { precioActual } = getProductPriceInfo(item.product);
-    return sum + precioActual * item.cantidad;
+    const optionsCost = item.opciones_seleccionadas?.reduce((acc, opt) => acc + Number(opt.precio_adicional || 0), 0) || 0;
+    return sum + (precioActual + optionsCost) * item.cantidad;
   }, 0);
 
   const ahorroTotal = items.reduce((sum, item) => {
