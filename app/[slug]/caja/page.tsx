@@ -1185,8 +1185,6 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     </div>
     )}
 
-    </div>
-
     {/* ========================================== */}
     {/* MODAL 1: APERTURA DE CAJA (LOCK SCREEN)    */}
     {/* ========================================== */}
