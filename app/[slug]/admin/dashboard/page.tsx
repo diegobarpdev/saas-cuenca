@@ -53,14 +53,14 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
           .order('created_at', { ascending: false });
 
         const ordersList = ordersToday || [];
-        const ventasSum = ordersList.reduce((acc, o) => acc + Number(o.total || 0), 0);
+        const ventasSum = ordersList.reduce((acc: number, o: any) => acc + Number(o.total || 0), 0);
         const count = ordersList.length;
 
         setStats({
           ventasHoy: ventasSum,
           pedidosHoy: count,
           ticketPromedio: count > 0 ? ventasSum / count : 0,
-          clientesNuevosHoy: new Set(ordersList.map(o => o.cliente_telefono || o.cliente_nombre)).size,
+          clientesNuevosHoy: new Set(ordersList.map((o: any) => o.cliente_telefono || o.cliente_nombre)).size,
         });
 
         setRecentOrders(ordersList.slice(0, 5));
