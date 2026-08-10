@@ -54,6 +54,11 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
   const [stock, setStock] = useState('20');
   const [imagenUrl, setImagenUrl] = useState('');
   const [disponible, setDisponible] = useState(true);
+
+  // Estados para variantes / opciones del producto
+  const [productOptionGroups, setProductOptionGroups] = useState<any[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(false);
+
   const [isSaving, setIsSaving] = useState(false);
 
   // Estado Subida de Foto Local
@@ -154,7 +159,43 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
     setDisponible(true);
     setImageMode('upload');
     setUploadError(null);
+    setProductOptionGroups([]);
     setIsModalOpen(true);
+  };
+
+  const loadProductOptions = async (productId: string) => {
+    setLoadingOptions(true);
+    try {
+      const supabase = createClient();
+      const { data: groups } = await supabase
+        .from('product_option_groups')
+        .select('*')
+        .eq('product_id', productId)
+        .order('orden');
+
+      if (!groups || groups.length === 0) {
+        setProductOptionGroups([]);
+        return;
+      }
+
+      const groupIds = groups.map((g: any) => g.id);
+      const { data: values } = await supabase
+        .from('product_option_values')
+        .select('*')
+        .in('group_id', groupIds)
+        .order('orden');
+
+      const enriched = groups.map((g: any) => ({
+        ...g,
+        values: (values || []).filter((v: any) => v.group_id === g.id),
+      }));
+
+      setProductOptionGroups(enriched);
+    } catch (err) {
+      console.error('Error cargando opciones:', err);
+    } finally {
+      setLoadingOptions(false);
+    }
   };
 
   const handleOpenEditProduct = (p: Product) => {
@@ -172,6 +213,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
     setImageMode('upload');
     setUploadError(null);
     setIsModalOpen(true);
+    loadProductOptions(p.id);
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
@@ -207,39 +249,82 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
         disponible,
       };
 
-      if (editingProduct) {
-        const { data, error } = await supabase
-          .from('products')
-          .update(productPayload)
-          .eq('id', editingProduct.id)
-          .select()
-          .single();
+        let targetProductId = editingProduct ? editingProduct.id : null;
 
-        if (!error && data) {
-          setProducts((prev) => prev.map((p) => (p.id === data.id ? (data as Product) : p)));
-          toast.success(`Producto "${nombre}" actualizado correctamente`);
-        } else if (error) {
-          toast.error(`Error al editar producto: ${error.message}`);
+        if (editingProduct) {
+          const { data, error } = await supabase
+            .from('products')
+            .update(productPayload)
+            .eq('id', editingProduct.id)
+            .select()
+            .single();
+
+          if (!error && data) {
+            setProducts((prev) => prev.map((p) => (p.id === data.id ? (data as Product) : p)));
+            toast.success(`Producto "${nombre}" actualizado correctamente`);
+          } else if (error) {
+            toast.error(`Error al editar producto: ${error.message}`);
+          }
+        } else {
+          const { data, error } = await supabase
+            .from('products')
+            .insert({
+              business_id: business.id,
+              ...productPayload,
+            })
+            .select()
+            .single();
+
+          if (!error && data) {
+            targetProductId = data.id;
+            setProducts((prev) => [data as Product, ...prev]);
+            toast.success(`Producto "${nombre}" creado exitosamente`);
+          } else if (error) {
+            toast.error(`Error al crear producto: ${error.message}`);
+          }
         }
-      } else {
-        const { data, error } = await supabase
-          .from('products')
-          .insert({
-            business_id: business.id,
-            ...productPayload,
-          })
-          .select()
-          .single();
 
-        if (!error && data) {
-          setProducts((prev) => [data as Product, ...prev]);
-          toast.success(`Producto "${nombre}" creado exitosamente`);
-        } else if (error) {
-          toast.error(`Error al crear producto: ${error.message}`);
+        // Guardar variantes / opciones si existen
+        if (targetProductId) {
+          await supabase.from('product_option_groups').delete().eq('product_id', targetProductId);
+
+          for (let gIdx = 0; gIdx < productOptionGroups.length; gIdx++) {
+            const group = productOptionGroups[gIdx];
+            if (!group.nombre.trim()) continue;
+
+            const { data: gData } = await supabase
+              .from('product_option_groups')
+              .insert({
+                product_id: targetProductId,
+                nombre: group.nombre,
+                tipo: group.tipo || 'radio',
+                requerido: group.requerido ?? true,
+                seleccion_minima: group.tipo === 'radio' ? 1 : (group.seleccion_minima || 0),
+                seleccion_maxima: group.tipo === 'radio' ? 1 : (group.seleccion_maxima || 5),
+                orden: gIdx,
+              })
+              .select()
+              .single();
+
+            if (gData && group.values && group.values.length > 0) {
+              const valPayloads = group.values
+                .filter((v: any) => v.nombre.trim())
+                .map((v: any, vIdx: number) => ({
+                  group_id: gData.id,
+                  nombre: v.nombre,
+                  precio_adicional: parseFloat(v.precio_adicional) || 0,
+                  disponible: true,
+                  orden: vIdx,
+                }));
+
+              if (valPayloads.length > 0) {
+                await supabase.from('product_option_values').insert(valPayloads);
+              }
+            }
+          }
         }
-      }
 
-      setIsModalOpen(false);
+        setIsModalOpen(false);
     } catch (err: any) {
       toast.error(`Excepción: ${err.message}`);
     } finally {
@@ -866,6 +951,172 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                   onChange={(e) => setDescripcion(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100"
                 />
+              </div>
+
+              {/* Sección de Variantes y Opciones Adicionales */}
+              <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs font-bold text-zinc-100">Opciones & Variantes</h4>
+                    <p className="text-[10px] text-zinc-400">Tamaños, Sabores, Extras, Exclusiones</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProductOptionGroups((prev) => [
+                        ...prev,
+                        {
+                          id: `temp-${Date.now()}`,
+                          nombre: '',
+                          tipo: 'radio',
+                          requerido: true,
+                          values: [{ id: `val-${Date.now()}`, nombre: '', precio_adicional: 0 }],
+                        },
+                      ]);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Grupo de Opciones</span>
+                  </button>
+                </div>
+
+                {loadingOptions ? (
+                  <div className="flex items-center justify-center py-4 text-xs text-zinc-500">
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" /> Cargando variantes...
+                  </div>
+                ) : productOptionGroups.length === 0 ? (
+                  <p className="text-[11px] text-zinc-500 italic text-center py-2">
+                    Sin variantes registradas. Ej: "Tamaño (1L, 2L)" o "Sabor (Coca, Fanta)".
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {productOptionGroups.map((group, gIdx) => (
+                      <div key={group.id || gIdx} className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <input
+                            type="text"
+                            placeholder="Nombre del grupo (Ej: Selección de Sabor)"
+                            value={group.nombre}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setProductOptionGroups((prev) =>
+                                prev.map((g, idx) => (idx === gIdx ? { ...g, nombre: val } : g))
+                              );
+                            }}
+                            className="flex-1 px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-bold"
+                          />
+                          
+                          <select
+                            value={group.tipo}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setProductOptionGroups((prev) =>
+                                prev.map((g, idx) => (idx === gIdx ? { ...g, tipo: val } : g))
+                              );
+                            }}
+                            className="px-2 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-300 font-semibold"
+                          >
+                            <option value="radio">Única (Radio)</option>
+                            <option value="checkbox">Múltiple (Check)</option>
+                          </select>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setProductOptionGroups((prev) => prev.filter((_, idx) => idx !== gIdx));
+                            }}
+                            className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/30"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Opciones del grupo */}
+                        <div className="space-y-2 pl-2 border-l-2 border-zinc-800">
+                          {group.values?.map((valItem: any, vIdx: number) => (
+                            <div key={valItem.id || vIdx} className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                placeholder="Opción (Ej: 1 Litro / Extra Queso)"
+                                value={valItem.nombre}
+                                onChange={(e) => {
+                                  const text = e.target.value;
+                                  setProductOptionGroups((prev) =>
+                                    prev.map((g, idx) => {
+                                      if (idx !== gIdx) return g;
+                                      const updatedVals = g.values.map((v: any, vi: number) =>
+                                        vi === vIdx ? { ...v, nombre: text } : v
+                                      );
+                                      return { ...g, values: updatedVals };
+                                    })
+                                  );
+                                }}
+                                className="flex-1 px-2.5 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-200"
+                              />
+
+                              <div className="flex items-center gap-1 shrink-0">
+                                <span className="text-[10px] text-zinc-500">+$</span>
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  placeholder="0.00"
+                                  value={valItem.precio_adicional}
+                                  onChange={(e) => {
+                                    const cost = e.target.value;
+                                    setProductOptionGroups((prev) =>
+                                      prev.map((g, idx) => {
+                                        if (idx !== gIdx) return g;
+                                        const updatedVals = g.values.map((v: any, vi: number) =>
+                                          vi === vIdx ? { ...v, precio_adicional: cost } : v
+                                        );
+                                        return { ...g, values: updatedVals };
+                                      })
+                                    );
+                                  }}
+                                  className="w-16 px-2 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                                />
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setProductOptionGroups((prev) =>
+                                    prev.map((g, idx) => {
+                                      if (idx !== gIdx) return g;
+                                      return { ...g, values: g.values.filter((_: any, vi: number) => vi !== vIdx) };
+                                    })
+                                  );
+                                }}
+                                className="text-zinc-500 hover:text-rose-400 text-xs px-1"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setProductOptionGroups((prev) =>
+                                prev.map((g, idx) => {
+                                  if (idx !== gIdx) return g;
+                                  return {
+                                    ...g,
+                                    values: [...g.values, { id: `val-${Date.now()}`, nombre: '', precio_adicional: 0 }],
+                                  };
+                                })
+                              );
+                            }}
+                            className="text-[11px] text-emerald-400 font-semibold hover:underline flex items-center gap-1 pt-1"
+                          >
+                            <Plus className="w-3 h-3" /> Añadir valor a este grupo
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Subidor de Foto */}
