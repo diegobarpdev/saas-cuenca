@@ -12,7 +12,6 @@ import {
   Phone, 
   Receipt, 
   AlertCircle,
-  Clock,
   ArrowLeft,
   Maximize2,
   Minimize2,
@@ -57,7 +56,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   const [activeTab, setActiveTab] = useState<'pos' | 'pedidos'>('pos');
 
   // Suscripción Realtime a Pedidos
-  const { orders: liveOrders, updateOrderStatus, updatePaymentStatus } = useRealtimeOrders(business?.id || '');
+  const { orders: liveOrders, updateOrderStatusLocal: updateOrderStatus } = useRealtimeOrders(business?.id || '');
 
   // Estado del Carrito POS
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -765,7 +764,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
                       {/* Items */}
                       <div className="border-t border-white/5 pt-2 space-y-1">
-                        {order.items?.map((it, idx) => (
+                        {((order as any).items || []).map((it: any, idx: number) => (
                           <div key={idx} className="flex justify-between text-[11px] text-slate-300">
                             <span>{it.cantidad}x {it.product?.nombre || 'Producto'}</span>
                             <span className="font-mono text-slate-400">{formatCurrency((it.precio_unitario || 0) * it.cantidad)}</span>
