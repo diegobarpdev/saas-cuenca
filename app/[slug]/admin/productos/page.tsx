@@ -1138,7 +1138,12 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                               {Math.round(((parseFloat(precio) - parseFloat(precioOferta)) / parseFloat(precio)) * 100)}% OFF)!
                             </span>
                           </p>
-                                         {/* Sección de Variantes y Opciones Adicionales (Rediseño Limpio) */}
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sección de Variantes y Opciones Adicionales (Rediseño Limpio) */}
                   <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800 space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
