@@ -4,7 +4,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Yapi - Sistema de Pedidos en Vivo & Catálogo Digital para Cuenca',
-  description: 'Plataforma SaaS multi-empresa de pedidos en tiempo real, cobros con PayPhone / Deuna y comanda térmica POS para comercios de Cuenca y Ecuador.',
+  description: 'Plataforma de pedidos en tiempo real, cobros con PayPhone / Deuna y comanda térmica POS para restaurantes y negocios de Cuenca y Ecuador.',
   keywords: ['Yapi', 'Yapi Ecuador', 'Yapi.ec', 'pedidos Cuenca', 'catálogo digital', 'comanda pos', 'payphone', 'deuna'],
 };
 

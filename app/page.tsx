@@ -39,7 +39,7 @@ export default function LandingPage() {
                 Yapi<span className="text-emerald-400">.ec</span>
               </span>
               <span className="block text-[9px] text-emerald-400/90 font-mono-tech font-bold uppercase tracking-wider">
-                Infraestructura SaaS de Pedidos
+                Plataforma de Pedidos & Menú Digital
               </span>
             </div>
           </div>
@@ -302,7 +302,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-slate-400">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Infraestructura Segura Multi-Empresa Ecuador</span>
+            <span>Plataforma Segura de Pedidos Directos — Ecuador</span>
           </div>
           <p>© 2026 Yapi.ec — Plataforma de Pedidos para Cuenca y Ecuador. Todos los derechos reservados.</p>
         </div>
