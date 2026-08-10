@@ -892,17 +892,17 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
         </div>
       )}
 
-      {/* Modal Formulario Crear / Editar Producto (Rediseño 2 Columnas) */}
+      {/* Modal Formulario Crear / Editar Producto (Optimizado Móvil) */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-zinc-900 p-6 md:p-8 rounded-3xl border border-zinc-800 max-w-4xl w-full space-y-6 shadow-2xl my-auto animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center pb-3 border-b border-zinc-800">
+        <div className="fixed inset-0 z-50 bg-zinc-950/90 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+          <div className="bg-zinc-900 p-4 sm:p-6 md:p-8 rounded-t-3xl sm:rounded-3xl border border-zinc-800 max-w-4xl w-full h-[92vh] sm:h-auto max-h-[95vh] space-y-4 sm:space-y-6 shadow-2xl flex flex-col my-0 sm:my-auto animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+            <div className="flex justify-between items-center pb-3 border-b border-zinc-800 shrink-0">
               <div>
-                <h3 className="font-display font-bold text-zinc-100 text-base">
+                <h3 className="font-display font-bold text-zinc-100 text-sm sm:text-base">
                   {editingProduct ? 'Editar Producto' : 'Añadir Nuevo Producto'}
                 </h3>
-                <p className="text-xs text-zinc-400">
-                  Configura los detalles principales, fotos, promociones y variantes adicionales.
+                <p className="text-[11px] sm:text-xs text-zinc-400">
+                  Detalles principales, foto, promociones y variantes.
                 </p>
               </div>
               <button 
@@ -913,9 +913,9 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
               </button>
             </div>
 
-            <form onSubmit={handleSaveProduct} className="space-y-6">
-              {/* Layout en 2 Columnas */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[70vh] overflow-y-auto pr-1">
+            <form onSubmit={handleSaveProduct} className="flex-1 flex flex-col justify-between overflow-hidden">
+              {/* Layout en 2 Columnas con scroll independiente en móvil */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 overflow-y-auto pr-1 flex-1 pb-4 scrollbar-thin">
                 
                 {/* COLUMNA 1: Datos Básicos & Fotografía */}
                 <div className="space-y-4">
@@ -1315,22 +1315,22 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
 
               </div>
 
-              {/* Footer Acciones de Modal */}
-              <div className="pt-4 border-t border-zinc-800 flex justify-end gap-3">
+              {/* Footer Acciones de Modal (Fijo en Móvil) */}
+              <div className="pt-3 border-t border-zinc-800 flex items-center justify-end gap-2.5 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-zinc-400 font-semibold text-xs border border-zinc-800 transition-colors"
+                  className="flex-1 sm:flex-none px-4 py-3 sm:py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-zinc-400 font-semibold text-xs border border-zinc-800 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving || uploadingImage}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2"
+                  className="flex-2 sm:flex-none px-5 py-3 sm:py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 active:scale-95"
                 >
                   <Save className="w-4 h-4" />
-                  <span>{isSaving ? 'Guardando Producto...' : 'Guardar Producto'}</span>
+                  <span>{isSaving ? 'Guardando...' : 'Guardar Producto'}</span>
                 </button>
               </div>
             </form>
