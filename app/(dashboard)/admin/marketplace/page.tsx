@@ -193,49 +193,6 @@ export default function AdminMarketplacePage() {
           );
         })}
 
-        {/* Tarjeta Oferta Especial: Pack Full Combo */}
-        <div className="p-6 rounded-3xl border border-amber-500/40 glass-card bg-gradient-to-b from-amber-500/15 via-slate-950/80 to-slate-950 space-y-5 flex flex-col justify-between shadow-2xl relative overflow-hidden">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-mono-tech font-bold uppercase border border-amber-500/30">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Pack Full Combo
-              </span>
-              <span className="text-xs font-mono-tech font-bold text-amber-400">$35 / mes</span>
-            </div>
-
-            <div>
-              <h3 className="font-display font-black text-lg text-white">Todos los Add-ons Incluidos</h3>
-              <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                Obtén acceso ilimitado a PayPhone, Monitor KDS, Impresión POS, Reportes/CRM y Dominio Propio ahorrando dinero mensual.
-              </p>
-            </div>
-
-            <ul className="space-y-2 pt-2 border-t border-white/10 text-xs text-slate-300">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>Plan Base Core + Todos los 5 Add-ons</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>Ahorras $7/mes frente al precio individual</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>Soporte Técnico Prioritario VIP</span>
-              </li>
-            </ul>
-          </div>
-
-          <a
-            href={getWhatsAppLink('Pack Full Combo (Todos los Add-ons)', '$35/mes')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-display font-black text-xs text-center shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2 transition-all active:scale-95"
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>Activar Pack Full Combo $35/mes</span>
-          </a>
-        </div>
       </div>
     </div>
   );
