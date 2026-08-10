@@ -1138,17 +1138,15 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                               {Math.round(((parseFloat(precio) - parseFloat(precioOferta)) / parseFloat(precio)) * 100)}% OFF)!
                             </span>
                           </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Sección de Variantes y Opciones Adicionales */}
+                                         {/* Sección de Variantes y Opciones Adicionales (Rediseño Limpio) */}
                   <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800 space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
-                        <h4 className="text-xs font-bold text-zinc-100">Opciones & Variantes</h4>
-                        <p className="text-[10px] text-zinc-400">Tamaños, Sabores, Extras, Exclusiones</p>
+                        <h4 className="text-xs font-bold text-zinc-100 flex items-center gap-1.5">
+                          <Layers className="w-4 h-4 text-emerald-400" />
+                          <span>Opciones & Variantes</span>
+                        </h4>
+                        <p className="text-[10px] text-zinc-400">Personaliza extras, tamaños o sabores.</p>
                       </div>
                       <button
                         type="button"
@@ -1164,44 +1162,63 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                             },
                           ]);
                         }}
-                        className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1"
+                        className="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 self-start sm:self-auto"
                       >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Grupo de Opciones</span>
+                        <Plus className="w-4 h-4" />
+                        <span>+ Grupo de Opciones</span>
                       </button>
                     </div>
 
                     {loadingOptions ? (
-                      <div className="flex items-center justify-center py-4 text-xs text-zinc-500">
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" /> Cargando variantes...
+                      <div className="flex items-center justify-center py-6 text-xs text-zinc-500">
+                        <Loader2 className="w-4 h-4 animate-spin mr-2 text-emerald-400" /> Cargando variantes...
                       </div>
                     ) : productOptionGroups.length === 0 ? (
-                      <p className="text-[11px] text-zinc-500 italic text-center py-2">
-                        Sin variantes registradas. Ej: "Tamaño (1L, 2L)" o "Sabor (Coca, Fanta)".
-                      </p>
+                      <div className="p-6 rounded-xl border border-dashed border-zinc-800 text-center space-y-1">
+                        <p className="text-xs font-medium text-zinc-400">Este producto no tiene variantes.</p>
+                        <p className="text-[10px] text-zinc-600">Ej: "Tamaño (1L, 2L)" o "Acompañado de (Papas, Ensalada)".</p>
+                      </div>
                     ) : (
                       <div className="space-y-4">
                         {productOptionGroups.map((group, gIdx) => (
-                          <div key={group.id || gIdx} className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 space-y-3">
-                            <div className="flex items-center justify-between gap-2">
-                              <input
-                                type="text"
-                                placeholder="Nombre grupo (Ej: Sabor)"
-                                value={group.nombre}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  setProductOptionGroups((prev) =>
-                                    prev.map((g, idx) => (idx === gIdx ? { ...g, nombre: val } : g))
-                                  );
-                                }}
-                                className="flex-1 px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-bold focus:outline-none focus:border-emerald-500/60 transition-colors"
-                              />
-                              
-                              <div className="w-36">
+                          <div key={group.id || gIdx} className="p-3.5 rounded-2xl bg-zinc-900/90 border border-zinc-800 space-y-3.5 shadow-md">
+                            
+                            {/* Cabecera del Grupo */}
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[10px] font-mono-tech font-bold text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                  Grupo #{gIdx + 1}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setProductOptionGroups((prev) => prev.filter((_, idx) => idx !== gIdx));
+                                  }}
+                                  className="p-1 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                                  title="Eliminar grupo completo"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="Nombre (Ej: Tamaño / Sabor)"
+                                  value={group.nombre}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setProductOptionGroups((prev) =>
+                                      prev.map((g, idx) => (idx === gIdx ? { ...g, nombre: val } : g))
+                                    );
+                                  }}
+                                  className="sm:col-span-2 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-bold focus:outline-none focus:border-emerald-500/60"
+                                />
+
                                 <CustomSelect
                                   options={[
-                                    { value: 'radio', label: 'Única (Radio)' },
-                                    { value: 'checkbox', label: 'Múltiple (Check)' },
+                                    { value: 'radio', label: 'Selección Única' },
+                                    { value: 'checkbox', label: 'Múltiple Check' },
                                   ]}
                                   value={group.tipo}
                                   onChange={(val) => {
@@ -1213,25 +1230,19 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                   size="compact"
                                 />
                               </div>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setProductOptionGroups((prev) => prev.filter((_, idx) => idx !== gIdx));
-                                }}
-                                className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/30"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
                             </div>
 
                             {/* Opciones del grupo */}
-                            <div className="space-y-2 pl-2 border-l-2 border-zinc-800">
+                            <div className="space-y-2 pt-2 border-t border-zinc-800/80">
+                              <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
+                                Opciones para el cliente:
+                              </span>
+
                               {group.values?.map((valItem: any, vIdx: number) => (
                                 <div key={valItem.id || vIdx} className="flex items-center gap-2">
                                   <input
                                     type="text"
-                                    placeholder="Opción (Ej: 1 Litro / Extra)"
+                                    placeholder="Nombre opción (Ej: 1 Litro / Extra Queso)"
                                     value={valItem.nombre}
                                     onChange={(e) => {
                                       const text = e.target.value;
@@ -1245,11 +1256,11 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                         })
                                       );
                                     }}
-                                    className="flex-1 px-3 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500/60 transition-colors"
+                                    className="flex-1 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500/60"
                                   />
 
-                                  <div className="flex items-center gap-1 shrink-0">
-                                    <span className="text-[10px] text-zinc-500">+$</span>
+                                  <div className="relative w-24 shrink-0">
+                                    <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-zinc-500 text-xs pointer-events-none font-mono">+</span>
                                     <input
                                       type="number"
                                       step="0.01"
@@ -1267,7 +1278,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                           })
                                         );
                                       }}
-                                      className="w-20 px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono focus:outline-none focus:border-emerald-500/60 transition-colors"
+                                      className="w-full pl-6 pr-2 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-emerald-400 font-mono focus:outline-none focus:border-emerald-500/60"
                                     />
                                   </div>
 
@@ -1281,9 +1292,10 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                         })
                                       );
                                     }}
-                                    className="text-zinc-500 hover:text-rose-400 text-xs px-1"
+                                    className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                                    title="Eliminar opción"
                                   >
-                                    <X className="w-3.5 h-3.5" />
+                                    <X className="w-4 h-4" />
                                   </button>
                                 </div>
                               ))}
@@ -1301,11 +1313,13 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                     })
                                   );
                                 }}
-                                className="text-[11px] text-emerald-400 font-semibold hover:underline flex items-center gap-1 pt-1"
+                                className="w-full py-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-dashed border-zinc-800 text-emerald-400 font-bold text-xs flex items-center justify-center gap-1 transition-colors mt-2"
                               >
-                                <Plus className="w-3 h-3" /> Añadir opción
+                                <Plus className="w-3.5 h-3.5" />
+                                <span>Añadir valor a este grupo</span>
                               </button>
                             </div>
+
                           </div>
                         ))}
                       </div>
