@@ -827,7 +827,6 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                               >
                                 <Edit className="w-3.5 h-3.5" />
                               </button>
-                            </button>
                             <button
                               onClick={() => handleDeleteCategory(cat)}
                               className="p-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
