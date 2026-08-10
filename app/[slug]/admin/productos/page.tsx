@@ -1180,19 +1180,22 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                 className="flex-1 px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-bold"
                               />
                               
-                              <select
-                                value={group.tipo}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  setProductOptionGroups((prev) =>
-                                    prev.map((g, idx) => (idx === gIdx ? { ...g, tipo: val } : g))
-                                  );
-                                }}
-                                className="px-2 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-300 font-semibold"
-                              >
-                                <option value="radio">Única (Radio)</option>
-                                <option value="checkbox">Múltiple (Check)</option>
-                              </select>
+                              <div className="w-36">
+                                <CustomSelect
+                                  options={[
+                                    { value: 'radio', label: 'Única (Radio)' },
+                                    { value: 'checkbox', label: 'Múltiple (Check)' },
+                                  ]}
+                                  value={group.tipo}
+                                  onChange={(val) => {
+                                    setProductOptionGroups((prev) =>
+                                      prev.map((g, idx) => (idx === gIdx ? { ...g, tipo: val } : g))
+                                    );
+                                  }}
+                                  accentColor="emerald"
+                                  size="compact"
+                                />
+                              </div>
 
                               <button
                                 type="button"
