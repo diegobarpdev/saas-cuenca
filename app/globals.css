@@ -20,6 +20,11 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
+/* Regla Global: Eliminar el borde azul/blanco por defecto del navegador en focus de inputs */
+input:focus, textarea:focus, select:focus {
+  outline: none !important;
+}
+
 /* ============================================================================
    YAPI BRANDING & TYPOGRAPHY SYSTEM
    ============================================================================ */

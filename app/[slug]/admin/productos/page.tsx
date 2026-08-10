@@ -1177,7 +1177,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                     prev.map((g, idx) => (idx === gIdx ? { ...g, nombre: val } : g))
                                   );
                                 }}
-                                className="flex-1 px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-bold"
+                                className="flex-1 px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-bold focus:outline-none focus:border-emerald-500/60 transition-colors"
                               />
                               
                               <div className="w-36">
@@ -1228,7 +1228,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                         })
                                       );
                                     }}
-                                    className="flex-1 px-2.5 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-200"
+                                    className="flex-1 px-3 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500/60 transition-colors"
                                   />
 
                                   <div className="flex items-center gap-1 shrink-0">
@@ -1250,7 +1250,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                           })
                                         );
                                       }}
-                                      className="w-16 px-2 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono"
+                                      className="w-20 px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono focus:outline-none focus:border-emerald-500/60 transition-colors"
                                     />
                                   </div>
 
