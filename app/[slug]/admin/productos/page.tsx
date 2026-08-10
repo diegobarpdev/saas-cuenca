@@ -1150,7 +1150,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                         className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>+ Grupo</span>
+                        <span>Grupo de Opciones</span>
                       </button>
                     </div>
 
