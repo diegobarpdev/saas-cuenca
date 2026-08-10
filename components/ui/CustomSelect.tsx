@@ -82,8 +82,8 @@ export function CustomSelect({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full ${
-          size === 'compact' ? 'px-3 py-2 rounded-lg text-xs' : 'px-4 py-3 rounded-2xl text-xs md:text-sm'
-        } bg-slate-950/90 text-left text-white flex items-center justify-between gap-2 border transition-all duration-200 shadow-md ${
+          size === 'compact' ? 'px-3 py-2 rounded-xl text-xs' : 'px-4 py-3 rounded-2xl text-xs md:text-sm'
+        } bg-[#090D16] text-left text-white flex items-center justify-between gap-2 border transition-all duration-200 shadow-md ${
           borderGlowMap[accentColor]
         } ${isOpen ? 'border-amber-500 ring-2 ring-amber-500/20' : ''}`}
       >
