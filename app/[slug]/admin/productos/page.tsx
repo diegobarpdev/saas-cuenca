@@ -368,7 +368,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
     setIsSavingCat(true);
     try {
       const supabase = createClient();
-      const nextOrden = parseInt(newCatOrden) || (categories.length + 1) * 10;
+      const nextOrden = categories.length + 1;
       const { data, error } = await supabase
         .from('categories')
         .insert({
@@ -382,9 +382,9 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
       if (!error && data) {
         setCategories((prev) => [...prev, data as Category].sort((a, b) => a.orden - b.orden));
         setNewCatNombre('');
-        setNewCatOrden('');
+        toast.success(`Categoría "${newCatNombre}" creada.`);
       } else if (error) {
-        alert(`Error al crear categoría: ${error.message}`);
+        toast.error(`Error al crear categoría: ${error.message}`);
       }
     } catch (err: any) {
       console.error('Error creando categoría:', err);
@@ -393,10 +393,35 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
     }
   };
 
+  const handleMoveCategory = async (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= categories.length) return;
+
+    const newCategories = [...categories];
+    const temp = newCategories[index];
+    newCategories[index] = newCategories[targetIndex];
+    newCategories[targetIndex] = temp;
+
+    // Actualizar orden numérico secuencial
+    const updated = newCategories.map((cat, idx) => ({ ...cat, orden: idx + 1 }));
+    setCategories(updated);
+
+    try {
+      const supabase = createClient();
+      await Promise.all(
+        updated.map((cat) =>
+          supabase.from('categories').update({ orden: cat.orden }).eq('id', cat.id)
+        )
+      );
+      toast.success('Orden de categorías guardado.');
+    } catch (err) {
+      console.error('Error guardando reordenamiento:', err);
+    }
+  };
+
   const handleStartEditCat = (cat: Category) => {
     setEditingCatId(cat.id);
     setEditCatNombre(cat.nombre);
-    setEditCatOrden(cat.orden.toString());
   };
 
   const handleSaveEditCategory = async (catId: string) => {
@@ -407,7 +432,6 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
         .from('categories')
         .update({
           nombre: editCatNombre.trim(),
-          orden: parseInt(editCatOrden) || 0,
         })
         .eq('id', catId)
         .select()
@@ -415,11 +439,10 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
 
       if (!error && data) {
         setCategories((prev) =>
-          prev.map((c) => (c.id === catId ? (data as Category) : c)).sort((a, b) => a.orden - b.orden)
+          prev.map((c) => (c.id === catId ? (data as Category) : c))
         );
         setEditingCatId(null);
-      } else if (error) {
-        alert(`Error al guardar categoría: ${error.message}`);
+        toast.success('Categoría actualizada.');
       }
     } catch (err: any) {
       console.error('Error editando categoría:', err);
@@ -699,105 +722,111 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
               </button>
             </div>
 
-            {/* Formulario Nueva Categoría */}
-            <form onSubmit={handleCreateCategory} className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2.5">
-              <h4 className="font-semibold text-xs text-zinc-200 flex items-center gap-1.5">
-                <FolderPlus className="w-4 h-4 text-zinc-400" />
-                <span>Crear Nueva Categoría</span>
-              </h4>
+              {/* Formulario Nueva Categoría */}
+              <form onSubmit={handleCreateCategory} className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2.5">
+                <h4 className="font-semibold text-xs text-zinc-200 flex items-center gap-1.5">
+                  <FolderPlus className="w-4 h-4 text-zinc-400" />
+                  <span>Crear Nueva Categoría</span>
+                </h4>
 
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  required
-                  placeholder="Nombre categoría..."
-                  value={newCatNombre}
-                  onChange={(e) => setNewCatNombre(e.target.value)}
-                  className="flex-1 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-500"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nombre categoría..."
+                    value={newCatNombre}
+                    onChange={(e) => setNewCatNombre(e.target.value)}
+                    className="flex-1 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-500"
+                  />
 
-                <input
-                  type="number"
-                  placeholder="Orden (10)"
-                  value={newCatOrden}
-                  onChange={(e) => setNewCatOrden(e.target.value)}
-                  className="w-20 px-2 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 font-mono placeholder-zinc-500"
-                />
+                  <button
+                    type="submit"
+                    disabled={isSavingCat}
+                    className="px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs flex items-center gap-1 shadow-sm transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>{isSavingCat ? '...' : 'Crear'}</span>
+                  </button>
+                </div>
+              </form>
 
-                <button
-                  type="submit"
-                  disabled={isSavingCat}
-                  className="px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs flex items-center gap-1 shadow-sm transition-colors"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>{isSavingCat ? '...' : 'Crear'}</span>
-                </button>
-              </div>
-            </form>
+              {/* Lista de Categorías con Botones de Posición */}
+              <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                <h4 className="font-medium text-xs text-zinc-400">
+                  Categorías Registradas ({categories.length}) — Usa las flechas para ordenar
+                </h4>
 
-            {/* Lista de Categorías */}
-            <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
-              <h4 className="font-medium text-xs text-zinc-400">
-                Categorías Registradas ({categories.length})
-              </h4>
+                {categories.length === 0 ? (
+                  <p className="text-xs text-zinc-500 italic py-2">No hay categorías registradas.</p>
+                ) : (
+                  categories.map((cat, idx) => {
+                    const prodCount = products.filter((p) => p.category_id === cat.id).length;
+                    const isEditingThis = editingCatId === cat.id;
 
-              {categories.length === 0 ? (
-                <p className="text-xs text-zinc-500 italic py-2">No hay categorías registradas.</p>
-              ) : (
-                categories.map((cat) => {
-                  const prodCount = products.filter((p) => p.category_id === cat.id).length;
-                  const isEditingThis = editingCatId === cat.id;
-
-                  return (
-                    <div
-                      key={cat.id}
-                      className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-3"
-                    >
-                      {isEditingThis ? (
-                        <div className="flex-1 flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={editCatNombre}
-                            onChange={(e) => setEditCatNombre(e.target.value)}
-                            className="flex-1 px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-zinc-100"
-                          />
-                          <input
-                            type="number"
-                            value={editCatOrden}
-                            onChange={(e) => setEditCatOrden(e.target.value)}
-                            className="w-14 px-2 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-zinc-100 font-mono"
-                          />
-                          <button
-                            onClick={() => handleSaveEditCategory(cat.id)}
-                            className="p-1 rounded bg-emerald-600 text-white"
-                          >
-                            <Check className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => setEditingCatId(null)}
-                            className="p-1 rounded bg-zinc-800 text-zinc-400"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex items-center gap-2.5">
-                            <span className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono text-[10px] font-bold">
-                              #{cat.orden}
-                            </span>
-                            <div>
-                              <p className="font-semibold text-xs text-zinc-100">{cat.nombre}</p>
-                              <span className="text-[10px] text-zinc-500">{prodCount} producto(s)</span>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-1">
+                    return (
+                      <div
+                        key={cat.id}
+                        className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-3"
+                      >
+                        {isEditingThis ? (
+                          <div className="flex-1 flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={editCatNombre}
+                              onChange={(e) => setEditCatNombre(e.target.value)}
+                              className="flex-1 px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-zinc-100"
+                            />
                             <button
-                              onClick={() => handleStartEditCat(cat)}
-                              className="p-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition-colors"
+                              onClick={() => handleSaveEditCategory(cat.id)}
+                              className="p-1 rounded bg-emerald-600 text-white"
                             >
-                              <Edit className="w-3.5 h-3.5" />
+                              <Check className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => setEditingCatId(null)}
+                              className="p-1 rounded bg-zinc-800 text-zinc-400"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-2.5">
+                              {/* Controles de ordenamiento arriba / abajo */}
+                              <div className="flex flex-col gap-0.5">
+                                <button
+                                  type="button"
+                                  disabled={idx === 0}
+                                  onClick={() => handleMoveCategory(idx, 'up')}
+                                  className="p-0.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                                  title="Mover arriba"
+                                >
+                                  ▲
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={idx === categories.length - 1}
+                                  onClick={() => handleMoveCategory(idx, 'down')}
+                                  className="p-0.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                                  title="Mover abajo"
+                                >
+                                  ▼
+                                </button>
+                              </div>
+
+                              <div>
+                                <p className="font-semibold text-xs text-zinc-100">{cat.nombre}</p>
+                                <span className="text-[10px] text-zinc-500">{prodCount} producto(s)</span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => handleStartEditCat(cat)}
+                                className="p-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition-colors"
+                              >
+                                <Edit className="w-3.5 h-3.5" />
+                              </button>
                             </button>
                             <button
                               onClick={() => handleDeleteCategory(cat)}
