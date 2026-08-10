@@ -258,21 +258,28 @@ export default function LandingPage() {
                   <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
                     <span className="text-slate-200 flex items-center gap-2.5">
                       <Bell className="w-4 h-4 text-emerald-400 shrink-0" />
-                      Monitor de Cocina KDS & Alertas
+                      Monitor de Cocina Digital (KDS)
                     </span>
                     <span className="font-mono-tech font-bold text-emerald-400">+$7/mes</span>
                   </div>
                   <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
                     <span className="text-slate-200 flex items-center gap-2.5">
                       <Printer className="w-4 h-4 text-emerald-400 shrink-0" />
-                      Impresión Comandas POS
+                      Impresión Térmica POS Comandas
                     </span>
                     <span className="font-mono-tech font-bold text-emerald-400">+$7/mes</span>
                   </div>
                   <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
                     <span className="text-slate-200 flex items-center gap-2.5">
+                      <Globe className="w-4 h-4 text-emerald-400 shrink-0" />
+                      Dominio Web Personalizado
+                    </span>
+                    <span className="font-mono-tech font-bold text-emerald-400">+$9/mes</span>
+                  </div>
+                  <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
+                    <span className="text-slate-200 flex items-center gap-2.5">
                       <Database className="w-4 h-4 text-emerald-400 shrink-0" />
-                      Reportes, Ventas & CRM (Excel)
+                      Reportes Ventas & Exportación (CRM)
                     </span>
                     <span className="font-mono-tech font-bold text-emerald-400">+$5/mes</span>
                   </div>
