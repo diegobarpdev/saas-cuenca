@@ -1,7 +1,7 @@
 'use client';
 
 import React, { use, useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Check, X, Package, Tag, RefreshCw, FolderPlus, Save, UploadCloud, Link as LinkIcon, Loader2, Flame, AlertTriangle, Lock, GripVertical } from 'lucide-react';
+import { Plus, Edit, Trash2, Check, X, Package, Tag, RefreshCw, FolderPlus, Save, UploadCloud, Link as LinkIcon, Loader2, Flame, AlertTriangle, Lock, GripVertical, Layers } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { Product, Category } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
