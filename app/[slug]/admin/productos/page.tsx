@@ -1167,10 +1167,10 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                             },
                           ]);
                         }}
-                        className="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 self-start sm:self-auto"
+                        className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-display font-black flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95 w-full sm:w-auto"
                       >
-                        <Plus className="w-4 h-4" />
-                        <span>+ Grupo de Opciones</span>
+                        <Plus className="w-4 h-4 shrink-0" />
+                        <span>Añadir Variante</span>
                       </button>
                     </div>
 
