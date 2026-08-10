@@ -601,52 +601,54 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   return (
     <div className="h-screen w-screen flex flex-col bg-[#070A11] text-slate-100 overflow-hidden w-full select-none">
       
-      {/* Header de Caja POS */}
-      <header className="h-16 border-b border-white/10 bg-[#0B0F1B] px-6 flex items-center justify-between shrink-0 z-10 w-full">
-        <div className="flex items-center gap-3">
-          {simulatedRole === 'dueño' && (
-            <Link
-              href={`/${slug}/admin/dashboard`}
-              className="p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-              title="Volver al panel"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
-          )}
+      {/* Header de Caja POS (Adaptado a Móvil) */}
+      <header className="h-auto sm:h-16 border-b border-white/10 bg-[#0B0F1B] px-4 sm:px-6 py-2.5 sm:py-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0 z-20 w-full">
+        <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
           <div className="flex items-center gap-2">
-            <Store className="w-5 h-5 text-emerald-400" />
-            <h1 className="font-display font-black text-sm md:text-base tracking-tight text-white">
-              Caja & Facturación Manual (POS)
-            </h1>
-            <span className="hidden sm:inline-block text-[10px] font-mono-tech font-bold text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
-              {business?.nombre}
-            </span>
+            {simulatedRole === 'dueño' && (
+              <Link
+                href={`/${slug}/admin/dashboard`}
+                className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white transition-colors"
+                title="Volver al panel"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            )}
+            <div className="flex items-center gap-1.5">
+              <Store className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 shrink-0" />
+              <h1 className="font-display font-black text-xs sm:text-base tracking-tight text-white truncate">
+                Caja & POS
+              </h1>
+              <span className="hidden md:inline-block text-[10px] font-mono-tech font-bold text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
+                {business?.nombre}
+              </span>
+            </div>
           </div>
 
-          {/* Switcher de Pestañas Rápidas: POS vs Pedidos en Vivo */}
-          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-white/10 ml-4">
+          {/* Switcher de Pestañas Rápidas */}
+          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-white/10">
             <button
               onClick={() => setActiveTab('pos')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold flex items-center gap-1.5 transition-all ${
+              className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-xs font-display font-bold flex items-center gap-1 transition-all ${
                 activeTab === 'pos'
-                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <Store className="w-3.5 h-3.5" />
-              <span>Nueva Comanda</span>
+              <span className="text-[11px] sm:text-xs">Comanda</span>
             </button>
 
             <button
               onClick={() => setActiveTab('pedidos')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold flex items-center gap-1.5 transition-all relative ${
+              className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-xs font-display font-bold flex items-center gap-1 transition-all relative ${
                 activeTab === 'pedidos'
-                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <Clock className="w-3.5 h-3.5" />
-              <span>Pedidos en Vivo</span>
+              <span className="text-[11px] sm:text-xs">En Vivo</span>
               {liveOrders.filter(o => o.estado !== 'entregado' && o.estado !== 'cancelado').length > 0 && (
                 <span className="w-4 h-4 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black flex items-center justify-center">
                   {liveOrders.filter(o => o.estado !== 'entregado' && o.estado !== 'cancelado').length}
@@ -657,7 +659,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
         </div>
 
 
-        <div className="flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-2">
           {/* Movimientos de Caja Chica */}
           {activeRegister && activeRegister.id !== 'mock-dueño-register' && (
             <button
@@ -811,11 +813,11 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           )}
         </div>
       ) : (
-        /* VISTA: POS - SECCIÓN DE COMANDAS */
-        <div className="flex-1 flex flex-col xl:flex-row gap-6 p-6 overflow-hidden min-h-0 w-full">
+        /* VISTA: POS - SECCIÓN DE COMANDAS (Layout Móvil Optimizado) */
+        <div className="flex-1 flex flex-col xl:flex-row gap-4 p-3 sm:p-6 overflow-y-auto sm:overflow-hidden min-h-0 w-full">
           
           {/* SECCIÓN IZQUIERDA: Búsqueda, Categorías y Catálogo */}
-          <div className="flex-1 flex flex-col space-y-4 min-w-0">
+          <div className="flex-1 flex flex-col space-y-3 min-w-0">
           
           {/* Barra de Búsqueda y Filtros */}
           <div className="flex items-center justify-between gap-4">
@@ -828,16 +830,16 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                 placeholder="Buscar producto..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 bg-[#0B0F1B] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                className="w-full pl-9 pr-4 py-2 bg-[#0B0F1B] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
               />
             </div>
           </div>
 
-        {/* Categorías Scroller Horizontal */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+        {/* Categorías Scroller Horizontal (Táctil Móvil) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-0 shrink-0">
           <button
             onClick={() => setActiveCategory('todas')}
-            className={`px-4 py-2 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all shrink-0 ${
               activeCategory === 'todas'
                 ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md'
                 : 'bg-slate-900 border border-white/5 text-slate-400 hover:text-white'
@@ -849,7 +851,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all shrink-0 ${
                 activeCategory === cat.id
                   ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md'
                   : 'bg-slate-900 border border-white/5 text-slate-400 hover:text-white'
@@ -861,7 +863,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
         </div>
 
         {/* Catálogo de Productos */}
-        <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+        <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5 min-h-[220px]">
           {filteredProducts.length === 0 ? (
             <div className="col-span-full flex flex-col items-center justify-center p-12 text-slate-500 border border-dashed border-white/10 rounded-2xl">
               <AlertCircle className="w-7 h-7 mb-2 text-slate-600" />
