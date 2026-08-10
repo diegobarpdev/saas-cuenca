@@ -289,43 +289,60 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
         }
 
         // Guardar variantes / opciones si existen
-        if (targetProductId) {
-          await supabase.from('product_option_groups').delete().eq('product_id', targetProductId);
+        if (targetProductId && productOptionGroups.length > 0) {
+          // Eliminar grupos anteriores
+          const { error: delErr } = await supabase.from('product_option_groups').delete().eq('product_id', targetProductId);
+          if (delErr) {
+            console.error('Error limpiando opciones anteriores:', delErr);
+          }
 
           for (let gIdx = 0; gIdx < productOptionGroups.length; gIdx++) {
             const group = productOptionGroups[gIdx];
-            if (!group.nombre.trim()) continue;
+            if (!group.nombre || !group.nombre.trim()) continue;
 
-            const { data: gData } = await supabase
+            const groupPayload = {
+              product_id: targetProductId,
+              nombre: group.nombre.trim(),
+              tipo: group.tipo || 'radio',
+              requerido: group.requerido ?? true,
+              seleccion_minima: group.tipo === 'radio' ? 1 : (group.seleccion_minima || 0),
+              seleccion_maxima: group.tipo === 'radio' ? 1 : (group.seleccion_maxima || 5),
+              orden: gIdx,
+            };
+
+            const { data: gData, error: gErr } = await supabase
               .from('product_option_groups')
-              .insert({
-                product_id: targetProductId,
-                nombre: group.nombre,
-                tipo: group.tipo || 'radio',
-                requerido: group.requerido ?? true,
-                seleccion_minima: group.tipo === 'radio' ? 1 : (group.seleccion_minima || 0),
-                seleccion_maxima: group.tipo === 'radio' ? 1 : (group.seleccion_maxima || 5),
-                orden: gIdx,
-              })
+              .insert(groupPayload)
               .select()
               .single();
 
+            if (gErr) {
+              console.error('Error insertando grupo de opciones:', gErr);
+              toast.error(`Error guardando grupo "${group.nombre}": ${gErr.message}`);
+              continue;
+            }
+
             if (gData && group.values && group.values.length > 0) {
               const valPayloads = group.values
-                .filter((v: any) => v.nombre.trim())
+                .filter((v: any) => v.nombre && v.nombre.trim())
                 .map((v: any, vIdx: number) => ({
                   group_id: gData.id,
-                  nombre: v.nombre,
+                  nombre: v.nombre.trim(),
                   precio_adicional: parseFloat(v.precio_adicional) || 0,
                   disponible: true,
                   orden: vIdx,
                 }));
 
               if (valPayloads.length > 0) {
-                await supabase.from('product_option_values').insert(valPayloads);
+                const { error: vErr } = await supabase.from('product_option_values').insert(valPayloads);
+                if (vErr) {
+                  console.error('Error insertando valores de opciones:', vErr);
+                  toast.error(`Error guardando opciones para "${group.nombre}": ${vErr.message}`);
+                }
               }
             }
           }
+          toast.success('Variantes y opciones guardadas.');
         }
 
         setIsModalOpen(false);
