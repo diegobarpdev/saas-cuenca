@@ -116,6 +116,7 @@ export interface Business {
   has_pos_printing?: boolean;
   has_crm_export?: boolean;
   has_custom_domain?: boolean;
+  custom_domain?: string | null;
   branding?: BusinessBranding;
   configuracion_operativa?: OperationalSettings;
   created_at: string;

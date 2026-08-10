@@ -81,6 +81,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
   const [telefonoWhatsapp, setTelefonoWhatsapp] = useState('');
   const [direccion, setDireccion] = useState('');
   const [googleMapsUrl, setGoogleMapsUrl] = useState('');
+  const [customDomain, setCustomDomain] = useState('');
 
   // 2. Tiempos & Modalidades
   const [tiempoPreparacion, setTiempoPreparacion] = useState('15 - 25 min');
@@ -116,6 +117,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
       setTelefonoWhatsapp(business.telefono_whatsapp || '');
       setDireccion(business.direccion || '');
       setGoogleMapsUrl(business.configuracion_operativa?.google_maps_url || business.google_maps_url || '');
+      setCustomDomain(business.custom_domain || '');
       setPayphoneToken(business.payphone_token || '');
 
       // Cargar Cuentas Bancarias
@@ -231,6 +233,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
           ruc,
           telefono_whatsapp: telefonoWhatsapp,
           direccion,
+          custom_domain: customDomain.trim() || null,
           payphone_token: payphoneToken || null,
           datos_bancarios: {
             banco: primaryBank.banco,
@@ -368,6 +371,62 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
             <p className="text-[11px] text-slate-400 mt-1">
               Enlace directo al mapa de tu local que se abrirá cuando los clientes hagan clic en el botón "Maps" del catálogo.
             </p>
+          </div>
+
+          {/* Dominio Personalizado Add-on */}
+          <div className="pt-4 border-t border-slate-800 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-display font-semibold text-slate-300">
+                Dominio Web Personalizado
+              </label>
+              {business.has_custom_domain ? (
+                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono-tech font-bold border border-emerald-500/30">
+                  Módulo Activo (+$9/m)
+                </span>
+              ) : (
+                <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-mono-tech font-bold border border-amber-500/30">
+                  Módulo no contratado (+$9/m)
+                </span>
+              )}
+            </div>
+
+            {business.has_custom_domain ? (
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Ej: pedidos.milocal.com o mi-restaurante.com"
+                  value={customDomain}
+                  onChange={(e) => setCustomDomain(e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-emerald-400 font-mono focus:outline-none focus:border-emerald-500"
+                />
+                
+                <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-emerald-500/20 text-xs space-y-2">
+                  <span className="font-bold text-emerald-400 block">📌 Configuración DNS requerida en tu proveedor de dominio (GoDaddy / Namecheap / Cloudflare):</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono bg-slate-900 p-2.5 rounded-xl border border-white/5">
+                    <div><span className="text-slate-500">Tipo de Registro:</span> <strong className="text-white">CNAME</strong></div>
+                    <div><span className="text-slate-500">Nombre / Host:</span> <strong className="text-white">{customDomain.split('.')[0] || 'pedidos'}</strong></div>
+                    <div className="col-span-full"><span className="text-slate-500">Valor / Destino:</span> <strong className="text-emerald-300">cname.yapi.ec</strong></div>
+                  </div>
+                  <p className="text-[10px] text-slate-400">
+                    Una vez guardado el registro DNS, el certificado SSL de seguridad (HTTPS) se generará automáticamente.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3.5 rounded-2xl bg-slate-950 border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <p className="text-slate-400">
+                  Conecta tu propio dominio (ej: <code className="text-emerald-400 font-mono">pedidos.tu-restaurante.com</code>) para dar una imagen totalmente corporativa a tus clientes.
+                </p>
+                <a
+                  href={`https://wa.me/593969307527?text=${encodeURIComponent(`Hola! Soy de ${business.nombre} (/${business.slug}). Me gustaría activar el módulo Add-on de Dominio Personalizado (+$9/mes) en Yapi.ec.`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs shrink-0 transition-all shadow-lg shadow-emerald-500/20"
+                >
+                  Solicitar Dominio por WhatsApp
+                </a>
+              </div>
+            )}
           </div>
         </div>
 
