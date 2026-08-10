@@ -1,7 +1,7 @@
 'use client';
 
 import React, { use, useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Check, X, Package, Tag, RefreshCw, FolderPlus, Save, UploadCloud, Link as LinkIcon, Loader2, Flame, AlertTriangle, Lock } from 'lucide-react';
+import { Plus, Edit, Trash2, Check, X, Package, Tag, RefreshCw, FolderPlus, Save, UploadCloud, Link as LinkIcon, Loader2, Flame, AlertTriangle, Lock, GripVertical } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { Product, Category } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -58,6 +58,10 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
   // Estados para variantes / opciones del producto
   const [productOptionGroups, setProductOptionGroups] = useState<any[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
+
+  // Estado para Drag and Drop de Categorías
+  const [draggedCategoryIndex, setDraggedCategoryIndex] = useState<number | null>(null);
+
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -393,18 +397,27 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
     }
   };
 
-  const handleMoveCategory = async (index: number, direction: 'up' | 'down') => {
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= categories.length) return;
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedCategoryIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedCategoryIndex === null || draggedCategoryIndex === dropIndex) return;
 
     const newCategories = [...categories];
-    const temp = newCategories[index];
-    newCategories[index] = newCategories[targetIndex];
-    newCategories[targetIndex] = temp;
+    const [draggedItem] = newCategories.splice(draggedCategoryIndex, 1);
+    newCategories.splice(dropIndex, 0, draggedItem);
 
-    // Actualizar orden numérico secuencial
     const updated = newCategories.map((cat, idx) => ({ ...cat, orden: idx + 1 }));
     setCategories(updated);
+    setDraggedCategoryIndex(null);
 
     try {
       const supabase = createClient();
@@ -413,9 +426,9 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
           supabase.from('categories').update({ orden: cat.orden }).eq('id', cat.id)
         )
       );
-      toast.success('Orden de categorías guardado.');
+      toast.success('Nuevo orden guardado.');
     } catch (err) {
-      console.error('Error guardando reordenamiento:', err);
+      console.error('Error al guardar nuevo orden:', err);
     }
   };
 
@@ -750,10 +763,10 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                 </div>
               </form>
 
-              {/* Lista de Categorías con Botones de Posición */}
+              {/* Lista de Categorías con Drag and Drop */}
               <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
                 <h4 className="font-medium text-xs text-zinc-400">
-                  Categorías Registradas ({categories.length}) — Usa las flechas para ordenar
+                  Categorías Registradas ({categories.length}) — Arrastra desde los 6 puntos para reordenar
                 </h4>
 
                 {categories.length === 0 ? (
@@ -766,7 +779,15 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                     return (
                       <div
                         key={cat.id}
-                        className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-3"
+                        draggable={!isEditingThis}
+                        onDragStart={(e) => handleDragStart(e, idx)}
+                        onDragOver={(e) => handleDragOver(e, idx)}
+                        onDrop={(e) => handleDrop(e, idx)}
+                        className={`p-2.5 rounded-xl bg-zinc-950 border transition-all flex items-center justify-between gap-3 ${
+                          draggedCategoryIndex === idx
+                            ? 'border-emerald-500 bg-emerald-500/10 opacity-50'
+                            : 'border-zinc-800 hover:border-zinc-700'
+                        }`}
                       >
                         {isEditingThis ? (
                           <div className="flex-1 flex items-center gap-2">
@@ -792,26 +813,9 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                         ) : (
                           <>
                             <div className="flex items-center gap-2.5">
-                              {/* Controles de ordenamiento arriba / abajo */}
-                              <div className="flex flex-col gap-0.5">
-                                <button
-                                  type="button"
-                                  disabled={idx === 0}
-                                  onClick={() => handleMoveCategory(idx, 'up')}
-                                  className="p-0.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
-                                  title="Mover arriba"
-                                >
-                                  ▲
-                                </button>
-                                <button
-                                  type="button"
-                                  disabled={idx === categories.length - 1}
-                                  onClick={() => handleMoveCategory(idx, 'down')}
-                                  className="p-0.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
-                                  title="Mover abajo"
-                                >
-                                  ▼
-                                </button>
+                              {/* Manilla para Arrastrar (Grip) */}
+                              <div className="cursor-grab active:cursor-grabbing text-zinc-600 hover:text-zinc-300 p-0.5">
+                                <GripVertical className="w-4 h-4" />
                               </div>
 
                               <div>
