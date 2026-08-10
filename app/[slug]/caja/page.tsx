@@ -1470,32 +1470,51 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
       primaryColor="#10b981"
     />
 
-    {/* Selector de Roles flotante para vistas de pantalla completa (POS/KDS) */}
-    <div className="fixed bottom-4 right-4 z-50 bg-[#0B0F1B]/95 backdrop-blur-md border border-white/10 rounded-2xl p-2.5 shadow-2xl flex items-center gap-2">
-      <span className="text-[10px] font-mono-tech font-bold text-amber-400 shrink-0">⚡ Simulador:</span>
-      <CustomSelect
-        options={[
-          { value: 'dueño', label: 'Dueño / Admin' },
-          { value: 'cajero-1', label: 'Cajero 1 (Principal)' },
-          { value: 'cajero-2', label: 'Cajero 2 (Barra)' },
-          { value: 'cocinero', label: 'Cocinero (KDS)' }
-        ]}
-        value={simulatedRole}
-        onChange={(val) => {
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('yapi_simulated_role', val);
-            if (val === 'cocinero') {
-              window.location.href = `/${slug}/cocina`;
-            } else if (val.startsWith('cajero')) {
-              window.location.href = `/${slug}/caja`;
-            } else {
-              window.location.href = `/${slug}/admin/dashboard`;
-            }
-          }
-        }}
-        accentColor="amber"
-        className="w-44 text-[11px]"
-      />
+    {/* Selector de Roles Simulador (Discreto en la esquina) */}
+    <div className="fixed bottom-3 right-3 z-50 group">
+      <details className="relative">
+        <summary className="list-none cursor-pointer px-2.5 py-1.5 rounded-full bg-slate-900/90 backdrop-blur-md border border-white/10 text-amber-400 hover:text-amber-300 text-[11px] font-mono-tech font-bold shadow-xl flex items-center gap-1.5 transition-all active:scale-95">
+          <span>⚡</span>
+          <span className="hidden sm:inline">Simulador</span>
+          <span className="text-[10px] text-slate-400">({simulatedRole})</span>
+        </summary>
+        
+        <div className="absolute bottom-full right-0 mb-2 p-2 rounded-2xl bg-[#0B0F1B]/95 backdrop-blur-2xl border border-white/10 shadow-2xl space-y-1.5 w-48 animate-in fade-in zoom-in-95 duration-150">
+          <span className="block text-[10px] font-mono-tech font-bold text-amber-400 px-2 py-0.5">
+            Cambiar Rol Simulación:
+          </span>
+          {[
+            { value: 'dueño', label: 'Dueño / Admin' },
+            { value: 'cajero-1', label: 'Cajero 1 (Principal)' },
+            { value: 'cajero-2', label: 'Cajero 2 (Barra)' },
+            { value: 'cocinero', label: 'Cocinero (KDS)' }
+          ].map((roleOpt) => (
+            <button
+              key={roleOpt.value}
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem('yapi_simulated_role', roleOpt.value);
+                  if (roleOpt.value === 'cocinero') {
+                    window.location.href = `/${slug}/cocina`;
+                  } else if (roleOpt.value.startsWith('cajero')) {
+                    window.location.href = `/${slug}/caja`;
+                  } else {
+                    window.location.href = `/${slug}/admin/dashboard`;
+                  }
+                }
+              }}
+              className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+                simulatedRole === roleOpt.value
+                  ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30'
+                  : 'text-slate-300 hover:bg-slate-900 hover:text-white'
+              }`}
+            >
+              {roleOpt.label}
+            </button>
+          ))}
+        </div>
+      </details>
     </div>
   </div>
   );
