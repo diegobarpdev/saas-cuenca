@@ -154,7 +154,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
             </a>
             
             <Link
-              href="/admin/dashboard"
+              href={`/${slug}/admin/dashboard`}
               className="py-2.5 text-xs text-slate-400 hover:text-white font-medium transition-colors"
             >
               Volver al Panel Principal
@@ -178,7 +178,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
         <div className="flex items-center gap-3">
           {simulatedRole === 'dueño' && (
             <Link
-              href="/admin/dashboard"
+              href={`/${slug}/admin/dashboard`}
               className="p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
               title="Volver al panel"
             >
@@ -481,7 +481,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
               } else if (val.startsWith('cajero')) {
                 window.location.href = `/${slug}/caja`;
               } else {
-                window.location.href = '/admin/dashboard';
+                window.location.href = `/${slug}/admin/dashboard`;
               }
             }
           }}

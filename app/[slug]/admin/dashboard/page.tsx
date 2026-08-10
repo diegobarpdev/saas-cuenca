@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import { Volume2, VolumeX, Printer, MessageSquare, Clock, Eye, X, Plus, Download, Lock, Tv, Unlock } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { Order, OrderStatus } from '@/lib/types/database';
@@ -12,8 +12,9 @@ import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 
 import { createClient } from '@/lib/supabase/client';
 
-export default function AdminDashboardPage() {
-  const { business, loading: loadingBusiness } = useAdminBusiness();
+export default function AdminDashboardPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  const { business, loading: loadingBusiness } = useAdminBusiness(slug);
 
   const { orders, soundEnabled, setSoundEnabled, addOrderLocal, updateOrderStatusLocal, updatePaymentStatusLocal } =
     useRealtimeOrders(business?.id || '');

@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import { ShoppingCart, CreditCard, Volume2, Printer, Download, Globe, Sparkles, CheckCircle2, ShieldCheck, RefreshCw, MessageSquare } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { toast } from '@/lib/utils/toast';
 
-export default function AdminMarketplacePage() {
-  const { business, loading } = useAdminBusiness();
+export default function AdminMarketplacePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  const { business, loading } = useAdminBusiness(slug);
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {

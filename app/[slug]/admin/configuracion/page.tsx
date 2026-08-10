@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import { Settings, Save, Building2, CreditCard, Clock, ShieldCheck, RefreshCw, QrCode, Banknote, Landmark, Smartphone, Plus, Trash2, Eye, EyeOff } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
@@ -57,8 +57,9 @@ const ECUADOR_BANKS = [
   'Otro / Institución Financiera',
 ];
 
-export default function AdminSettingsPage() {
-  const { business, loading } = useAdminBusiness();
+export default function AdminSettingsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  const { business, loading } = useAdminBusiness(slug);
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Check, X, Package, Tag, RefreshCw, FolderPlus, Save, UploadCloud, Link as LinkIcon, Loader2, Flame, AlertTriangle, Lock } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { Product, Category } from '@/lib/types/database';
@@ -13,8 +13,9 @@ import { CustomCheckbox } from '@/components/ui/CustomCheckbox';
 import { compressImage } from '@/lib/utils/imageCompressor';
 import { getProductPriceInfo } from '@/lib/utils/promo';
 
-export default function AdminProductsPage() {
-  const { business, loading: loadingBusiness } = useAdminBusiness();
+export default function AdminProductsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  const { business, loading: loadingBusiness } = useAdminBusiness(slug);
   const planLimits = usePlanLimits(business);
   const [authorized, setAuthorized] = useState(false);
 

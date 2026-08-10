@@ -17,7 +17,13 @@ export default function AdminLoginPage() {
   useEffect(() => {
     const raw = localStorage.getItem('yapi_admin_session');
     if (raw) {
-      router.replace('/admin/dashboard');
+      const raw = localStorage.getItem('yapi_admin_session');
+      if (raw) {
+        const s = JSON.parse(raw);
+        router.replace(`/${s?.business?.slug || ''}/admin/dashboard`);
+      } else {
+        router.replace('/admin/login');
+      }
     }
   }, []);
 
@@ -44,7 +50,7 @@ export default function AdminLoginPage() {
       // Guardar sesión y redirigir
       saveSession(data.session);
       sessionStorage.removeItem('is_super_admin_impersonating');
-      router.push('/admin/dashboard');
+      router.push(`/${data.session.business.slug}/admin/dashboard`);
     } catch (err) {
       setError('Error de conexión. Intenta nuevamente.');
       setLoading(false);
@@ -70,7 +76,7 @@ export default function AdminLoginPage() {
         return;
       }
       saveSession(data.session);
-      router.push('/admin/dashboard');
+      router.push(`/${data.session.business.slug}/admin/dashboard`);
     } catch {
       setError('Error de conexión.');
       setLoading(false);

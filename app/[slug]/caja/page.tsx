@@ -599,7 +599,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
         <div className="flex items-center gap-3">
           {simulatedRole === 'dueño' && (
             <Link
-              href="/admin/dashboard"
+              href={`/${slug}/admin/dashboard`}
               className="p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
               title="Volver al panel"
             >
@@ -1339,7 +1339,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             } else if (val.startsWith('cajero')) {
               window.location.href = `/${slug}/caja`;
             } else {
-              window.location.href = '/admin/dashboard';
+              window.location.href = `/${slug}/admin/dashboard`;
             }
           }
         }}

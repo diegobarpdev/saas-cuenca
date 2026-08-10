@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import { Palette, Save, UploadCloud, CheckCircle2, RefreshCw, Sparkles, Image as ImageIcon, Type, Layout, Eye } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
@@ -108,8 +108,9 @@ const PRESET_THEMES = [
   },
 ];
 
-export default function AdminBrandingPage() {
-  const { business, loading } = useAdminBusiness();
+export default function AdminBrandingPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  const { business, loading } = useAdminBusiness(slug);
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
