@@ -55,13 +55,12 @@ export default function AdminLayout({
   };
 
   const navItems = [
-    { label: 'Pedidos en Vivo',        href: `/${slug}/admin/dashboard`,     icon: ShoppingBag, roles: ['dueño', 'cajero-1', 'cajero-2'] },
-    { label: 'Caja POS',               href: `/${slug}/caja`,                icon: Store,       roles: ['dueño', 'cajero-1', 'cajero-2'] },
-    { label: 'Monitor Cocina KDS',     href: `/${slug}/cocina`,              icon: Tv,          roles: ['dueño', 'cocinero'] },
-    { label: 'Productos y Categorías', href: `/${slug}/admin/productos`,      icon: Package,     roles: ['dueño'] },
-    { label: 'Apariencia & Branding',  href: `/${slug}/admin/apariencia`,    icon: Palette,     roles: ['dueño'] },
-    { label: 'Marketplace Add-ons',    href: `/${slug}/admin/marketplace`,   icon: ShoppingCart,roles: ['dueño'] },
-    { label: 'Configuración Negocio',  href: `/${slug}/admin/configuracion`, icon: Settings,    roles: ['dueño'] },
+    { label: 'Caja POS (Toma & Pedidos)', href: `/${slug}/caja`,                icon: Store,       roles: ['dueño', 'cajero-1', 'cajero-2'] },
+    { label: 'Monitor Cocina KDS',        href: `/${slug}/cocina`,              icon: Tv,          roles: ['dueño', 'cocinero'] },
+    { label: 'Productos y Categorías',    href: `/${slug}/admin/productos`,      icon: Package,     roles: ['dueño'] },
+    { label: 'Apariencia & Branding',     href: `/${slug}/admin/apariencia`,    icon: Palette,     roles: ['dueño'] },
+    { label: 'Marketplace Add-ons',       href: `/${slug}/admin/marketplace`,   icon: ShoppingCart,roles: ['dueño'] },
+    { label: 'Configuración Negocio',     href: `/${slug}/admin/configuracion`, icon: Settings,    roles: ['dueño'] },
   ].filter((item) => item.roles.includes(simulatedRole));
 
   return (
