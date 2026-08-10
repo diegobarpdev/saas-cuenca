@@ -1182,7 +1182,8 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           </div>
         </form>
       </div>
-      )}
+    </div>
+    )}
 
     </div>
 
