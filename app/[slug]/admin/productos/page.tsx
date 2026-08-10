@@ -407,7 +407,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
     if (draggedCategoryIndex === null || draggedCategoryIndex === dropIndex) return;
 
@@ -418,17 +418,24 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
     const updated = newCategories.map((cat, idx) => ({ ...cat, orden: idx + 1 }));
     setCategories(updated);
     setDraggedCategoryIndex(null);
+  };
 
+  const handleSaveCategoriesOrder = async () => {
+    setIsSavingCat(true);
     try {
       const supabase = createClient();
       await Promise.all(
-        updated.map((cat) =>
-          supabase.from('categories').update({ orden: cat.orden }).eq('id', cat.id)
+        categories.map((cat, idx) =>
+          supabase.from('categories').update({ orden: idx + 1 }).eq('id', cat.id)
         )
       );
-      toast.success('Nuevo orden guardado.');
-    } catch (err) {
-      console.error('Error al guardar nuevo orden:', err);
+      toast.success('Orden de categorías guardado exitosamente.');
+      setIsCategoryModalOpen(false);
+    } catch (err: any) {
+      console.error('Error guardando orden:', err);
+      toast.error('Error al guardar el nuevo orden de categorías.');
+    } finally {
+      setIsSavingCat(false);
     }
   };
 
@@ -846,12 +853,22 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
               )}
             </div>
 
-            <div className="pt-2 border-t border-zinc-800">
+            <div className="pt-3 border-t border-zinc-800 flex gap-2">
               <button
+                type="button"
                 onClick={() => setIsCategoryModalOpen(false)}
-                className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors"
+                className="w-1/3 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-semibold text-xs transition-colors"
               >
-                Cerrar
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveCategoriesOrder}
+                disabled={isSavingCat}
+                className="w-2/3 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isSavingCat ? 'Guardando...' : 'Guardar Orden de Categorías'}</span>
               </button>
             </div>
           </div>
