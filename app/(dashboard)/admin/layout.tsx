@@ -31,14 +31,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setIsSidebarOpen(false);
   }, [pathname]);
 
+  const slug = business?.slug || '';
+
   const handleSwitchRole = (newRole: 'dueño' | 'cajero-1' | 'cajero-2' | 'cocinero') => {
     setSimulatedRole(newRole);
     if (typeof window !== 'undefined') {
       localStorage.setItem('yapi_simulated_role', newRole);
       if (newRole === 'cocinero') {
-        window.location.href = '/cocina';
+        window.location.href = `/${slug}/cocina`;
       } else if (newRole.startsWith('cajero')) {
-        window.location.href = '/caja';
+        window.location.href = `/${slug}/caja`;
       } else {
         window.location.href = '/admin/dashboard';
       }
@@ -47,8 +49,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { label: 'Pedidos en Vivo', href: '/admin/dashboard', icon: ShoppingBag, roles: ['dueño', 'cajero-1', 'cajero-2'] },
-    { label: 'Caja POS (Toma Pedidos)', href: '/caja', icon: Store, roles: ['dueño', 'cajero-1', 'cajero-2'] },
-    { label: 'Monitor Cocina KDS', href: '/cocina', icon: Tv, roles: ['dueño', 'cocinero'] },
+    { label: 'Caja POS (Toma Pedidos)', href: `/${slug}/caja`, icon: Store, roles: ['dueño', 'cajero-1', 'cajero-2'] },
+    { label: 'Monitor Cocina KDS', href: `/${slug}/cocina`, icon: Tv, roles: ['dueño', 'cocinero'] },
     { label: 'Productos y Categorías', href: '/admin/productos', icon: Package, roles: ['dueño'] },
     { label: 'Apariencia & Branding', href: '/admin/apariencia', icon: Palette, roles: ['dueño'] },
     { label: 'Marketplace Add-ons', href: '/admin/marketplace', icon: ShoppingCart, roles: ['dueño'] },

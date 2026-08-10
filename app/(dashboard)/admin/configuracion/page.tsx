@@ -66,7 +66,8 @@ export default function AdminSettingsPage() {
       const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
       if (role !== 'dueño') {
         toast.error('Acceso denegado: solo el Administrador (Dueño) puede gestionar la configuración.');
-        window.location.href = '/caja';
+        const _s = JSON.parse(localStorage.getItem('yapi_admin_session') || '{}');
+        window.location.href = `/${_s?.business?.slug || ''}/caja`;
       } else {
         setAuthorized(true);
       }
