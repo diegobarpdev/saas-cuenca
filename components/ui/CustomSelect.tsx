@@ -16,6 +16,7 @@ interface CustomSelectProps {
   placeholder?: string;
   className?: string;
   accentColor?: 'emerald' | 'purple' | 'amber' | 'sky';
+  size?: 'normal' | 'compact';
 }
 
 export function CustomSelect({
@@ -25,6 +26,7 @@ export function CustomSelect({
   placeholder = 'Selecciona una opción',
   className = '',
   accentColor = 'amber',
+  size = 'compact',
 }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -79,7 +81,9 @@ export function CustomSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full px-4 py-3 rounded-2xl bg-slate-950/90 text-left text-xs md:text-sm text-white flex items-center justify-between gap-2 border transition-all duration-200 shadow-md ${
+        className={`w-full ${
+          size === 'compact' ? 'px-3 py-2 rounded-lg text-xs' : 'px-4 py-3 rounded-2xl text-xs md:text-sm'
+        } bg-slate-950/90 text-left text-white flex items-center justify-between gap-2 border transition-all duration-200 shadow-md ${
           borderGlowMap[accentColor]
         } ${isOpen ? 'border-amber-500 ring-2 ring-amber-500/20' : ''}`}
       >
@@ -87,7 +91,7 @@ export function CustomSelect({
           {selectedOption ? selectedOption.label : <span className="text-slate-500">{placeholder}</span>}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-slate-400 transition-transform duration-300 flex-shrink-0 ${
+          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-300 flex-shrink-0 ${
             isOpen ? 'rotate-180 text-amber-400' : ''
           }`}
         />
