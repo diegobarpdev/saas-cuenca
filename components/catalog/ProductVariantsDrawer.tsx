@@ -249,7 +249,7 @@ export function ProductVariantsDrawer({
                         <ChevronRight className="w-4 h-4 text-rose-400 shrink-0" />
                       )}
                       {group.requerido && selected.length > 0 && (
-                        <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <Check className="w-4 h-4 text-brand-400 shrink-0" />
                       )}
                     </div>
 

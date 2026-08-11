@@ -177,7 +177,7 @@ export default function SuperAdminDashboardPage() {
     return plan?.toUpperCase() || '—';
   };
   const getPlanColor = (plan: string) => {
-    if (plan === 'basico') return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+    if (plan === 'basico') return 'bg-brand-500/15 text-brand-300 border-brand-500/30';
     if (plan === 'trial') return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
     return 'bg-zinc-800 text-zinc-400 border-zinc-700';
   };
@@ -212,9 +212,9 @@ export default function SuperAdminDashboardPage() {
           <p className="text-2xl font-mono font-bold text-zinc-100">{businesses.length}</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-zinc-900/40 border border-emerald-900/40 space-y-1">
+        <div className="p-4 rounded-xl bg-zinc-900/40 border border-brand-900/40 space-y-1">
           <span className="text-xs text-zinc-400 font-medium">Plan Base Core (activos)</span>
-          <p className="text-2xl font-mono font-bold text-emerald-400">
+          <p className="text-2xl font-mono font-bold text-brand-400">
             {businesses.filter((b) => b.plan === 'basico').length}
           </p>
         </div>
@@ -279,7 +279,7 @@ export default function SuperAdminDashboardPage() {
               <div className="flex flex-wrap items-center gap-2 self-end md:self-auto pt-2 md:pt-0 border-t md:border-t-0 border-zinc-800">
                 <button
                   onClick={() => handleEnterAsAdmin(b.id)}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
+                  className="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
                   title="Entrar al panel de control de esta empresa"
                 >
                   <LogIn className="w-3.5 h-3.5" />
@@ -382,7 +382,7 @@ export default function SuperAdminDashboardPage() {
                     options={planOptions}
                     value={editPlan}
                     onChange={(val) => setEditPlan(val as any)}
-                    accentColor="emerald"
+                    accentColor="brand"
                   />
                   <p className="text-[10px] text-zinc-500 mt-1">
                     {editPlan === 'basico' ? 'Pago mensual activo — $15/mes base.' : 'En período de prueba gratuita.'}
@@ -414,52 +414,52 @@ export default function SuperAdminDashboardPage() {
 
               {/* Módulos Add-ons Habilitados */}
               <div className="pt-2 border-t border-zinc-800 space-y-2">
-                <label className="block text-xs font-semibold text-emerald-400">Módulos & Add-ons Habilitados</label>
+                <label className="block text-xs font-semibold text-brand-400">Módulos & Add-ons Habilitados</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-zinc-300">
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
                     <input
                       type="checkbox"
                       checked={editHasPayphone}
                       onChange={(e) => setEditHasPayphone(e.target.checked)}
-                      className="rounded accent-emerald-500"
+                      className="rounded accent-brand-500"
                     />
-                    <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-emerald-400" /> PayPhone Tarjetas (+$9/m)</span>
+                    <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-brand-400" /> PayPhone Tarjetas (+$9/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
                     <input
                       type="checkbox"
                       checked={editHasLiveKitchen}
                       onChange={(e) => setEditHasLiveKitchen(e.target.checked)}
-                      className="rounded accent-emerald-500"
+                      className="rounded accent-brand-500"
                     />
-                    <span className="flex items-center gap-1.5"><Bell className="w-3.5 h-3.5 text-emerald-400" /> Monitor Cocina KDS (+$7/m)</span>
+                    <span className="flex items-center gap-1.5"><Bell className="w-3.5 h-3.5 text-brand-400" /> Monitor Cocina KDS (+$7/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
                     <input
                       type="checkbox"
                       checked={editHasPosPrinting}
                       onChange={(e) => setEditHasPosPrinting(e.target.checked)}
-                      className="rounded accent-emerald-500"
+                      className="rounded accent-brand-500"
                     />
-                    <span className="flex items-center gap-1.5"><Printer className="w-3.5 h-3.5 text-emerald-400" /> Impresión POS (+$7/m)</span>
+                    <span className="flex items-center gap-1.5"><Printer className="w-3.5 h-3.5 text-brand-400" /> Impresión POS (+$7/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700">
                     <input
                       type="checkbox"
                       checked={editHasCrmExport}
                       onChange={(e) => setEditHasCrmExport(e.target.checked)}
-                      className="rounded accent-emerald-500"
+                      className="rounded accent-brand-500"
                     />
-                    <span className="flex items-center gap-1.5"><Database className="w-3.5 h-3.5 text-emerald-400" /> Reportes & CRM (+$5/m)</span>
+                    <span className="flex items-center gap-1.5"><Database className="w-3.5 h-3.5 text-brand-400" /> Reportes & CRM (+$5/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-zinc-700 sm:col-span-2">
                     <input
                       type="checkbox"
                       checked={editHasCustomDomain}
                       onChange={(e) => setEditHasCustomDomain(e.target.checked)}
-                      className="rounded accent-emerald-500"
+                      className="rounded accent-brand-500"
                     />
-                    <span className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-emerald-400" /> Dominio Personalizado (+$9/m)</span>
+                    <span className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-brand-400" /> Dominio Personalizado (+$9/m)</span>
                   </label>
                 </div>
               </div>

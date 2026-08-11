@@ -7,7 +7,7 @@ export function SkeletonCatalog() {
     <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col font-sans w-full animate-pulse relative overflow-hidden">
       {/* Luces Ambientales de Fondo */}
       <div className="pointer-events-none absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-[120px]"></div>
-      <div className="pointer-events-none absolute top-1/3 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[140px]"></div>
+      <div className="pointer-events-none absolute top-1/3 right-0 w-[500px] h-[500px] bg-brand-500/5 rounded-full blur-[140px]"></div>
 
       {/* Contenido Principal Skeleton */}
       <main className="max-w-7xl mx-auto px-3 sm:px-8 py-4 sm:py-8 flex-1 w-full space-y-6 sm:space-y-8 relative z-10">

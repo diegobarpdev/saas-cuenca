@@ -39,8 +39,8 @@ export function HeaderCatalog({ business, cartCount, onOpenCart }: HeaderCatalog
                 <h1 className="font-display font-black text-base md:text-lg text-white tracking-tight leading-none">
                   {business.nombre}
                 </h1>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-mono font-bold border border-emerald-500/20">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 text-[10px] font-mono font-bold border border-brand-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse"></span>
                   Abierto
                 </span>
               </div>

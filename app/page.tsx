@@ -97,7 +97,7 @@ export default function LandingPage() {
               className="w-8 h-8 rounded-lg object-contain"
             />
             <span className="font-display font-black text-white text-lg tracking-tight">
-              Kaltiro<span className="text-emerald-400">.com</span>
+              Kaltiro<span className="text-brand-400">.com</span>
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -109,7 +109,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/admin/login"
-              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-bold text-sm transition-all active:scale-95 cursor-pointer"
+              className="px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-bold text-sm transition-all active:scale-95 cursor-pointer"
             >
               Iniciar sesión
             </Link>
@@ -124,16 +124,16 @@ export default function LandingPage() {
           {/* Copy */}
           <div className="space-y-7 order-1">
             {/* Price badge — hero level */}
-            <div className="inline-flex items-center gap-2.5 border border-emerald-500/40 rounded-full px-4 py-2 bg-emerald-500/5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <span className="text-emerald-400 text-sm font-mono-tech font-bold tracking-tight">
+            <div className="inline-flex items-center gap-2.5 border border-brand-500/40 rounded-full px-4 py-2 bg-brand-500/5">
+              <span className="w-2 h-2 rounded-full bg-brand-400 animate-pulse shrink-0" />
+              <span className="text-brand-400 text-sm font-mono-tech font-bold tracking-tight">
                 $20/mes · 0% de comisión por venta
               </span>
             </div>
 
             <h1 className="text-[clamp(2.5rem,6vw,4.5rem)] font-display font-black text-white leading-[1.04] tracking-tight">
               Tu restaurante recibe pedidos directos.{' '}
-              <span className="text-emerald-400">Tú te quedas con el 100%.</span>
+              <span className="text-brand-400">Tú te quedas con el 100%.</span>
             </h1>
 
             <p className="text-lg text-slate-400 leading-relaxed max-w-lg">
@@ -143,7 +143,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <Link
                 href="/restaurante-demo"
-                className="px-7 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-emerald-500/20"
+                className="px-7 py-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-brand-500/20"
               >
                 Ver demo en vivo
                 <ArrowRight className="w-4 h-4" />
@@ -159,15 +159,15 @@ export default function LandingPage() {
             {/* Trust anchors — no fake metrics */}
             <div className="flex items-center gap-5 pt-2 text-sm text-slate-500">
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-brand-500 shrink-0" />
                 Sin tarjeta al inicio
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-brand-500 shrink-0" />
                 Listo en minutos
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-brand-500 shrink-0" />
                 Ecuador 🇪🇨
               </span>
             </div>
@@ -218,11 +218,11 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              <div className="p-6 rounded-2xl border border-emerald-500/30 bg-emerald-950/20">
-                <p className="text-emerald-400 font-mono-tech text-[11px] uppercase tracking-widest mb-4">
+              <div className="p-6 rounded-2xl border border-brand-500/30 bg-brand-950/20">
+                <p className="text-brand-400 font-mono-tech text-[11px] uppercase tracking-widest mb-4">
                   Kaltiro
                 </p>
-                <p className="text-4xl font-display font-black text-emerald-400 mb-1 leading-none">
+                <p className="text-4xl font-display font-black text-brand-400 mb-1 leading-none">
                   $20
                   <br />
                   fijos
@@ -259,24 +259,24 @@ export default function LandingPage() {
                 key={i}
                 className={`p-6 rounded-2xl border transition-colors ${
                   step.highlight
-                    ? 'border-emerald-500/40 bg-emerald-950/25'
+                    ? 'border-brand-500/40 bg-brand-950/25'
                     : 'border-white/[0.07] bg-[#0D1117]'
                 }`}
               >
                 <div className="flex items-start gap-4">
                   <div
                     className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${
-                      step.highlight ? 'bg-emerald-500/20' : 'bg-white/[0.06]'
+                      step.highlight ? 'bg-brand-500/20' : 'bg-white/[0.06]'
                     }`}
                   >
                     <Icon
-                      className={`w-4.5 h-4.5 ${step.highlight ? 'text-emerald-400' : 'text-slate-400'}`}
+                      className={`w-4.5 h-4.5 ${step.highlight ? 'text-brand-400' : 'text-slate-400'}`}
                       size={18}
                     />
                   </div>
                   <span
                     className={`font-mono-tech text-xs font-bold pt-2 ${
-                      step.highlight ? 'text-emerald-500' : 'text-slate-600'
+                      step.highlight ? 'text-brand-500' : 'text-slate-600'
                     }`}
                   >
                     {String(i + 1).padStart(2, '0')}
@@ -284,7 +284,7 @@ export default function LandingPage() {
                 </div>
                 <h3
                   className={`font-display font-bold text-base mt-4 mb-2 leading-snug ${
-                    step.highlight ? 'text-emerald-400' : 'text-white'
+                    step.highlight ? 'text-brand-400' : 'text-white'
                   }`}
                 >
                   {step.title}
@@ -335,7 +335,7 @@ export default function LandingPage() {
                   'Historial completo de pedidos y ventas',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-brand-500 shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -356,7 +356,7 @@ export default function LandingPage() {
             </p>
             <h2 className="text-4xl sm:text-5xl font-display font-black text-white leading-tight mb-5">
               Un plan.<br />Un precio.<br />
-              <span className="text-emerald-400">Sin sorpresas.</span>
+              <span className="text-brand-400">Sin sorpresas.</span>
             </h2>
             <p className="text-slate-400 text-base leading-relaxed max-w-md">
               Empezás con el Plan Base que cubre todo lo que necesita un restaurante o cafetería para operar digitalmente. Si querés agregar pantalla de cocina, cobros con tarjeta o impresión de comandas, los sumás por separado.
@@ -376,7 +376,7 @@ export default function LandingPage() {
                   </div>
                   <p className="text-slate-500 text-sm mt-1">Sin comisión. Sin contrato.</p>
                 </div>
-                <div className="px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-mono-tech font-bold">
+                <div className="px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-[11px] font-mono-tech font-bold">
                   0% comisión
                 </div>
               </div>
@@ -391,7 +391,7 @@ export default function LandingPage() {
                   '0% de comisión por cada venta',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-slate-300">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-brand-500 shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -399,7 +399,7 @@ export default function LandingPage() {
 
               <Link
                 href="/admin/login"
-                className="w-full py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-emerald-500/20 block text-center"
+                className="w-full py-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-brand-500/20 block text-center"
               >
                 Comenzar con Plan Base
               </Link>
@@ -475,9 +475,13 @@ export default function LandingPage() {
       <footer className="border-t border-white/[0.06]">
         <div className="max-w-6xl mx-auto px-5 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-600">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-emerald-500/20 flex items-center justify-center font-display font-black text-emerald-400 text-xs">
-              Y
-            </div>
+            <Image
+              src="/assets/isotipo.png"
+              alt="Kaltiro"
+              width={24}
+              height={24}
+              className="w-6 h-6 rounded-md object-contain"
+            />
             <span>Kaltiro.com — Cuenca y Ecuador</span>
           </div>
           <p>© 2026 Kaltiro.com · Todos los derechos reservados</p>

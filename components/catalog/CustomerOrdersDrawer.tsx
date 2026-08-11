@@ -38,7 +38,7 @@ export function CustomerOrdersDrawer({
     pendiente: { label: 'Esperando Confirmación', bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/30' },
     aceptado: { label: 'Aceptado por el Local', bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30' },
     en_preparacion: { label: 'En Cocina / Preparación', bg: 'bg-indigo-500/10', text: 'text-indigo-400', border: 'border-indigo-500/30' },
-    listo: { label: '¡Listo para Entrega!', bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/30' },
+    listo: { label: '¡Listo para Entrega!', bg: 'bg-brand-500/10', text: 'text-brand-400', border: 'border-brand-500/30' },
     entregado: { label: 'Entregado / Completado', bg: 'bg-slate-800', text: 'text-slate-400', border: 'border-slate-700' },
     cancelado: { label: 'Cancelado', bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/30' },
   };

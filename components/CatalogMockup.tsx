@@ -153,7 +153,7 @@ export default function CatalogMockup() {
   return (
     <div className="relative w-full max-w-[360px] lg:max-w-[420px]">
       {/* Glow detrás — separa el teléfono del fondo negro del hero */}
-      <div className="absolute -inset-8 bg-emerald-500/20 blur-[80px] rounded-full -z-10" />
+      <div className="absolute -inset-8 bg-brand-500/20 blur-[80px] rounded-full -z-10" />
 
       {/* Phone bezel */}
       <div className="relative rounded-[2.75rem] bg-[#1a1d24] border-[6px] border-[#2a2e37] shadow-2xl shadow-black/60 ring-1 ring-white/10 overflow-hidden select-none">
@@ -181,8 +181,8 @@ export default function CatalogMockup() {
                 Cuenca, EC
               </p>
             </div>
-            <div className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
-              <Leaf className="w-4 h-4 text-emerald-400" />
+            <div className="w-8 h-8 rounded-full bg-brand-500/10 border border-brand-500/30 flex items-center justify-center shrink-0">
+              <Leaf className="w-4 h-4 text-brand-400" />
             </div>
           </div>
 
@@ -195,7 +195,7 @@ export default function CatalogMockup() {
                 onClick={() => setActiveCategory(cat)}
                 className={`text-[11px] font-mono-tech font-bold px-3 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
                   cat === activeCategory
-                    ? 'bg-emerald-500 text-slate-950'
+                    ? 'bg-brand-500 text-slate-950'
                     : 'bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]'
                 }`}
               >
@@ -223,7 +223,7 @@ export default function CatalogMockup() {
                   <div className="px-2.5 py-2 flex items-center justify-between gap-1">
                     <div className="min-w-0">
                       <p className="text-white text-[11px] font-bold truncate leading-tight">{item.name}</p>
-                      <p className="text-emerald-400 text-[11px] font-mono-tech font-bold">
+                      <p className="text-brand-400 text-[11px] font-mono-tech font-bold">
                         ${item.price.toFixed(2)}
                       </p>
                     </div>
@@ -232,7 +232,7 @@ export default function CatalogMockup() {
                         type="button"
                         onClick={() => addItem(item.id)}
                         aria-label={`Agregar ${item.name}`}
-                        className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 cursor-pointer active:scale-90 transition-transform"
+                        className="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center shrink-0 cursor-pointer active:scale-90 transition-transform"
                       >
                         <Plus className="w-3 h-3 text-slate-950" strokeWidth={3} />
                       </button>
@@ -251,7 +251,7 @@ export default function CatalogMockup() {
                           type="button"
                           onClick={() => addItem(item.id)}
                           aria-label={`Agregar ${item.name}`}
-                          className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
+                          className="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
                         >
                           <Plus className="w-3 h-3 text-slate-950" strokeWidth={3} />
                         </button>
@@ -268,7 +268,7 @@ export default function CatalogMockup() {
             <button
               type="button"
               onClick={() => setCartOpen(true)}
-              className="mx-5 mb-5 mt-auto rounded-2xl bg-emerald-500 px-4 py-3 flex items-center justify-between shrink-0 cursor-pointer active:scale-[0.98] transition-transform"
+              className="mx-5 mb-5 mt-auto rounded-2xl bg-brand-500 px-4 py-3 flex items-center justify-between shrink-0 cursor-pointer active:scale-[0.98] transition-transform"
             >
               <span className="text-slate-950 text-[11px] font-bold">
                 {totalQty} producto{totalQty > 1 ? 's' : ''} · ${totalPrice.toFixed(2)}
@@ -310,7 +310,7 @@ export default function CatalogMockup() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-white text-xs font-bold truncate">{item.name}</p>
-                      <p className="text-emerald-400 text-[11px] font-mono-tech">${item.price.toFixed(2)}</p>
+                      <p className="text-brand-400 text-[11px] font-mono-tech">${item.price.toFixed(2)}</p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <button
@@ -326,7 +326,7 @@ export default function CatalogMockup() {
                         type="button"
                         onClick={() => addItem(item.id)}
                         aria-label={`Agregar ${item.name}`}
-                        className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center cursor-pointer"
+                        className="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center cursor-pointer"
                       >
                         <Plus className="w-3 h-3 text-slate-950" strokeWidth={3} />
                       </button>
@@ -335,7 +335,7 @@ export default function CatalogMockup() {
                 ))}
               </div>
               <div className="p-5 shrink-0">
-                <div className="rounded-2xl bg-emerald-500 px-4 py-3 flex items-center justify-between">
+                <div className="rounded-2xl bg-brand-500 px-4 py-3 flex items-center justify-between">
                   <span className="text-slate-950 text-[11px] font-bold">Total · ${totalPrice.toFixed(2)}</span>
                   <span className="text-slate-950 text-[11px] font-black">Enviar por WhatsApp</span>
                 </div>

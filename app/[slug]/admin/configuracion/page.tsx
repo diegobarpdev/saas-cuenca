@@ -285,7 +285,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
   if (loading || !business || !authorized) {
     return (
       <div className="p-12 text-center text-slate-400 font-display text-sm flex items-center justify-center gap-2">
-        <RefreshCw className="w-5 h-5 animate-spin text-emerald-400" />
+        <RefreshCw className="w-5 h-5 animate-spin text-brand-400" />
         <span>Cargando datos de configuración desde Supabase...</span>
       </div>
     );
@@ -296,7 +296,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
       {/* Header Fijo Inmóvil */}
       <div className="bg-[#0D1322] p-5 rounded-3xl border border-white/10 glass-panel shadow-xl">
         <h1 className="text-xl font-display font-extrabold text-white tracking-tight flex items-center gap-2.5">
-          <Settings className="w-6 h-6 text-emerald-400" />
+          <Settings className="w-6 h-6 text-brand-400" />
           <span>Configuración de Empresa — {business.nombre}</span>
         </h1>
         <p className="text-xs text-slate-400 mt-0.5">
@@ -309,8 +309,8 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
       <form onSubmit={handleSaveSettings} className="space-y-6">
         {/* 1. Perfil Comercial del Negocio */}
         <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl">
-          <h2 className="font-display font-black text-sm text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-emerald-400" />
+          <h2 className="font-display font-black text-sm text-brand-400 uppercase tracking-wider flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-brand-400" />
             <span>1. Datos Comerciales del Negocio</span>
           </h2>
 
@@ -322,7 +322,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
                 required
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:border-emerald-500"
+                className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:border-brand-500"
               />
             </div>
 
@@ -391,7 +391,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
                 options={prepTimeOptions}
                 value={tiempoPreparacion}
                 onChange={(val) => setTiempoPreparacion(val)}
-                accentColor="emerald"
+                accentColor="brand"
               />
               <p className="text-[11px] text-slate-400 mt-1">
                 Este tiempo aparecerá visible para tus clientes en la cabecera de la carta.
@@ -409,7 +409,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
                   onChange={setPermiteDomicilio}
                   label="Entrega a Domicilio"
                   description="Permite que tus clientes pidan despacho directo a su dirección"
-                  accentColor="emerald"
+                  accentColor="brand"
                 />
               </div>
 
@@ -419,7 +419,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
                   onChange={setPermiteRetiro}
                   label="Retiro en Local / Takeaway"
                   description="Permite a los clientes hacer el pedido y retirarlo personalmente"
-                  accentColor="emerald"
+                  accentColor="brand"
                 />
               </div>
             </div>
@@ -439,12 +439,12 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
                 onClick={() => setTipoServicioMesa('mesero')}
                 className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                   tipoServicioMesa === 'mesero'
-                    ? 'bg-emerald-500/10 border-emerald-500 text-white shadow-lg shadow-emerald-500/5'
+                    ? 'bg-brand-500/10 border-brand-500 text-white shadow-lg shadow-brand-500/5'
                     : 'bg-slate-950/80 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <p className="text-xs font-bold text-white flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${tipoServicioMesa === 'mesero' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`}></span>
+                  <span className={`w-2 h-2 rounded-full ${tipoServicioMesa === 'mesero' ? 'bg-brand-400 animate-pulse' : 'bg-slate-600'}`}></span>
                   Servicio Tradicional (Mesero a la Mesa)
                 </p>
                 <p className="text-[11px] text-slate-400 mt-1">
@@ -457,12 +457,12 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
                 onClick={() => setTipoServicioMesa('barra')}
                 className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                   tipoServicioMesa === 'barra'
-                    ? 'bg-emerald-500/10 border-emerald-500 text-white shadow-lg shadow-emerald-500/5'
+                    ? 'bg-brand-500/10 border-brand-500 text-white shadow-lg shadow-brand-500/5'
                     : 'bg-slate-950/80 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <p className="text-xs font-bold text-white flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${tipoServicioMesa === 'barra' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`}></span>
+                  <span className={`w-2 h-2 rounded-full ${tipoServicioMesa === 'barra' ? 'bg-brand-400 animate-pulse' : 'bg-slate-600'}`}></span>
                   Autoservicio / Retiro en Caja (Estilo Fast Food)
                 </p>
                 <p className="text-[11px] text-slate-400 mt-1">
@@ -738,7 +738,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
             <div className="p-5 rounded-2xl bg-slate-950/80 border border-white/10 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold">
+                  <div className="w-8 h-8 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 font-bold">
                     <Banknote className="w-4 h-4" />
                   </div>
                   <div>
@@ -751,7 +751,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
                   checked={aceptaEfectivo}
                   onChange={setAceptaEfectivo}
                   label=""
-                  accentColor="emerald"
+                  accentColor="brand"
                 />
               </div>
 
@@ -780,9 +780,9 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
           type="button"
           onClick={() => handleSaveSettings()}
           disabled={isSaving}
-          className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-display font-black text-xs md:text-sm shadow-2xl shadow-emerald-500/40 border border-emerald-400/30 flex items-center gap-2.5 active:scale-95 transition-all backdrop-blur-xl group"
+          className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-display font-black text-xs md:text-sm shadow-2xl shadow-brand-500/40 border border-brand-400/30 flex items-center gap-2.5 active:scale-95 transition-all backdrop-blur-xl group"
         >
-          <Save className="w-4 h-4 text-emerald-100 group-hover:rotate-12 transition-transform" />
+          <Save className="w-4 h-4 text-brand-100 group-hover:rotate-12 transition-transform" />
           <span>{isSaving ? 'Guardando en Supabase...' : 'Guardar Cambios de Configuración'}</span>
         </button>
       </div>

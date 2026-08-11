@@ -29,9 +29,9 @@ export function OrderBadge({ status, className }: OrderBadgeProps) {
     },
     listo: {
       label: 'Listo / En camino',
-      bg: 'bg-emerald-500/10 border-emerald-500/30',
-      text: 'text-emerald-600 dark:text-emerald-400',
-      dot: 'bg-emerald-500',
+      bg: 'bg-brand-500/10 border-brand-500/30',
+      text: 'text-brand-600 dark:text-brand-400',
+      dot: 'bg-brand-500',
     },
     entregado: {
       label: 'Entregado',
@@ -79,8 +79,8 @@ export function PaymentBadge({ status, method, className }: PaymentBadgeProps) {
     },
     pagado: {
       label: 'Pagado',
-      bg: 'bg-emerald-500/10 border-emerald-500/30',
-      text: 'text-emerald-600 dark:text-emerald-400',
+      bg: 'bg-brand-500/10 border-brand-500/30',
+      text: 'text-brand-600 dark:text-brand-400',
     },
     verificando: {
       label: 'Verificando Comprobante',

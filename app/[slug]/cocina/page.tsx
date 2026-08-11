@@ -70,7 +70,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
 
   const getTimeColor = (createdAtStr: string) => {
     const mins = getMinutesElapsed(createdAtStr);
-    if (mins < 10) return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+    if (mins < 10) return 'text-brand-400 bg-brand-500/10 border-brand-500/20';
     if (mins < 20) return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
     return 'text-rose-400 bg-rose-500/10 border-rose-500/20 border animate-pulse';
   };
@@ -92,7 +92,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
   if (loadingBusiness) {
     return (
       <div className="h-full flex items-center justify-center gap-2 text-slate-400 bg-[#070A11]">
-        <RefreshCw className="w-5 h-5 animate-spin text-emerald-400" />
+        <RefreshCw className="w-5 h-5 animate-spin text-brand-400" />
         <span className="font-display text-sm font-semibold">Cargando monitor de cocina KDS...</span>
       </div>
     );
@@ -186,11 +186,11 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
             </Link>
           )}
           <div className="flex items-center gap-2">
-            <ChefHat className="w-5 h-5 text-emerald-400" />
+            <ChefHat className="w-5 h-5 text-brand-400" />
             <h1 className="font-display font-black text-sm md:text-base tracking-tight text-white">
               Monitor de Cocina KDS
             </h1>
-            <span className="hidden sm:inline-block text-[10px] font-mono-tech font-bold text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
+            <span className="hidden sm:inline-block text-[10px] font-mono-tech font-bold text-brand-300 bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/25">
               En Vivo
             </span>
           </div>
@@ -199,7 +199,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
         <div className="flex items-center gap-2">
           {/* Indicador de pedidos pendientes */}
           <div className="px-3 py-1 rounded-xl bg-slate-900 border border-white/10 text-xs font-mono font-bold text-slate-300">
-            En Cola: <span className="text-emerald-400">{activeKitchenOrders.length}</span>
+            En Cola: <span className="text-brand-400">{activeKitchenOrders.length}</span>
           </div>
 
           {/* Control de sonido de timbre */}
@@ -207,14 +207,14 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
             onClick={() => setSoundEnabled(!soundEnabled)}
             className={`p-2.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-bold ${
               soundEnabled
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                ? 'bg-brand-500/10 border-brand-500/30 text-brand-400'
                 : 'bg-slate-900 border-white/10 text-slate-500'
             }`}
             title={soundEnabled ? 'Silenciar alarma' : 'Activar alarma'}
           >
             {soundEnabled ? (
               <>
-                <Volume2 className="w-4 h-4 text-emerald-400" />
+                <Volume2 className="w-4 h-4 text-brand-400" />
                 <span className="hidden md:inline">Alarma Activa</span>
               </>
             ) : (
@@ -257,7 +257,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
                   ? 'border-amber-500/40 bg-[#0E1528]/95 ring-2 ring-amber-500/20'
                   : order.estado === 'aceptado'
                   ? 'border-indigo-500/40 bg-[#0F102B]/95'
-                  : 'border-emerald-500/40 bg-[#0E1B15]/95'
+                  : 'border-brand-500/40 bg-[#0E1B15]/95'
               }`}
             >
               {/* Header de Tarjeta */}
@@ -365,7 +365,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
                     </button>
                     <button
                       onClick={() => handleUpdateStatus(order.id, 'listo', order.numero_pedido, order.estado)}
-                      className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-display font-black text-xs tracking-tight shadow-lg shadow-emerald-500/15"
+                      className="flex-1 py-3 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-slate-950 font-display font-black text-xs tracking-tight shadow-lg shadow-brand-500/15"
                     >
                       PEDIDO LISTO
                     </button>
@@ -383,7 +383,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
                     </button>
                     <button
                       onClick={() => handleUpdateStatus(order.id, 'entregado', order.numero_pedido, order.estado)}
-                      className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-display font-black text-xs tracking-tight shadow-lg shadow-emerald-500/15"
+                      className="flex-1 py-3 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-slate-950 font-display font-black text-xs tracking-tight shadow-lg shadow-brand-500/15"
                     >
                       ENTREGAR PEDIDO
                     </button>
@@ -397,7 +397,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
 
       {/* Alerta flotante para deshacer acción de pedido Listo */}
       {lastFinishedOrder && (
-        <div className="fixed bottom-6 right-6 bg-[#0D1322] border border-emerald-500/40 p-4 rounded-2xl shadow-2xl flex items-center gap-4 z-40 animate-slide-up">
+        <div className="fixed bottom-6 right-6 bg-[#0D1322] border border-brand-500/40 p-4 rounded-2xl shadow-2xl flex items-center gap-4 z-40 animate-slide-up">
           <div className="text-xs">
             <p className="text-white font-bold">Pedido #{String(lastFinishedOrder.num).padStart(4, '0')} marcado como Listo</p>
             <p className="text-slate-400">Se quitó de la pantalla de cocina.</p>
@@ -408,7 +408,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
               toast.info(`Pedido #${String(lastFinishedOrder.num).padStart(4, '0')} regresó a la cocina.`);
               setLastFinishedOrder(null);
             }}
-            className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-colors cursor-pointer"
+            className="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold text-xs transition-colors cursor-pointer"
           >
             Deshacer
           </button>

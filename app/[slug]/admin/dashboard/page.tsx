@@ -97,7 +97,7 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
   if (loadingBusiness || loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-3">
-        <TrendingUp className="w-8 h-8 text-emerald-400 animate-pulse" />
+        <TrendingUp className="w-8 h-8 text-brand-400 animate-pulse" />
         <p className="text-slate-400 text-xs font-medium">Cargando métricas del negocio...</p>
       </div>
     );
@@ -108,7 +108,7 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
       {/* Header General */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#0B0F1B] border border-white/10 shadow-2xl">
         <div>
-          <span className="text-[10px] font-mono-tech font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+          <span className="text-[10px] font-mono-tech font-bold text-brand-400 uppercase tracking-widest bg-brand-500/10 px-2.5 py-1 rounded-full border border-brand-500/20">
             Resumen de Negocio
           </span>
           <h1 className="text-xl font-display font-black text-white tracking-tight mt-2">
@@ -122,7 +122,7 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
         <div className="flex items-center gap-2">
           <Link
             href={`/${slug}/caja`}
-            className="px-4 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+            className="px-4 py-2.5 rounded-2xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-xs flex items-center gap-2 shadow-lg shadow-brand-500/20 transition-all active:scale-95"
           >
             <ShoppingBag className="w-4 h-4" />
             <span>Ir a Caja POS</span>
@@ -135,11 +135,11 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
         <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-3 shadow-lg relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-400">Ventas de Hoy</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="w-8 h-8 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-mono-tech font-black text-emerald-400">
+          <p className="text-2xl font-mono-tech font-black text-brand-400">
             {formatCurrency(stats.ventasHoy)}
           </p>
           <span className="text-[10px] text-slate-500">Ingresos brutos del día</span>
@@ -191,10 +191,10 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
         <div className="lg:col-span-2 bg-[#0B0F1B] border border-white/10 rounded-3xl p-6 space-y-4 shadow-xl">
           <div className="flex items-center justify-between">
             <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-400" />
+              <Clock className="w-4 h-4 text-brand-400" />
               Últimas Comandas del Día
             </h3>
-            <Link href={`/${slug}/caja`} className="text-xs font-bold text-emerald-400 hover:underline flex items-center gap-1">
+            <Link href={`/${slug}/caja`} className="text-xs font-bold text-brand-400 hover:underline flex items-center gap-1">
               Ver todas en Caja POS <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -206,7 +206,7 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
               {recentOrders.map((ord) => (
                 <div key={ord.id} className="flex items-center justify-between p-3 rounded-2xl bg-slate-950/70 border border-white/5 text-xs">
                   <div>
-                    <span className="font-mono-tech font-bold text-emerald-400">#{String(ord.numero_pedido).padStart(4, '0')}</span>
+                    <span className="font-mono-tech font-bold text-brand-400">#{String(ord.numero_pedido).padStart(4, '0')}</span>
                     <span className="text-white font-medium ml-2">{ord.cliente_nombre}</span>
                   </div>
                   <div className="flex items-center gap-3">

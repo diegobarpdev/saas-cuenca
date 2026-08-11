@@ -544,7 +544,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800">
         <div>
           <h1 className="text-lg sm:text-xl font-bold text-zinc-100 tracking-tight flex items-center gap-2">
-            <Package className="w-5 h-5 text-emerald-400 shrink-0" />
+            <Package className="w-5 h-5 text-brand-400 shrink-0" />
             <span className="truncate">Productos — {business?.nombre}</span>
           </h1>
           <p className="text-xs text-zinc-400 mt-0.5">
@@ -557,14 +557,14 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
             onClick={() => setIsCategoryModalOpen(true)}
             className="px-3 py-2.5 sm:px-3.5 sm:py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-800 flex items-center justify-center gap-1.5 transition-all active:scale-95"
           >
-            <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <Tag className="w-3.5 h-3.5 text-brand-400 shrink-0" />
             <span className="truncate">Categorías ({categories.length})</span>
           </button>
 
           {planLimits.puedeAgregarProducto(products.length) ? (
             <button
               onClick={handleOpenCreateProduct}
-              className="px-3 py-2.5 sm:px-3.5 sm:py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+              className="px-3 py-2.5 sm:px-3.5 sm:py-1.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-brand-500/20 transition-all active:scale-95"
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span>Añadir Producto</span>
@@ -603,7 +603,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
           onClick={() => setSelectedCategoryFilter('todas')}
           className={`px-3.5 py-2 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all active:scale-95 shrink-0 ${
             selectedCategoryFilter === 'todas'
-              ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+              ? 'bg-brand-500 text-slate-950 shadow-md shadow-brand-500/20'
               : 'bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 border border-zinc-800'
           }`}
         >
@@ -619,7 +619,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
               onClick={() => setSelectedCategoryFilter(cat.id)}
               className={`px-3.5 py-2 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all active:scale-95 shrink-0 ${
                 isActive
-                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                  ? 'bg-brand-500 text-slate-950 shadow-md shadow-brand-500/20'
                   : 'bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 border border-zinc-800'
               }`}
             >
@@ -633,7 +633,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
             onClick={() => setSelectedCategoryFilter('sin_categoria')}
             className={`px-3.5 py-2 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all active:scale-95 shrink-0 ${
               selectedCategoryFilter === 'sin_categoria'
-                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                ? 'bg-brand-500 text-slate-950 shadow-md shadow-brand-500/20'
                 : 'bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 border border-zinc-800'
             }`}
           >
@@ -678,12 +678,12 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                             <span className="text-[10px] text-zinc-500 line-through">
                               {formatCurrency(p.precio)}
                             </span>
-                            <span className="font-black text-sm text-emerald-400">
+                            <span className="font-black text-sm text-brand-400">
                               {formatCurrency(p.precio_oferta)}
                             </span>
                           </div>
                         ) : (
-                          <span className="font-black text-sm text-emerald-400">{formatCurrency(p.precio)}</span>
+                          <span className="font-black text-sm text-brand-400">{formatCurrency(p.precio)}</span>
                         )}
                       </div>
                     </div>
@@ -711,7 +711,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                     onClick={() => handleToggleDisponible(p)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all active:scale-95 ${
                       p.disponible
-                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+                        ? 'bg-brand-500/10 border-brand-500/30 text-brand-400 hover:bg-brand-500/20'
                         : 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
                     }`}
                   >
@@ -809,7 +809,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                         onDrop={(e) => handleDrop(e, idx)}
                         className={`p-2.5 rounded-xl bg-zinc-950 border transition-all flex items-center justify-between gap-3 ${
                           draggedCategoryIndex === idx
-                            ? 'border-emerald-500 bg-emerald-500/10 opacity-50'
+                            ? 'border-brand-500 bg-brand-500/10 opacity-50'
                             : 'border-zinc-800 hover:border-zinc-700'
                         }`}
                       >
@@ -823,7 +823,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                             />
                             <button
                               onClick={() => handleSaveEditCategory(cat.id)}
-                              className="p-1 rounded bg-emerald-600 text-white"
+                              className="p-1 rounded bg-brand-600 text-white"
                             >
                               <Check className="w-3.5 h-3.5" />
                             </button>
@@ -882,7 +882,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                 type="button"
                 onClick={handleSaveCategoriesOrder}
                 disabled={isSavingCat}
-                className="w-2/3 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5"
+                className="w-2/3 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-xs shadow-lg shadow-brand-500/20 transition-all flex items-center justify-center gap-1.5"
               >
                 <Save className="w-4 h-4" />
                 <span>{isSavingCat ? 'Guardando...' : 'Guardar Orden de Categorías'}</span>
@@ -931,7 +931,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                       placeholder="Ej: Humita Especial"
                       value={nombre}
                       onChange={(e) => setNombre(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500/60"
+                      className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-brand-500/60"
                     />
                   </div>
 
@@ -945,7 +945,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                         placeholder="2.50"
                         value={precio}
                         onChange={(e) => setPrecio(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono focus:outline-none focus:border-emerald-500/60"
+                        className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-mono focus:outline-none focus:border-brand-500/60"
                       />
                     </div>
                     <div>
@@ -954,7 +954,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                         options={categoryOptions}
                         value={categoryId}
                         onChange={(val) => setCategoryId(val)}
-                        accentColor="emerald"
+                        accentColor="brand"
                         size="compact"
                       />
                     </div>
@@ -967,7 +967,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                       placeholder="Detalles del producto (ingredientes, porciones...)"
                       value={descripcion}
                       onChange={(e) => setDescripcion(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500/60 resize-none"
+                      className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-brand-500/60 resize-none"
                     />
                   </div>
 
@@ -1132,7 +1132,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                         </div>
 
                         {precio && precioOferta && parseFloat(precio) > parseFloat(precioOferta) && (
-                          <p className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
+                          <p className="text-[11px] text-brand-400 font-mono flex items-center gap-1">
                             <span>
                               ¡Tu cliente ahorrará ${(parseFloat(precio) - parseFloat(precioOferta)).toFixed(2)} (
                               {Math.round(((parseFloat(precio) - parseFloat(precioOferta)) / parseFloat(precio)) * 100)}% OFF)!
@@ -1148,7 +1148,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
                         <h4 className="text-xs font-bold text-zinc-100 flex items-center gap-1.5">
-                          <Layers className="w-4 h-4 text-emerald-400" />
+                          <Layers className="w-4 h-4 text-brand-400" />
                           <span>Opciones & Variantes</span>
                         </h4>
                         <p className="text-[10px] text-zinc-400">Personaliza extras, tamaños o sabores.</p>
@@ -1167,7 +1167,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                             },
                           ]);
                         }}
-                        className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-display font-black flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95 w-full sm:w-auto"
+                        className="px-3.5 py-2 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 text-xs font-display font-black flex items-center justify-center gap-1.5 shadow-md shadow-brand-500/20 transition-all active:scale-95 w-full sm:w-auto"
                       >
                         <Plus className="w-4 h-4 shrink-0" />
                         <span>Añadir Variante</span>
@@ -1176,7 +1176,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
 
                     {loadingOptions ? (
                       <div className="flex items-center justify-center py-6 text-xs text-zinc-500">
-                        <Loader2 className="w-4 h-4 animate-spin mr-2 text-emerald-400" /> Cargando variantes...
+                        <Loader2 className="w-4 h-4 animate-spin mr-2 text-brand-400" /> Cargando variantes...
                       </div>
                     ) : productOptionGroups.length === 0 ? (
                       <div className="p-6 rounded-xl border border-dashed border-zinc-800 text-center space-y-1">
@@ -1191,7 +1191,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                             {/* Cabecera del Grupo */}
                             <div className="space-y-2">
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-[10px] font-mono-tech font-bold text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                <span className="text-[10px] font-mono-tech font-bold text-brand-400 uppercase tracking-wider bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20">
                                   Grupo #{gIdx + 1}
                                 </span>
                                 <button
@@ -1217,7 +1217,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                       prev.map((g, idx) => (idx === gIdx ? { ...g, nombre: val } : g))
                                     );
                                   }}
-                                  className="sm:col-span-2 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-bold focus:outline-none focus:border-emerald-500/60"
+                                  className="sm:col-span-2 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 font-bold focus:outline-none focus:border-brand-500/60"
                                 />
 
                                 <CustomSelect
@@ -1231,7 +1231,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                       prev.map((g, idx) => (idx === gIdx ? { ...g, tipo: val } : g))
                                     );
                                   }}
-                                  accentColor="emerald"
+                                  accentColor="brand"
                                   size="compact"
                                 />
                               </div>
@@ -1261,7 +1261,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                         })
                                       );
                                     }}
-                                    className="flex-1 min-w-0 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-emerald-500/60"
+                                    className="flex-1 min-w-0 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-brand-500/60"
                                   />
 
                                   <div className="relative w-20 sm:w-24 shrink-0">
@@ -1283,7 +1283,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                           })
                                         );
                                       }}
-                                      className="w-full pl-5 pr-2 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-emerald-400 font-mono focus:outline-none focus:border-emerald-500/60"
+                                      className="w-full pl-5 pr-2 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-brand-400 font-mono focus:outline-none focus:border-brand-500/60"
                                     />
                                   </div>
 
@@ -1318,7 +1318,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                                     })
                                   );
                                 }}
-                                className="w-full py-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-dashed border-zinc-800 text-emerald-400 font-bold text-xs flex items-center justify-center gap-1 transition-colors mt-2"
+                                className="w-full py-2 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-dashed border-zinc-800 text-brand-400 font-bold text-xs flex items-center justify-center gap-1 transition-colors mt-2"
                               >
                                 <Plus className="w-3.5 h-3.5" />
                                 <span>Añadir valor a este grupo</span>
@@ -1346,7 +1346,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
                 <button
                   type="submit"
                   disabled={isSaving || uploadingImage}
-                  className="flex-2 sm:flex-none px-5 py-3 sm:py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 active:scale-95"
+                  className="flex-2 sm:flex-none px-5 py-3 sm:py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-xs shadow-lg shadow-brand-500/20 transition-all flex items-center justify-center gap-2 active:scale-95"
                 >
                   <Save className="w-4 h-4" />
                   <span>{isSaving ? 'Guardando...' : 'Guardar Producto'}</span>

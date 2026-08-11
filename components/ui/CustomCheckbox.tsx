@@ -8,7 +8,7 @@ interface CustomCheckboxProps {
   onChange: (checked: boolean) => void;
   label?: React.ReactNode;
   description?: string;
-  accentColor?: 'emerald' | 'amber' | 'sky' | 'purple';
+  accentColor?: 'brand' | 'amber' | 'sky' | 'purple';
   disabled?: boolean;
   className?: string;
 }
@@ -18,19 +18,19 @@ export function CustomCheckbox({
   onChange,
   label,
   description,
-  accentColor = 'emerald',
+  accentColor = 'brand',
   disabled = false,
   className = '',
 }: CustomCheckboxProps) {
   const activeBgMap = {
-    emerald: 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-emerald-500/30',
+    brand: 'bg-brand-500 border-brand-400 text-slate-950 shadow-brand-500/30',
     amber: 'bg-amber-500 border-amber-400 text-slate-950 shadow-amber-500/30',
     sky: 'bg-sky-500 border-sky-400 text-slate-950 shadow-sky-500/30',
     purple: 'bg-purple-500 border-purple-400 text-white shadow-purple-500/30',
   };
 
   const hoverBorderMap = {
-    emerald: 'hover:border-emerald-500/50',
+    brand: 'hover:border-brand-500/50',
     amber: 'hover:border-amber-500/50',
     sky: 'hover:border-sky-500/50',
     purple: 'hover:border-purple-500/50',

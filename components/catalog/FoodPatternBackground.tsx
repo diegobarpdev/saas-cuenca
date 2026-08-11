@@ -66,7 +66,7 @@ export const FoodPatternBackground = React.memo(function FoodPatternBackground({
         />
         {/* Resplandores Ambientales */}
         <div className="absolute top-[15%] left-1/4 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-amber-500/5 rounded-full blur-[100px] sm:blur-[140px]" />
-        <div className="absolute top-[55%] right-10 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-emerald-500/5 rounded-full blur-[120px] sm:blur-[160px]" />
+        <div className="absolute top-[55%] right-10 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-brand-500/5 rounded-full blur-[120px] sm:blur-[160px]" />
       </div>
     </div>
   );

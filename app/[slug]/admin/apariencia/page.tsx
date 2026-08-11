@@ -436,8 +436,8 @@ export default function AdminBrandingPage({ params }: { params: Promise<{ slug: 
 
           {/* 2. Paleta de Colores */}
           <div className="p-6 rounded-3xl bg-[#0F1420] border border-white/10 space-y-4 shadow-xl">
-            <h3 className="font-display font-bold text-sm text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-              <Palette className="w-4 h-4 text-emerald-400" />
+            <h3 className="font-display font-bold text-sm text-brand-400 uppercase tracking-wider flex items-center gap-2">
+              <Palette className="w-4 h-4 text-brand-400" />
               <span>2. Paleta de Colores de Marca</span>
             </h3>
 
@@ -670,7 +670,7 @@ export default function AdminBrandingPage({ params }: { params: Promise<{ slug: 
               <Eye className="w-4 h-4 text-amber-400" />
               <span>Previsualización en Tiempo Real</span>
             </span>
-            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <span className="text-[10px] font-mono text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded-full border border-brand-500/20">
               Vista Catálogo
             </span>
           </div>

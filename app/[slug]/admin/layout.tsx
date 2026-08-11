@@ -71,14 +71,14 @@ export default function AdminLayout({
       {/* Header móvil */}
       <header className="md:hidden w-full h-16 bg-[#0B0F1B] border-b border-white/10 flex items-center justify-between px-4 shrink-0 z-30">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 flex-shrink-0">
             <Store className="w-4 h-4" />
           </div>
           <div className="min-w-0">
             <h2 className="font-display font-black text-xs text-white truncate max-w-[150px]">
               {loading ? 'Cargando...' : business?.nombre || 'Mi Empresa'}
             </h2>
-            <span className="text-[9px] text-emerald-400 font-mono font-bold block leading-none">
+            <span className="text-[9px] text-brand-400 font-mono font-bold block leading-none">
               {business?.plan?.toUpperCase() || 'TRIAL'}
             </span>
           </div>
@@ -101,14 +101,14 @@ export default function AdminLayout({
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold shadow-lg flex-shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 font-bold shadow-lg flex-shrink-0">
                 <Store className="w-5 h-5" />
               </div>
               <div className="min-w-0">
                 <h2 className="font-display font-black text-sm text-white truncate max-w-[140px]">
                   {loading ? 'Cargando...' : business?.nombre || 'Mi Empresa'}
                 </h2>
-                <span className="inline-block text-[10px] text-emerald-400 font-mono font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <span className="inline-block text-[10px] text-brand-400 font-mono font-bold bg-brand-500/10 px-2 py-0.5 rounded-full border border-brand-500/20">
                   Panel {business?.plan?.toUpperCase() || 'TRIAL'}
                 </span>
               </div>
@@ -128,7 +128,7 @@ export default function AdminLayout({
                   href={item.href}
                   className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-display font-bold transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 border border-emerald-400/30'
+                      ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-lg shadow-brand-500/20 border border-brand-400/30'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/80'
                   }`}
                 >
@@ -158,7 +158,7 @@ export default function AdminLayout({
               className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-display font-medium border border-slate-800 transition-colors"
             >
               <span className="flex items-center gap-2">
-                <ExternalLink className="w-3.5 h-3.5 text-emerald-400" /> Ver Catálogo Público
+                <ExternalLink className="w-3.5 h-3.5 text-brand-400" /> Ver Catálogo Público
               </span>
             </Link>
           )}

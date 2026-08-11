@@ -62,7 +62,7 @@ export function CartDrawer({
         {/* Header del Carrito */}
         <div className="px-5 py-3.5 border-b border-white/10 flex items-center justify-between flex-shrink-0 bg-slate-900/50">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="w-8 h-8 rounded-xl bg-brand-500/20 flex items-center justify-center text-brand-400">
               <ShoppingBag className="w-4 h-4" />
             </div>
             <h2 className="font-display font-extrabold text-base text-white">Tu Carrito de Pedido</h2>
@@ -153,12 +153,12 @@ export function CartDrawer({
         {items.length > 0 && (
           <div className="p-4 border-t border-white/10 bg-slate-950/90 flex-shrink-0 space-y-3">
             {ahorroTotal > 0 && (
-              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-xs text-emerald-300 font-display font-semibold">
+              <div className="p-2.5 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-between text-xs text-brand-300 font-display font-semibold">
                 <span className="flex items-center gap-1.5">
-                  <Flame className="w-4 h-4 text-emerald-400 fill-emerald-400" />
+                  <Flame className="w-4 h-4 text-brand-400 fill-brand-400" />
                   ¡Estás ahorrando con tus promociones!
                 </span>
-                <span className="font-mono-tech font-bold text-emerald-400">-{formatCurrency(ahorroTotal)}</span>
+                <span className="font-mono-tech font-bold text-brand-400">-{formatCurrency(ahorroTotal)}</span>
               </div>
             )}
 

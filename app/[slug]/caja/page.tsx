@@ -592,7 +592,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   if (loadingBusiness || loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-3">
-        <Store className="w-8 h-8 text-emerald-400 animate-pulse" />
+        <Store className="w-8 h-8 text-brand-400 animate-pulse" />
         <p className="text-slate-400 text-xs font-medium">Cargando catálogo de Caja POS...</p>
       </div>
     );
@@ -615,11 +615,11 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               </Link>
             )}
             <div className="flex items-center gap-1.5">
-              <Store className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 shrink-0" />
+              <Store className="w-4 h-4 sm:w-5 sm:h-5 text-brand-400 shrink-0" />
               <h1 className="font-display font-black text-xs sm:text-base tracking-tight text-white truncate">
                 Caja & POS
               </h1>
-              <span className="hidden md:inline-block text-[10px] font-mono-tech font-bold text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/25">
+              <span className="hidden md:inline-block text-[10px] font-mono-tech font-bold text-brand-300 bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/25">
                 {business?.nombre}
               </span>
             </div>
@@ -631,7 +631,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               onClick={() => setActiveTab('pos')}
               className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-xs font-display font-bold flex items-center gap-1 transition-all ${
                 activeTab === 'pos'
-                  ? 'bg-emerald-500 text-slate-950 shadow-md'
+                  ? 'bg-brand-500 text-slate-950 shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -643,7 +643,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               onClick={() => setActiveTab('pedidos')}
               className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-xs font-display font-bold flex items-center gap-1 transition-all relative ${
                 activeTab === 'pedidos'
-                  ? 'bg-emerald-500 text-slate-950 shadow-md'
+                  ? 'bg-brand-500 text-slate-950 shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -712,7 +712,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-display font-black text-white flex items-center gap-2">
-                <Clock className="w-5 h-5 text-emerald-400" />
+                <Clock className="w-5 h-5 text-brand-400" />
                 Monitor de Pedidos en Vivo
               </h2>
               <p className="text-xs text-slate-400">
@@ -721,7 +721,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             </div>
             <button
               onClick={() => setActiveTab('pos')}
-              className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+              className="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-bold text-xs flex items-center gap-2 shadow-lg shadow-brand-500/20"
             >
               <Plus className="w-4 h-4" />
               <span>+ Nueva Comanda POS</span>
@@ -741,7 +741,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   switch (st) {
                     case 'pendiente': return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
                     case 'en_preparacion': return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
-                    case 'listo': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                    case 'listo': return 'bg-brand-500/10 text-brand-400 border-brand-500/30';
                     case 'entregado': return 'bg-slate-800 text-slate-400 border-slate-700';
                     default: return 'bg-rose-500/10 text-rose-400 border-rose-500/30';
                   }
@@ -751,7 +751,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   <div key={order.id} className="bg-[#0B0F1B] border border-white/10 rounded-2xl p-4 space-y-3 flex flex-col justify-between shadow-lg">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-mono-tech font-black text-sm text-emerald-400">
+                        <span className="font-mono-tech font-black text-sm text-brand-400">
                           #{String(order.numero_pedido).padStart(4, '0')}
                         </span>
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono-tech font-bold uppercase border ${getStatusColor(order.estado)}`}>
@@ -776,7 +776,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                     </div>
 
                     <div className="border-t border-white/10 pt-3 flex items-center justify-between">
-                      <span className="font-mono-tech font-bold text-sm text-emerald-400">{formatCurrency(order.total)}</span>
+                      <span className="font-mono-tech font-bold text-sm text-brand-400">{formatCurrency(order.total)}</span>
                       
                       {/* Botones de acción de estado rápido */}
                       <div className="flex gap-1.5">
@@ -791,7 +791,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                         {order.estado === 'en_preparacion' && (
                           <button
                             onClick={() => updateOrderStatus(order.id, 'listo')}
-                            className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold"
+                            className="px-2.5 py-1 rounded-lg bg-brand-500/20 hover:bg-brand-500/30 text-brand-300 border border-brand-500/40 text-[10px] font-bold"
                           >
                             Marcar Listo
                           </button>
@@ -830,7 +830,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                 placeholder="Buscar producto..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-[#0B0F1B] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                className="w-full pl-9 pr-4 py-2 bg-[#0B0F1B] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
               />
             </div>
           </div>
@@ -841,7 +841,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             onClick={() => setActiveCategory('todas')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all shrink-0 ${
               activeCategory === 'todas'
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md'
+                ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md'
                 : 'bg-slate-900 border border-white/5 text-slate-400 hover:text-white'
             }`}
           >
@@ -853,7 +853,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               onClick={() => setActiveCategory(cat.id)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all shrink-0 ${
                 activeCategory === cat.id
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md'
                   : 'bg-slate-900 border border-white/5 text-slate-400 hover:text-white'
               }`}
             >
@@ -876,7 +876,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                 <div 
                   key={p.id}
                   onClick={() => addToCart(p)}
-                  className="bg-[#0B0F1B] border border-white/5 hover:border-emerald-500/40 rounded-xl p-2 flex flex-col justify-between cursor-pointer group active:scale-95 transition-all shadow-md relative overflow-hidden h-40 sm:h-48"
+                  className="bg-[#0B0F1B] border border-white/5 hover:border-brand-500/40 rounded-xl p-2 flex flex-col justify-between cursor-pointer group active:scale-95 transition-all shadow-md relative overflow-hidden h-40 sm:h-48"
                 >
                   {/* Foto o fallback */}
                   <div className="w-full h-18 sm:h-24 rounded-lg bg-slate-950 flex items-center justify-center overflow-hidden relative border border-white/5 shrink-0">
@@ -899,7 +899,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
                   {/* Detalles */}
                   <div className="space-y-0.5 py-1 min-w-0 flex-1 overflow-hidden">
-                    <h4 className="text-[11px] sm:text-xs font-display font-extrabold text-white line-clamp-1 group-hover:text-emerald-400 transition-colors leading-tight">
+                    <h4 className="text-[11px] sm:text-xs font-display font-extrabold text-white line-clamp-1 group-hover:text-brand-400 transition-colors leading-tight">
                       {p.nombre}
                     </h4>
                     <p className="text-[9px] text-slate-400 line-clamp-1 leading-normal">
@@ -908,8 +908,8 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   </div>
 
                   {/* Precio & Acción */}
-                  <div className="flex items-center justify-between pt-1 border-t border-white/5 mt-auto text-slate-500 group-hover:text-emerald-400 transition-colors shrink-0">
-                    <span className="text-[11px] sm:text-xs font-mono font-black text-emerald-400">
+                  <div className="flex items-center justify-between pt-1 border-t border-white/5 mt-auto text-slate-500 group-hover:text-brand-400 transition-colors shrink-0">
+                    <span className="text-[11px] sm:text-xs font-mono font-black text-brand-400">
                       {formatCurrency(displayPrice)}
                     </span>
                     <span className="text-[8px] font-display font-black tracking-wider uppercase opacity-0 group-hover:opacity-100 transition-all transform translate-x-1 group-hover:translate-x-0">
@@ -929,7 +929,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
         {/* Ticket Header */}
         <div className="border-b border-white/10 pb-4 flex items-center justify-between">
           <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
-            <ShoppingCart className="w-4.5 h-4.5 text-emerald-400" />
+            <ShoppingCart className="w-4.5 h-4.5 text-brand-400" />
             <span>Resumen del Pedido</span>
           </h3>
           <span className="text-[10px] font-mono bg-slate-950 px-2 py-0.5 rounded border border-white/5 text-slate-400">
@@ -958,7 +958,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                       {item.opciones_seleccionadas && item.opciones_seleccionadas.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
                           {item.opciones_seleccionadas.map((opt, i) => (
-                            <span key={i} className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
+                            <span key={i} className="text-[9px] px-1.5 py-0.5 rounded bg-brand-500/10 border border-brand-500/20 text-brand-400 font-medium">
                               {opt.opcion_nombre}{opt.precio_adicional > 0 ? ` +${formatCurrency(opt.precio_adicional)}` : ''}
                             </span>
                           ))}
@@ -968,7 +968,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                         {formatCurrency(unitPrice)} c/u
                       </p>
                     </div>
-                    <span className="text-xs font-mono font-bold text-emerald-400 whitespace-nowrap">
+                    <span className="text-xs font-mono font-bold text-brand-400 whitespace-nowrap">
                       {formatCurrency(unitPrice * item.cantidad)}
                     </span>
                   </div>
@@ -980,7 +980,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                       placeholder="Nota (Ej: Sin cebolla)"
                       value={item.notas || ''}
                       onChange={(e) => updateItemNotes(item.product.id, e.target.value)}
-                      className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-[10px] text-white focus:outline-none focus:border-emerald-500"
+                      className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-[10px] text-white focus:outline-none focus:border-brand-500"
                     />
 
                     {/* +/- controles */}
@@ -1028,7 +1028,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   onClick={() => setTipoEntrega(opt.value as any)}
                   className={`py-1.5 rounded-xl text-[11px] font-display font-bold border transition-all cursor-pointer ${
                     tipoEntrega === opt.value
-                      ? 'bg-emerald-500/10 border-emerald-500 text-white'
+                      ? 'bg-brand-500/10 border-brand-500 text-white'
                       : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
@@ -1053,7 +1053,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   required
                   value={clienteNombre}
                   onChange={(e) => setClienteNombre(e.target.value)}
-                  className="w-full pl-7.5 pr-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full pl-7.5 pr-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-brand-500"
                 />
               </div>
             </div>
@@ -1069,7 +1069,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   placeholder="Ej: 5"
                   value={numeroMesa}
                   onChange={(e) => setNumeroMesa(e.target.value)}
-                  className="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                  className="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-brand-500"
                 />
               </div>
             ) : (
@@ -1086,7 +1086,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                     placeholder="09..."
                     value={clienteTelefono}
                     onChange={(e) => setClienteTelefono(e.target.value)}
-                    className="w-full pl-7.5 pr-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                    className="w-full pl-7.5 pr-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-brand-500"
                   />
                 </div>
               </div>
@@ -1107,7 +1107,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                 ]}
                 value={metodoPago}
                 onChange={(val) => setMetodoPago(val as any)}
-                accentColor="emerald"
+                accentColor="brand"
                 className="text-xs"
               />
             </div>
@@ -1122,7 +1122,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   onClick={() => setEstadoPago('pagado')}
                   className={`flex-1 py-1.5 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${
                     estadoPago === 'pagado'
-                      ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
+                      ? 'bg-brand-500/10 border-brand-500 text-brand-400'
                       : 'bg-slate-950 border-slate-800 text-slate-400'
                   }`}
                 >
@@ -1157,7 +1157,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             )}
             <div className="flex justify-between items-center text-sm font-bold text-white pt-1 border-t border-white/5">
               <span>Total a Cobrar:</span>
-              <span className="text-md font-mono-tech text-emerald-400">{formatCurrency(getTotal())}</span>
+              <span className="text-md font-mono-tech text-brand-400">{formatCurrency(getTotal())}</span>
             </div>
           </div>
 
@@ -1175,7 +1175,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             <button
               type="submit"
               disabled={isSaving || cart.length === 0}
-              className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-display font-black text-xs tracking-wider uppercase shadow-lg shadow-emerald-500/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-slate-950 font-display font-black text-xs tracking-wider uppercase shadow-lg shadow-brand-500/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               <Receipt className="w-4 h-4" />
               <span>{isSaving ? 'Registrando...' : 'Registrar Pedido'}</span>
@@ -1288,7 +1288,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   onClick={() => setTxTipo('ingreso')}
                   className={`py-2 rounded-xl text-xs font-display font-bold border transition-all cursor-pointer ${
                     txTipo === 'ingreso'
-                      ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
+                      ? 'bg-brand-500/10 border-brand-500 text-brand-400'
                       : 'bg-slate-950 border-slate-800 text-slate-400'
                   }`}
                 >
@@ -1378,7 +1378,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               </div>
               <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5">
                 <span className="text-slate-500 block text-[10px] uppercase font-bold">Ingresos Manuales</span>
-                <span className="text-emerald-400 font-mono font-extrabold text-sm">+{formatCurrency(activeRegister.ingresos_manuales_efectivo || 0)}</span>
+                <span className="text-brand-400 font-mono font-extrabold text-sm">+{formatCurrency(activeRegister.ingresos_manuales_efectivo || 0)}</span>
               </div>
               <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5">
                 <span className="text-slate-500 block text-[10px] uppercase font-bold">Egresos (Gastos)</span>

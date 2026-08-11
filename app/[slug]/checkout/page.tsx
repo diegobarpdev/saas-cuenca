@@ -756,8 +756,8 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
                               >
                                 {copiedAccNumber === acc.numero_cuenta ? (
                                   <>
-                                    <Check className="w-3 h-3 text-emerald-400" />
-                                    <span className="text-emerald-400">Copiado</span>
+                                    <Check className="w-3 h-3 text-brand-400" />
+                                    <span className="text-brand-400">Copiado</span>
                                   </>
                                 ) : (
                                   <>
@@ -791,7 +791,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
                       <span className="text-[10px] text-rose-400 font-mono-tech font-bold uppercase">* Obligatorio</span>
                     </label>
                     {comprobanteUrl ? (
-                      <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/30">
+                      <div className="flex items-center gap-2 text-xs text-brand-400 bg-brand-500/10 p-2.5 rounded-xl border border-brand-500/30">
                         <CheckCircle2 className="w-4 h-4" />
                         <span>Comprobante adjuntado correctamente.</span>
                       </div>

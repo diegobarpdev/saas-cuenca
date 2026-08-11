@@ -245,7 +245,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
   return (
     <div className="min-h-screen bg-[#070A11] text-slate-100 font-sans pb-16 relative overflow-hidden">
       {/* Glow Ambient Backdrop */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 glow-ambient-emerald pointer-events-none"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 glow-ambient-brand pointer-events-none"></div>
 
       {/* Header */}
       <header className="sticky top-0 z-30 glass-panel border-b border-white/10 px-4 py-3.5">
@@ -278,7 +278,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
           {/* Visualizador de Actividad en Vivo */}
           <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center justify-center space-y-3 relative overflow-hidden">
             {order.estado !== 'entregado' && order.estado !== 'cancelado' && (
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-teal-500/5 animate-pulse"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-brand-500/5 to-brand-500/5 animate-pulse"></div>
             )}
             
             <div className="relative z-10 flex items-center justify-center">
@@ -300,22 +300,22 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
               )}
               {order.estado === 'en_preparacion' && (
                 <div className="relative flex h-12 w-12 items-center justify-center">
-                  <div className="absolute inset-0 rounded-full border-2 border-emerald-500/20 border-t-emerald-400 animate-spin"></div>
-                  <div className="rounded-full h-9 w-9 bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                  <div className="absolute inset-0 rounded-full border-2 border-brand-500/20 border-t-brand-400 animate-spin"></div>
+                  <div className="rounded-full h-9 w-9 bg-brand-500/10 flex items-center justify-center text-brand-400">
                     <ChefHat className="w-5 h-5 animate-bounce" />
                   </div>
                 </div>
               )}
               {order.estado === 'listo' && (
                 <div className="relative flex h-12 w-12 items-center justify-center">
-                  <span className="animate-ping absolute inline-flex h-8 w-8 rounded-full bg-emerald-400/20 opacity-75"></span>
-                  <div className="relative rounded-full h-10 w-10 bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <span className="animate-ping absolute inline-flex h-8 w-8 rounded-full bg-brand-400/20 opacity-75"></span>
+                  <div className="relative rounded-full h-10 w-10 bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400">
                     <Truck className="w-5 h-5 animate-bounce" />
                   </div>
                 </div>
               )}
               {order.estado === 'entregado' && (
-                <div className="rounded-full h-10 w-10 bg-emerald-500/15 border border-emerald-500 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/20">
+                <div className="rounded-full h-10 w-10 bg-brand-500/15 border border-brand-500 flex items-center justify-center text-brand-400 shadow-lg shadow-brand-500/20">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
               )}
@@ -346,7 +346,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
                   <div
                     className={`w-11 h-11 rounded-2xl flex items-center justify-center border transition-all duration-300 ${
                       isCompleted
-                        ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-emerald-400 shadow-lg shadow-emerald-500/30 scale-105'
+                        ? 'bg-gradient-to-br from-brand-500 to-brand-600 text-white border-brand-400 shadow-lg shadow-brand-500/30 scale-105'
                         : 'bg-slate-950 text-slate-600 border-slate-800'
                     }`}
                   >
@@ -354,7 +354,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
                   </div>
                   <span
                     className={`text-[11px] font-display font-extrabold text-center ${
-                      isCompleted ? 'text-emerald-400' : 'text-slate-500'
+                      isCompleted ? 'text-brand-400' : 'text-slate-500'
                     }`}
                   >
                     {step.label}
@@ -373,7 +373,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
         {/* Resumen de Detalles */}
         <div className="glass-card p-5 md:p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl">
           <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
-            <Receipt className="w-4 h-4 text-emerald-400" /> Detalle de la Compra
+            <Receipt className="w-4 h-4 text-brand-400" /> Detalle de la Compra
           </h3>
 
           <div className="space-y-2 text-xs text-slate-300">
@@ -387,7 +387,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
             </div>
             <div className="flex justify-between">
               <span className="text-slate-400">Entrega:</span>
-              <span className="font-semibold text-emerald-400">{formatDeliveryType(order.tipo_entrega)}</span>
+              <span className="font-semibold text-brand-400">{formatDeliveryType(order.tipo_entrega)}</span>
             </div>
             {order.cliente_direccion && (
               <div className="flex justify-between">
@@ -404,7 +404,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
           {/* Facturación Ecuador */}
           {order.requiere_factura && order.datos_facturacion && (
             <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-white/5 text-xs space-y-1">
-              <p className="font-display font-bold text-emerald-400">Factura solicitada a:</p>
+              <p className="font-display font-bold text-brand-400">Factura solicitada a:</p>
               <p><span className="text-slate-400">{order.datos_facturacion.tipo_doc}:</span> {order.datos_facturacion.num_doc}</p>
               <p><span className="text-slate-400">Razón Social:</span> {order.datos_facturacion.razon_social}</p>
               <p><span className="text-slate-400">Email:</span> {order.datos_facturacion.email}</p>
@@ -414,7 +414,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
           {/* Total */}
           <div className="flex justify-between items-center text-sm font-bold text-white pt-2 border-t border-white/10">
             <span>Total Pagado / A Cobrar:</span>
-            <span className="text-lg font-mono-tech text-emerald-400">{formatCurrency(order.total)}</span>
+            <span className="text-lg font-mono-tech text-brand-400">{formatCurrency(order.total)}</span>
           </div>
         </div>
 
@@ -423,7 +423,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
           href={`https://wa.me/${business.telefono_whatsapp}?text=Hola,%20quisiera%20consultar%20sobre%20mi%20pedido%20%23${order.numero_pedido}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full py-4 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-display font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/25 active:scale-98 transition-all"
+          className="w-full py-4 px-5 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-display font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl shadow-brand-600/25 active:scale-98 transition-all"
         >
           <PhoneCall className="w-4 h-4" />
           <span>Contactar a {business.nombre} por WhatsApp</span>

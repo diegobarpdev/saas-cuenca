@@ -33,10 +33,10 @@ export function CustomToaster() {
 
         if (t.type === 'success') {
           Icon = CheckCircle2;
-          iconColor = 'text-emerald-400';
-          borderColor = 'border-emerald-500/50 hover:border-emerald-500/80';
-          accentBarColor = 'bg-emerald-500';
-          shadowGlow = 'shadow-emerald-500/10';
+          iconColor = 'text-brand-400';
+          borderColor = 'border-brand-500/50 hover:border-brand-500/80';
+          accentBarColor = 'bg-brand-500';
+          shadowGlow = 'shadow-brand-500/10';
         } else if (t.type === 'error') {
           Icon = XCircle;
           iconColor = 'text-rose-400';
