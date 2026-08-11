@@ -25,6 +25,14 @@ input:focus, textarea:focus, select:focus {
   outline: none !important;
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* ============================================================================
    YAPI BRANDING & TYPOGRAPHY SYSTEM
    ============================================================================ */

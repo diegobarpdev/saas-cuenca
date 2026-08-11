@@ -3,9 +3,14 @@ import { CustomToaster } from '@/components/ui/CustomToaster';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Yapi - Sistema de Pedidos en Vivo & Catálogo Digital para Cuenca',
-  description: 'Plataforma de pedidos en tiempo real, cobros con PayPhone / Deuna y comanda térmica POS para restaurantes y negocios de Cuenca y Ecuador.',
-  keywords: ['Yapi', 'Yapi Ecuador', 'Yapi.ec', 'pedidos Cuenca', 'catálogo digital', 'comanda pos', 'payphone', 'deuna'],
+  title: 'Yapi.ec — Pedidos directos para tu restaurante. $20/mes, 0% de comisión.',
+  description: 'Yapi es la plataforma de pedidos para restaurantes, cafeterías y negocios de comida en Ecuador. Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y cero comisión por venta. Plan fijo $20/mes.',
+  keywords: [
+    'yapi', 'yapi.ec', 'catálogo digital restaurante ecuador',
+    'pedidos whatsapp restaurante', 'menú digital QR cuenca',
+    'plataforma pedidos sin comisión', 'sistema pedidos restaurante cuenca',
+    'payphone restaurant', 'pedidos online ecuador', '0 comision delivery',
+  ],
 };
 
 export const viewport = {

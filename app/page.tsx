@@ -1,309 +1,493 @@
+import Image from 'next/image';
 import Link from 'next/link';
+import CatalogMockup from '@/components/CatalogMockup';
 import {
-  ShoppingBag,
-  ShieldCheck,
-  Zap,
-  Printer,
-  CreditCard,
   ArrowRight,
-  Store,
-  Sparkles,
   CheckCircle2,
-  Bell,
-  Database,
   QrCode,
   Smartphone,
-  Globe,
-  TrendingUp,
-  Lock,
-  ChevronRight,
+  BellRing,
+  ChefHat,
+  Wallet,
+  PartyPopper,
+  CreditCard,
+  Printer,
+  Monitor,
+  BarChart3,
 } from 'lucide-react';
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+
+const FLOW_STEPS = [
+  {
+    icon: QrCode,
+    title: 'Pones el QR en la mesa o vitrina',
+    desc: 'Imprimís un código QR único de tu catálogo y lo ponés donde pasan tus clientes. Sin apps que descargar, sin registro.',
+  },
+  {
+    icon: Smartphone,
+    title: 'El cliente ve tu menú y elige',
+    desc: 'Abre tu catálogo desde el celular: fotos, categorías, precios. Elige lo que quiere y arma el pedido.',
+  },
+  {
+    icon: BellRing,
+    title: 'El pedido llega a tu pantalla — en segundos',
+    desc: 'Recibes una alerta sonora. El pedido aparece completo: qué pidió, cómo paga, si es para mesa, retiro o domicilio.',
+  },
+  {
+    icon: ChefHat,
+    title: 'Cocina lo prepara',
+    desc: 'La pantalla de cocina muestra los pedidos activos en orden de llegada. Cambiás el estado con un toque para avisar al cliente.',
+  },
+  {
+    icon: Wallet,
+    title: 'El cliente paga',
+    desc: 'Tarjeta de débito/crédito (PayPhone), transferencia con comprobante o efectivo. Tú eliges qué métodos ofreces.',
+  },
+  {
+    icon: PartyPopper,
+    title: 'El 100% de esa venta es tuyo',
+    desc: 'Ningún porcentaje para nadie. Sin comisión oculta. La misma tarifa de $20/mes sin importar cuánto vendiste.',
+    highlight: true,
+  },
+];
+
+const ADDONS = [
+  {
+    icon: CreditCard,
+    name: 'Cobros con tarjeta',
+    desc: 'Visa / Mastercard / débito via PayPhone',
+    price: '+$9/mes',
+  },
+  {
+    icon: Monitor,
+    name: 'Pantalla de cocina',
+    desc: 'Vista en vivo de pedidos activos con alertas',
+    price: '+$7/mes',
+  },
+  {
+    icon: Printer,
+    name: 'Impresión de comandas',
+    desc: 'Compatible con ticketeras térmicas 58mm / 80mm',
+    price: '+$7/mes',
+  },
+  {
+    icon: BarChart3,
+    name: 'Historial y reportes',
+    desc: 'Exporta ventas, analiza tus productos top',
+    price: '+$5/mes',
+  },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#070A11] text-slate-100 font-sans flex flex-col relative overflow-hidden selection:bg-emerald-500/30 selection:text-emerald-300">
-      {/* Background Ambient Mesh Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] glow-ambient-emerald pointer-events-none opacity-80"></div>
-      <div className="absolute top-1/3 -right-20 w-[500px] h-[500px] glow-ambient-amber pointer-events-none opacity-60"></div>
-      <div className="absolute bottom-10 -left-20 w-[600px] h-[600px] glow-ambient-emerald pointer-events-none opacity-40"></div>
+    <div className="min-h-screen bg-[#080B11] text-slate-100 font-sans">
 
-      {/* Floating Header Landing */}
-      <div className="w-full px-4 md:px-8 pt-4 pb-2 sticky top-0 z-50">
-        <header className="max-w-7xl mx-auto glass-panel rounded-2xl border border-white/10 px-4 md:px-6 py-3.5 flex items-center justify-between shadow-2xl backdrop-blur-xl bg-slate-950/70">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-display font-black text-slate-950 text-xl shadow-lg shadow-emerald-500/25">
+      {/* ── NAV ─────────────────────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-50 bg-[#080B11]/95 backdrop-blur-sm border-b border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center font-display font-black text-slate-950 text-sm select-none">
               Y
             </div>
-            <div>
-              <span className="font-display font-black text-xl text-white tracking-tight flex items-center gap-1">
-                Yapi<span className="text-emerald-400">.ec</span>
-              </span>
-              <span className="block text-[9px] text-emerald-400/90 font-mono-tech font-bold uppercase tracking-wider">
-                Plataforma de Pedidos & Menú Digital
-              </span>
-            </div>
+            <span className="font-display font-black text-white text-lg tracking-tight">
+              Yapi<span className="text-emerald-400">.ec</span>
+            </span>
           </div>
-
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/restaurante-demo"
+              className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:inline"
+            >
+              Ver demo
+            </Link>
             <Link
               href="/admin/login"
-              className="px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 text-xs font-display font-bold border border-slate-700/80 transition-all cursor-pointer hover:border-slate-600 active:scale-95"
+              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-bold text-sm transition-all active:scale-95 cursor-pointer"
             >
-              Login Negocio
-            </Link>
-            <Link
-              href="/super-admin/login"
-              className="px-4 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-display font-bold border border-emerald-500/30 transition-all cursor-pointer hidden sm:inline-flex items-center gap-1.5 active:scale-95"
-            >
-              <Lock className="w-3.5 h-3.5 text-emerald-400" />
-              Super Admin
-            </Link>
-          </div>
-        </header>
-      </div>
-
-      {/* Hero Section */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-8 pt-12 pb-20 text-center flex flex-col items-center justify-center relative z-10">
-        <div className="space-y-6 max-w-4xl">
-          {/* Tagline Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/80 border border-emerald-500/30 text-emerald-300 text-xs font-mono-tech font-bold shadow-xl backdrop-blur-md">
-            <Zap className="w-4 h-4 text-emerald-400 animate-pulse" />
-            <span>Plataforma de Pedidos de Alta Velocidad para Cuenca & Ecuador</span>
-          </div>
-
-          {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-display font-black tracking-tight text-white leading-[1.06]">
-            Tu catálogo digital <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-              sin comisiones por venta.
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-base sm:text-lg text-slate-300 font-medium max-w-2xl mx-auto leading-relaxed">
-            Digitaliza tu menú o tienda en minutos. Recibe pedidos instantáneos directamente a WhatsApp, cobros con PayPhone / Deuna! e impresión de comandas de cocina en vivo.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link
-              href="/admin/login"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-display font-black text-sm transition-all shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2.5 active:scale-95 cursor-pointer border border-emerald-400/40"
-            >
-              <Store className="w-5 h-5" />
-              <span>Crear mi catálogo gratis</span>
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/restaurante-tiopamba"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-display font-bold text-sm border border-slate-700/80 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 hover:border-slate-600"
-            >
-              <span>Ver Demo Tienda Tiopamba</span>
-              <ArrowRight className="w-4 h-4 text-emerald-400" />
+              Iniciar sesión
             </Link>
           </div>
         </div>
+      </nav>
 
-        {/* Social Proof & Metrics Bar */}
-        <div className="w-full pt-16 pb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto p-4 rounded-2xl bg-slate-950/60 border border-white/10 glass-panel shadow-2xl">
-            <div className="flex items-center justify-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-              <TrendingUp className="w-5 h-5 text-emerald-400 shrink-0" />
-              <div className="text-left">
-                <span className="block font-display font-black text-white text-base">0% Comisiones</span>
-                <span className="text-[11px] text-slate-400">Conserva el 100% de tus ventas</span>
-              </div>
-            </div>
+      {/* ── HERO ────────────────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-5 pt-16 pb-20 lg:pt-24 lg:pb-28 overflow-x-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-            <div className="flex items-center justify-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-              <Zap className="w-5 h-5 text-cyan-400 shrink-0" />
-              <div className="text-left">
-                <span className="block font-display font-black text-white text-base">&lt; 1 Segundo</span>
-                <span className="text-[11px] text-slate-400">Carga ultra-rápida móvil</span>
-              </div>
+          {/* Copy */}
+          <div className="space-y-7 order-1">
+            {/* Price badge — hero level */}
+            <div className="inline-flex items-center gap-2.5 border border-emerald-500/40 rounded-full px-4 py-2 bg-emerald-500/5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span className="text-emerald-400 text-sm font-mono-tech font-bold tracking-tight">
+                $20/mes · 0% de comisión por venta
+              </span>
             </div>
 
-            <div className="flex items-center justify-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-              <ShieldCheck className="w-5 h-5 text-amber-400 shrink-0" />
-              <div className="text-left">
-                <span className="block font-display font-black text-white text-base">100% Seguro</span>
-                <span className="text-[11px] text-slate-400">Resguardo local de clientes</span>
-              </div>
-            </div>
-          </div>
-        </div>
+            <h1 className="text-[clamp(2.5rem,6vw,4.5rem)] font-display font-black text-white leading-[1.04] tracking-tight">
+              Tu restaurante recibe pedidos directos.{' '}
+              <span className="text-emerald-400">Tú te quedas con el 100%.</span>
+            </h1>
 
-        {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full pt-12 text-left">
-          <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl hover:border-emerald-500/40 hover:shadow-emerald-500/10 transition-all duration-300 group">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
-              <QrCode className="w-6 h-6" />
-            </div>
-            <div className="space-y-1.5">
-              <h3 className="font-display font-bold text-lg text-white">Catálogo Digital & QR</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Menú HD con fotos comprimidas instantáneas. Genera códigos QR listos para imprimir en mesas, vitrinas y flyers.
-              </p>
-            </div>
-          </div>
-
-          <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl hover:border-cyan-500/40 hover:shadow-cyan-500/10 transition-all duration-300 group">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
-              <CreditCard className="w-6 h-6" />
-            </div>
-            <div className="space-y-1.5">
-              <h3 className="font-display font-bold text-lg text-white">Pagos & WhatsApp Directo</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Cobros con tarjetas Visa/Mastercard mediante PayPhone, transferencias con subida de comprobante o pedidos automatizados a WhatsApp.
-              </p>
-            </div>
-          </div>
-
-          <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl hover:border-amber-500/40 hover:shadow-amber-500/10 transition-all duration-300 group">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
-              <Printer className="w-6 h-6" />
-            </div>
-            <div className="space-y-1.5">
-              <h3 className="font-display font-bold text-lg text-white">Monitor KDS & Comandas POS</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Pantalla digital (KDS) interactiva de cocina con alertas sonoras en vivo e impresión directa de tickets a cualquier ticketera térmica.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Sección de Precios & Add-ons */}
-        <div className="w-full pt-20 pb-8 space-y-10">
-          <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 text-xs font-mono-tech border border-emerald-500/30">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Precios Transparentes — Sin Sorpresas
-            </span>
-            <h2 className="text-3xl md:text-5xl font-display font-black text-white tracking-tight">
-              Paga solo por lo que tu negocio necesita
-            </h2>
-            <p className="text-sm text-slate-400 font-medium leading-relaxed">
-              Comienza con nuestro Plan Base Core y personaliza tu plataforma agregando únicamente los módulos adicionales (Add-ons) que tu local requiere.
+            <p className="text-lg text-slate-400 leading-relaxed max-w-lg">
+              Catálogo con código QR, pedidos que llegan directo a tu WhatsApp y cobros integrados. Sin intermediarios. Sin porcentaje por cada venta.
             </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 pt-1">
+              <Link
+                href="/restaurante-demo"
+                className="px-7 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-emerald-500/20"
+              >
+                Ver demo en vivo
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/admin/login"
+                className="px-7 py-4 rounded-xl border border-white/15 hover:border-white/30 text-white font-display font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
+              >
+                Comenzar gratis
+              </Link>
+            </div>
+
+            {/* Trust anchors — no fake metrics */}
+            <div className="flex items-center gap-5 pt-2 text-sm text-slate-500">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                Sin tarjeta al inicio
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                Listo en minutos
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                Ecuador 🇪🇨
+              </span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left max-w-4xl mx-auto">
-            {/* Plan Base */}
-            <div className="glass-card p-8 rounded-3xl border border-white/10 space-y-6 flex flex-col justify-between shadow-xl hover:border-white/20 transition-all">
-              <div className="space-y-4">
-                <div className="inline-block px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-[11px] font-mono-tech font-bold uppercase border border-slate-700">
-                  Plan Base Core
-                </div>
-                <div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-display font-black text-white">$20</span>
-                    <span className="text-slate-400 text-xs font-medium">/ mes</span>
-                  </div>
-                  <p className="text-xs text-slate-400 mt-1">Ideal para restaurantes, cafeterías y locales con venta presencial o delivery.</p>
-                </div>
+          {/* Phone mockup — interactive, real food photos, no generated image */}
+          <div className="order-2 flex justify-center lg:justify-end pt-4 lg:pt-0">
+            <CatalogMockup />
+          </div>
+        </div>
+      </section>
 
-                <ul className="space-y-3 text-xs text-slate-300 pt-2 border-t border-white/10">
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="font-bold text-white">Sistema de Caja POS & Comandas incluido</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Catálogo Digital HD ilimitado</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Código QR para mesas & vitrina</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Pedidos ilimitados a WhatsApp</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Pagos manuales (Deuna!, Transferencia, Efectivo)</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span className="font-bold text-amber-300">0% Comisiones por venta</span>
-                  </li>
+      {/* ── MATH HOOK ───────────────────────────────────────────────────── */}
+      <section className="border-y border-white/[0.06] bg-[#0D1117]">
+        <div className="max-w-6xl mx-auto px-5 py-16 lg:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+
+            <div>
+              <p className="text-xs font-mono-tech text-slate-500 uppercase tracking-widest mb-5">
+                El problema con los intermediarios
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-display font-black text-white leading-tight mb-5">
+                En $3,000 de ventas al mes, las apps de delivery se quedan con{' '}
+                <span className="text-red-400">$450 a $900.</span>
+              </h2>
+              <p className="text-slate-400 text-base leading-relaxed">
+                Comisiones del 15% al 30% en cada pedido. Más el costo de los anuncios para aparecer arriba. Y encima, los datos de tus clientes son de ellos, no tuyos.
+              </p>
+            </div>
+
+            {/* Comparison cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-6 rounded-2xl border border-red-500/20 bg-red-950/20">
+                <p className="text-red-400 font-mono-tech text-[11px] uppercase tracking-widest mb-4">
+                  Apps de delivery
+                </p>
+                <p className="text-4xl font-display font-black text-red-400 mb-1 leading-none">
+                  -$450
+                  <span className="text-2xl"> a</span>
+                  <br />
+                  -$900
+                </p>
+                <p className="text-slate-500 text-xs mt-2 mb-5">cada mes, solo en comisiones</p>
+                <ul className="space-y-2 text-sm text-slate-500">
+                  <li>15%–30% por cada pedido</li>
+                  <li>Los clientes son de la plataforma</li>
+                  <li>Dependés de su algoritmo</li>
                 </ul>
               </div>
 
-              <Link
-                href="/admin/login"
-                className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-xs text-center transition-all block cursor-pointer active:scale-95 shadow-lg shadow-emerald-500/20"
-              >
-                Comenzar con Plan Base $20/mes
-              </Link>
+              <div className="p-6 rounded-2xl border border-emerald-500/30 bg-emerald-950/20">
+                <p className="text-emerald-400 font-mono-tech text-[11px] uppercase tracking-widest mb-4">
+                  Yapi
+                </p>
+                <p className="text-4xl font-display font-black text-emerald-400 mb-1 leading-none">
+                  $20
+                  <br />
+                  fijos
+                </p>
+                <p className="text-slate-400 text-xs mt-2 mb-5">al mes, vendas lo que vendas</p>
+                <ul className="space-y-2 text-sm text-slate-400">
+                  <li>0% de comisión por venta</li>
+                  <li>Los clientes son tuyos</li>
+                  <li>Tu catálogo, tu WhatsApp, tu marca</li>
+                </ul>
+              </div>
             </div>
 
-            {/* Módulos Add-ons A la Carta */}
-            <div className="glass-card p-8 rounded-3xl border border-emerald-500/30 space-y-6 flex flex-col justify-between shadow-2xl relative overflow-hidden bg-slate-950/80 hover:border-emerald-500/50 transition-all">
-              <div className="space-y-4">
-                <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-mono-tech font-bold uppercase border border-emerald-500/30">
-                  Módulos Add-ons (A la carta)
-                </div>
-                <div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-display font-black text-white">Suma desde +$5</span>
-                    <span className="text-slate-400 text-xs font-medium">/ mes</span>
-                  </div>
-                  <p className="text-xs text-slate-400 mt-1">Agrega módulos opcionales al Plan Base según crezca tu local.</p>
-                </div>
+          </div>
+        </div>
+      </section>
 
-                <div className="space-y-2.5 pt-2 border-t border-white/10 text-xs">
-                  <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
-                    <span className="text-slate-200 flex items-center gap-2.5">
-                      <CreditCard className="w-4 h-4 text-emerald-400 shrink-0" />
-                      Pasarela PayPhone Tarjetas
-                    </span>
-                    <span className="font-mono-tech font-bold text-emerald-400">+$9/mes</span>
+      {/* ── FLOW ────────────────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-5 py-20 lg:py-28">
+        <div className="mb-14">
+          <p className="text-xs font-mono-tech text-slate-500 uppercase tracking-widest mb-4">
+            Flujo completo
+          </p>
+          <h2 className="text-4xl sm:text-5xl font-display font-black text-white leading-tight max-w-2xl">
+            De la mesa de tu cliente a tu bolsillo — en 6 pasos
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {FLOW_STEPS.map((step, i) => {
+            const Icon = step.icon;
+            return (
+              <div
+                key={i}
+                className={`p-6 rounded-2xl border transition-colors ${
+                  step.highlight
+                    ? 'border-emerald-500/40 bg-emerald-950/25'
+                    : 'border-white/[0.07] bg-[#0D1117]'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${
+                      step.highlight ? 'bg-emerald-500/20' : 'bg-white/[0.06]'
+                    }`}
+                  >
+                    <Icon
+                      className={`w-4.5 h-4.5 ${step.highlight ? 'text-emerald-400' : 'text-slate-400'}`}
+                      size={18}
+                    />
                   </div>
-                  <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
-                    <span className="text-slate-200 flex items-center gap-2.5">
-                      <Bell className="w-4 h-4 text-emerald-400 shrink-0" />
-                      Monitor de Cocina Digital (KDS)
-                    </span>
-                    <span className="font-mono-tech font-bold text-emerald-400">+$7/mes</span>
+                  <span
+                    className={`font-mono-tech text-xs font-bold pt-2 ${
+                      step.highlight ? 'text-emerald-500' : 'text-slate-600'
+                    }`}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                </div>
+                <h3
+                  className={`font-display font-bold text-base mt-4 mb-2 leading-snug ${
+                    step.highlight ? 'text-emerald-400' : 'text-white'
+                  }`}
+                >
+                  {step.title}
+                </h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{step.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── PRODUCT SHOWCASE ─────────────────────────────────────────────── */}
+      <section className="border-t border-white/[0.06] bg-[#0D1117]">
+        <div className="max-w-6xl mx-auto px-5 py-20 lg:py-28">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+            {/* Dashboard mockup */}
+            <div className="flex justify-center lg:justify-start">
+              <Image
+                src="/mockup-dashboard.jpg"
+                alt="Panel de pedidos en tiempo real de Yapi.ec — vista del negocio"
+                width={680}
+                height={383}
+                className="rounded-2xl w-full shadow-2xl shadow-black/60 border border-white/[0.07]"
+              />
+            </div>
+
+            {/* Panel features */}
+            <div className="space-y-8">
+              <div>
+                <p className="text-xs font-mono-tech text-slate-500 uppercase tracking-widest mb-4">
+                  Panel del negocio
+                </p>
+                <h2 className="text-3xl sm:text-4xl font-display font-black text-white leading-tight mb-4">
+                  Tus pedidos, en tiempo real. Sin complicaciones.
+                </h2>
+                <p className="text-slate-400 text-base leading-relaxed">
+                  Cada pedido que entra aparece en tu pantalla con alerta sonora. Ves quién pidió, qué pidió, cómo paga y a dónde se lo llevás. Un toque para actualizar el estado. Un toque para imprimir la comanda.
+                </p>
+              </div>
+
+              <ul className="space-y-4">
+                {[
+                  'Alerta sonora en cada nuevo pedido',
+                  'Estado del pedido en vivo para el cliente',
+                  'Comprobante de pago visible en el panel',
+                  'Datos de facturación para el SRI cuando aplique',
+                  'Historial completo de pedidos y ventas',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRICING ─────────────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-5 py-20 lg:py-28">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+
+          {/* Left — headline */}
+          <div>
+            <p className="text-xs font-mono-tech text-slate-500 uppercase tracking-widest mb-4">
+              Precio
+            </p>
+            <h2 className="text-4xl sm:text-5xl font-display font-black text-white leading-tight mb-5">
+              Un plan.<br />Un precio.<br />
+              <span className="text-emerald-400">Sin sorpresas.</span>
+            </h2>
+            <p className="text-slate-400 text-base leading-relaxed max-w-md">
+              Empezás con el Plan Base que cubre todo lo que necesita un restaurante o cafetería para operar digitalmente. Si querés agregar pantalla de cocina, cobros con tarjeta o impresión de comandas, los sumás por separado.
+            </p>
+          </div>
+
+          {/* Right — pricing card */}
+          <div className="space-y-4">
+            {/* Main plan */}
+            <div className="p-8 rounded-2xl border border-white/10 bg-[#0D1117]">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest mb-2">Plan Base</p>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-5xl font-display font-black text-white">$20</span>
+                    <span className="text-slate-500 text-sm">/mes</span>
                   </div>
-                  <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
-                    <span className="text-slate-200 flex items-center gap-2.5">
-                      <Printer className="w-4 h-4 text-emerald-400 shrink-0" />
-                      Impresión Térmica POS Comandas
-                    </span>
-                    <span className="font-mono-tech font-bold text-emerald-400">+$7/mes</span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-white/5 flex items-center justify-between border border-white/5 hover:border-white/10 transition-colors">
-                    <span className="text-slate-200 flex items-center gap-2.5">
-                      <Database className="w-4 h-4 text-emerald-400 shrink-0" />
-                      Reportes Ventas & Exportación (CRM)
-                    </span>
-                    <span className="font-mono-tech font-bold text-emerald-400">+$5/mes</span>
-                  </div>
+                  <p className="text-slate-500 text-sm mt-1">Sin comisión. Sin contrato.</p>
+                </div>
+                <div className="px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-mono-tech font-bold">
+                  0% comisión
                 </div>
               </div>
 
+              <ul className="space-y-3 pt-6 border-t border-white/[0.06] mb-6">
+                {[
+                  'Catálogo digital con fotos ilimitado',
+                  'Código QR para mesas, vitrina o delivery',
+                  'Pedidos directos a tu WhatsApp',
+                  'Pagos por transferencia, Deuna! o efectivo',
+                  'Sistema de caja y comandas de cocina incluido',
+                  '0% de comisión por cada venta',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-slate-300">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
               <Link
                 href="/admin/login"
-                className="w-full py-3.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-display font-bold text-xs text-center border border-emerald-500/40 transition-all block cursor-pointer active:scale-95"
+                className="w-full py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-emerald-500/20 block text-center"
               >
-                Personalizar mis Add-ons
+                Comenzar con Plan Base
+              </Link>
+            </div>
+
+            {/* Add-ons — simplified, no jargon */}
+            <div className="p-6 rounded-2xl border border-white/[0.06] bg-[#0A0D15]">
+              <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest mb-4">
+                Módulos opcionales
+              </p>
+              <div className="space-y-3">
+                {ADDONS.map((addon) => {
+                  const Icon = addon.icon;
+                  return (
+                    <div
+                      key={addon.name}
+                      className="flex items-center justify-between gap-4 py-3 border-b border-white/[0.05] last:border-0"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Icon className="w-4 h-4 text-slate-500 shrink-0" size={16} />
+                        <div className="min-w-0">
+                          <p className="text-sm text-slate-200 font-display font-semibold leading-none mb-0.5">
+                            {addon.name}
+                          </p>
+                          <p className="text-[11px] text-slate-600">{addon.desc}</p>
+                        </div>
+                      </div>
+                      <span className="font-mono-tech font-bold text-slate-400 text-sm shrink-0">
+                        {addon.price}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── DEMO CTA ────────────────────────────────────────────────────── */}
+      <section className="border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-5 py-20 lg:py-28">
+          <div className="max-w-2xl mx-auto text-center space-y-7">
+            <p className="text-xs font-mono-tech text-slate-500 uppercase tracking-widest">
+              Demo real — sin registro
+            </p>
+            <h2 className="text-4xl sm:text-5xl font-display font-black text-white leading-tight">
+              Mirá cómo se ve para un restaurante real
+            </h2>
+            <p className="text-slate-400 text-base leading-relaxed">
+              Explora el catálogo de demostración. Puedes navegar el menú, agregar productos y ver el flujo completo — exactamente como lo vería tu cliente.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <Link
+                href="/restaurante-demo"
+                className="px-8 py-4 rounded-xl bg-white text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 hover:bg-slate-100 transition-all active:scale-95 cursor-pointer"
+              >
+                Abrir catálogo demo
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/admin/login"
+                className="px-8 py-4 rounded-xl border border-white/15 hover:border-white/30 text-white font-display font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
+              >
+                Crear mi catálogo
               </Link>
             </div>
           </div>
         </div>
-      </main>
+      </section>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 py-8 text-center text-xs text-slate-500 glass-panel relative z-10">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Plataforma Segura de Pedidos Directos — Ecuador</span>
+      {/* ── FOOTER ──────────────────────────────────────────────────────── */}
+      <footer className="border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-5 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-600">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-emerald-500/20 flex items-center justify-center font-display font-black text-emerald-400 text-xs">
+              Y
+            </div>
+            <span>Yapi.ec — Cuenca y Ecuador</span>
           </div>
-          <p>© 2026 Yapi.ec — Plataforma de Pedidos para Cuenca y Ecuador. Todos los derechos reservados.</p>
+          <p>© 2026 Yapi.ec · Todos los derechos reservados</p>
+          {/* Discrete super-admin access */}
+          <Link
+            href="/super-admin/login"
+            className="text-slate-800 hover:text-slate-600 text-xs transition-colors"
+            aria-label="Acceso administrativo"
+          >
+            ·
+          </Link>
         </div>
       </footer>
+
     </div>
   );
 }
