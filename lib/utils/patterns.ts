@@ -1,5 +1,5 @@
 /**
- * Yapi.ec Pattern Registry - Hero Patterns Edition
+ * Kaltiro.com Pattern Registry - Hero Patterns Edition
  * Colección de texturas abstractas y geométricas premium de https://heropatterns.com/
  * Autogenerado a partir de la librería oficial de Steve Schoger.
  */

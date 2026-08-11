@@ -1,6 +1,6 @@
 # Skills del Proyecto (`.agents/skills/`)
 
-Este directorio contiene las **skills personalizadas** para los agentes de IA que trabajan en el proyecto **Yapi.ec**.
+Este directorio contiene las **skills personalizadas** para los agentes de IA que trabajan en el proyecto **Kaltiro.com**.
 
 ## Estructura de Skills
 

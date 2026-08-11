@@ -1,6 +1,7 @@
 'use client';
 
 import React, { use } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ShoppingBag, Package, Settings, LogOut, ExternalLink, Store, ShieldAlert, Palette, ShoppingCart, Menu, X, Tv, TrendingUp } from 'lucide-react';
@@ -25,7 +26,7 @@ export default function AdminLayout({
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsSuperAdmin(sessionStorage.getItem('is_super_admin_impersonating') === 'true');
-      const role = localStorage.getItem('yapi_simulated_role') as any;
+      const role = localStorage.getItem('kaltiro_simulated_role') as any;
       if (role) setSimulatedRole(role);
     }
   }, []);
@@ -35,7 +36,7 @@ export default function AdminLayout({
   const handleSwitchRole = (newRole: 'dueño' | 'cajero-1' | 'cajero-2' | 'cocinero') => {
     setSimulatedRole(newRole);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('yapi_simulated_role', newRole);
+      localStorage.setItem('kaltiro_simulated_role', newRole);
       if (newRole === 'cocinero') {
         window.location.href = `/${slug}/cocina`;
       } else if (newRole.startsWith('cajero')) {
@@ -48,8 +49,8 @@ export default function AdminLayout({
 
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('yapi_admin_session');
-      localStorage.removeItem('yapi_admin_business_id');
+      localStorage.removeItem('kaltiro_admin_session');
+      localStorage.removeItem('kaltiro_admin_business_id');
       router.push('/admin/login');
     }
   };
@@ -185,6 +186,11 @@ export default function AdminLayout({
               accentColor="amber"
               className="text-xs"
             />
+          </div>
+
+          <div className="pt-4 border-t border-white/10 mt-3.5 flex items-center justify-center gap-1.5 opacity-50">
+            <Image src="/assets/isotipo.png" alt="Kaltiro" width={14} height={14} className="rounded-sm object-contain" />
+            <span className="text-[9px] font-mono-tech font-medium text-slate-400">Kaltiro.com</span>
           </div>
         </div>
       </aside>

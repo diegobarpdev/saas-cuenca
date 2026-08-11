@@ -25,7 +25,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const role = (localStorage.getItem('yapi_simulated_role') || 'dueño') as any;
+      const role = (localStorage.getItem('kaltiro_simulated_role') || 'dueño') as any;
       setSimulatedRole(role);
     }
   }, []);
@@ -143,7 +143,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
           <div className="pt-2 flex flex-col gap-3">
             <a
               href={`https://wa.me/593969307527?text=${encodeURIComponent(
-                `Hola! Soy de ${business.nombre} (/${business.slug}). Me gustaría activar el módulo Add-on de Monitor de Cocina KDS (+$7/mes) en Yapi.ec.`
+                `Hola! Soy de ${business.nombre} (/${business.slug}). Me gustaría activar el módulo Add-on de Monitor de Cocina KDS (+$7/mes) en Kaltiro.com.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -486,7 +486,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
                 type="button"
                 onClick={() => {
                   if (typeof window !== 'undefined') {
-                    localStorage.setItem('yapi_simulated_role', roleOpt.value);
+                    localStorage.setItem('kaltiro_simulated_role', roleOpt.value);
                     if (roleOpt.value === 'cocinero') {
                       window.location.href = `/${slug}/cocina`;
                     } else if (roleOpt.value.startsWith('cajero')) {

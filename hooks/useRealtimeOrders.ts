@@ -31,7 +31,7 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
 
     // BroadcastChannel local aislado por inquilino para sincronizar ventanas locales al instante
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-      const bc = new BroadcastChannel(`yapi-orders-bc-${businessId}`);
+      const bc = new BroadcastChannel(`kaltiro-orders-bc-${businessId}`);
       broadcastRef.current = bc;
       
       bc.onmessage = (event) => {
@@ -73,7 +73,7 @@ export function useRealtimeOrders(businessId: string, initialOrders: Order[] = [
 
       fetchOrders();
 
-      const channelName = `yapi-orders-${businessId}`;
+      const channelName = `kaltiro-orders-${businessId}`;
       const existingChannel = supabase.getChannels().find((ch: any) => ch.topic === `realtime:${channelName}`);
       if (existingChannel) {
         supabase.removeChannel(existingChannel);

@@ -13,7 +13,7 @@ export interface AdminSession {
   business: Business;
 }
 
-const SESSION_KEY = 'yapi_admin_session';
+const SESSION_KEY = 'kaltiro_admin_session';
 
 function hashPassword(password: string): string {
   // Client-side: use SubtleCrypto async — but for simplicity store as a sync lookup key
@@ -40,7 +40,7 @@ export function useAdminSession() {
 
   const logout = () => {
     localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem('yapi_admin_business_id');
+    localStorage.removeItem('kaltiro_admin_business_id');
     setSession(null);
     window.location.href = '/admin/login';
   };
@@ -50,5 +50,5 @@ export function useAdminSession() {
 
 export function saveSession(s: AdminSession) {
   localStorage.setItem(SESSION_KEY, JSON.stringify(s));
-  localStorage.setItem('yapi_admin_business_id', s.business.id);
+  localStorage.setItem('kaltiro_admin_business_id', s.business.id);
 }

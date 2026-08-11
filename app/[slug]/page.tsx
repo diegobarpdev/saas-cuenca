@@ -76,13 +76,13 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
         </div>
         <h1 className="text-2xl font-display font-black">Local No Encontrado</h1>
         <p className="text-xs text-slate-400 max-w-sm">
-          El negocio con el enlace <strong className="text-white">/{slug}</strong> no se encuentra registrado en Yapi.ec.
+          El negocio con el enlace <strong className="text-white">/{slug}</strong> no se encuentra registrado en Kaltiro.com.
         </p>
         <Link
           href="/"
           className="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-display font-bold text-xs shadow-lg transition-colors"
         >
-          Volver a Yapi Principal
+          Volver a Kaltiro Principal
         </Link>
       </div>
     );
@@ -492,7 +492,7 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
               <span className="w-7 h-7 rounded-full bg-slate-950 text-white font-mono font-black text-xs flex items-center justify-center shadow-md">
                 {totalItemsCount}
               </span>
-              <span>Ver Pedido en Yapi</span>
+              <span>Ver Pedido en Kaltiro</span>
             </div>
             <span className="font-mono text-base font-bold">
               {subtotal.toLocaleString('es-EC', { style: 'currency', currency: 'USD' })}

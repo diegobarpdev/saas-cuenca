@@ -21,10 +21,10 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+      const role = localStorage.getItem('kaltiro_simulated_role') || 'dueño';
       if (role !== 'dueño') {
         toast.error('Acceso denegado: solo el Administrador (Dueño) puede gestionar productos.');
-        const _s = JSON.parse(localStorage.getItem('yapi_admin_session') || '{}');
+        const _s = JSON.parse(localStorage.getItem('kaltiro_admin_session') || '{}');
         window.location.href = `/${_s?.business?.slug || ''}/caja`;
       } else {
         setAuthorized(true);
@@ -227,7 +227,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
     // Verificar límite del plan solo para productos nuevos
     if (!editingProduct && !planLimits.puedeAgregarProducto(products.length)) {
       toast.error(`Plan Demo: Límite de ${planLimits.maxProductos} productos alcanzado.`, {
-        description: 'Contacta a Yapi.ec para activar un plan completo.',
+        description: 'Contacta a Kaltiro.com para activar un plan completo.',
       });
       return;
     }
@@ -591,7 +591,7 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
               Cuenta Demo — Plan Trial
             </p>
             <p className="text-[11px] text-amber-400/70">
-              {products.length}/{planLimits.maxProductos} productos usados · Para eliminar el límite, contrata un plan en Yapi.ec
+              {products.length}/{planLimits.maxProductos} productos usados · Para eliminar el límite, contrata un plan en Kaltiro.com
             </p>
           </div>
         </div>

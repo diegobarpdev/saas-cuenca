@@ -64,10 +64,10 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+      const role = localStorage.getItem('kaltiro_simulated_role') || 'dueño';
       if (role !== 'dueño') {
         toast.error('Acceso denegado: solo el Administrador (Dueño) puede gestionar la configuración.');
-        const _s = JSON.parse(localStorage.getItem('yapi_admin_session') || '{}');
+        const _s = JSON.parse(localStorage.getItem('kaltiro_admin_session') || '{}');
         window.location.href = `/${_s?.business?.slug || ''}/caja`;
       } else {
         setAuthorized(true);
@@ -699,7 +699,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
                     Activa la pasarela de cobros PayPhone para recibir pagos con tarjeta de crédito o débito en tu catálogo.
                   </p>
                   <a
-                    href={`https://wa.me/593969307527?text=${encodeURIComponent(`Hola! Soy de ${business.nombre} (/${business.slug}). Me gustaría activar el módulo Add-on de PayPhone Tarjetas (+$9/mes) en Yapi.ec.`)}`}
+                    href={`https://wa.me/593969307527?text=${encodeURIComponent(`Hola! Soy de ${business.nombre} (/${business.slug}). Me gustaría activar el módulo Add-on de PayPhone Tarjetas (+$9/mes) en Kaltiro.com.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-display font-bold text-xs shrink-0 shadow-lg shadow-purple-500/20 transition-all"

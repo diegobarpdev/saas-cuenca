@@ -89,11 +89,15 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-50 bg-[#080B11]/95 backdrop-blur-sm border-b border-white/[0.06]">
         <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center font-display font-black text-slate-950 text-sm select-none">
-              Y
-            </div>
+            <Image
+              src="/assets/isotipo.png"
+              alt="Kaltiro"
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-lg object-contain"
+            />
             <span className="font-display font-black text-white text-lg tracking-tight">
-              Yapi<span className="text-emerald-400">.ec</span>
+              Kaltiro<span className="text-emerald-400">.com</span>
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -216,7 +220,7 @@ export default function LandingPage() {
 
               <div className="p-6 rounded-2xl border border-emerald-500/30 bg-emerald-950/20">
                 <p className="text-emerald-400 font-mono-tech text-[11px] uppercase tracking-widest mb-4">
-                  Yapi
+                  Kaltiro
                 </p>
                 <p className="text-4xl font-display font-black text-emerald-400 mb-1 leading-none">
                   $20
@@ -301,7 +305,7 @@ export default function LandingPage() {
             <div className="flex justify-center lg:justify-start">
               <Image
                 src="/mockup-dashboard.jpg"
-                alt="Panel de pedidos en tiempo real de Yapi.ec — vista del negocio"
+                alt="Panel de pedidos en tiempo real de Kaltiro.com — vista del negocio"
                 width={680}
                 height={383}
                 className="rounded-2xl w-full shadow-2xl shadow-black/60 border border-white/[0.07]"
@@ -474,9 +478,9 @@ export default function LandingPage() {
             <div className="w-6 h-6 rounded-md bg-emerald-500/20 flex items-center justify-center font-display font-black text-emerald-400 text-xs">
               Y
             </div>
-            <span>Yapi.ec — Cuenca y Ecuador</span>
+            <span>Kaltiro.com — Cuenca y Ecuador</span>
           </div>
-          <p>© 2026 Yapi.ec · Todos los derechos reservados</p>
+          <p>© 2026 Kaltiro.com · Todos los derechos reservados</p>
           {/* Discrete super-admin access */}
           <Link
             href="/super-admin/login"

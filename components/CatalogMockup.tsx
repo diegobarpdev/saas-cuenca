@@ -175,7 +175,7 @@ export default function CatalogMockup() {
           {/* Restaurant header */}
           <div className="flex items-center justify-between px-5 pt-3 shrink-0">
             <div>
-              <p className="text-white font-display font-black text-lg leading-none">Yapi Restaurant</p>
+              <p className="text-white font-display font-black text-lg leading-none">Kaltiro Restaurant</p>
               <p className="flex items-center gap-1 text-slate-500 text-[11px] mt-1.5">
                 <MapPin className="w-3 h-3" />
                 Cuenca, EC

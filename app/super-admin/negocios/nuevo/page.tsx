@@ -132,7 +132,7 @@ export default function CreateBusinessPage() {
             <Sparkles className="w-3.5 h-3.5" /> Alta de Empresa Multi-Tenant
           </span>
           <h1 className="text-2xl font-display font-black text-white tracking-tight mt-2">
-            Registrar Nueva Empresa en Yapi.ec
+            Registrar Nueva Empresa en Kaltiro.com
           </h1>
           <p className="text-xs text-slate-400 mt-1">
             Se creará la empresa en Supabase Postgres con su propia URL exclusiva y aislamiento RLS.

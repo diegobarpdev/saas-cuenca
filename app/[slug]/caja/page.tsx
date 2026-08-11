@@ -43,7 +43,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const role = (localStorage.getItem('yapi_simulated_role') || 'dueño') as any;
+      const role = (localStorage.getItem('kaltiro_simulated_role') || 'dueño') as any;
       setSimulatedRole(role);
     }
   }, []);
@@ -106,7 +106,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   // Verificar turno activo
   const checkActiveShift = async () => {
     if (!business) return;
-    const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+    const role = localStorage.getItem('kaltiro_simulated_role') || 'dueño';
     
     if (role === 'dueño') {
       setActiveShift({ id: 'mock-dueño-shift', rol_ejecutado: 'dueño' });
@@ -147,7 +147,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
   // Establecer nombre de caja por defecto
   useEffect(() => {
-    const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+    const role = localStorage.getItem('kaltiro_simulated_role') || 'dueño';
     if (role === 'cajero-1') {
       setNombreCaja('Caja Principal');
     } else if (role === 'cajero-2') {
@@ -162,7 +162,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     if (!business) return;
     setIsSavingShift(true);
 
-    const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+    const role = localStorage.getItem('kaltiro_simulated_role') || 'dueño';
 
     try {
       const supabase = createClient();
@@ -557,7 +557,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
       }
 
       // Canal Supabase Realtime Broadcast
-      const channelName = `yapi-orders-${business.id}`;
+      const channelName = `kaltiro-orders-${business.id}`;
       const rtChannel = supabase.channel(channelName);
       await rtChannel.send({
         type: 'broadcast',
@@ -1494,7 +1494,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               type="button"
               onClick={() => {
                 if (typeof window !== 'undefined') {
-                  localStorage.setItem('yapi_simulated_role', roleOpt.value);
+                  localStorage.setItem('kaltiro_simulated_role', roleOpt.value);
                   if (roleOpt.value === 'cocinero') {
                     window.location.href = `/${slug}/cocina`;
                   } else if (roleOpt.value.startsWith('cajero')) {

@@ -1,15 +1,15 @@
-# 💰 PLAN FINANCIERO & ESTRATEGIA COMERCIAL DE YAPI.EC
+# 💰 PLAN FINANCIERO & ESTRATEGIA COMERCIAL DE KALTIRO.COM
 
-> **Yapi.ec — Plataforma SaaS de Pedidos Directos para Restaurantes y Comercios**
+> **Kaltiro.com — Plataforma SaaS de Pedidos Directos para Restaurantes y Comercios**
 > *Mercado Objetivo: Cuenca, Azuay y Ecuador.*
 
 ---
 
 ## 🥊 1. ANÁLISIS DE COMPETENCIA & ESTRATEGIA DE PRECIOS
 
-### Comparativa: PedidosYa / Rappi vs. Yapi.ec
+### Comparativa: PedidosYa / Rappi vs. Kaltiro.com
 
-| Criterio | 🛵 PedidosYa / Rappi / UberEats | 🚀 Yapi.ec (Plataforma SaaS) |
+| Criterio | 🛵 PedidosYa / Rappi / UberEats | 🚀 Kaltiro.com (Plataforma SaaS) |
 | :--- | :--- | :--- |
 | **Comisión por venta** | **22% al 35% + IVA** de cada pedido 💸 | **0% de comisión** (El 100% de la venta es del local) 🛡️ |
 | **Modelo de cobro** | Recorte de margen por cada plato vendido | **Suscripción Base** ($15/mes) + Add-ons a la carta 💳 |
@@ -25,7 +25,7 @@
 ### Costos Fijos de Infraestructura (Servidores en Nube)
 * **Vercel (Nube Next.js 16 App Router):** $0.00 a $20.00 USD / mes.
 * **Supabase (PostgreSQL en Tiempo Real + Realtime Websockets):** $0.00 (Free Tier) a $25.00 USD / mes.
-* **Dominio (`yapi.ec`):** ~$1.25 USD / mes ($15/año).
+* **Dominio (`kaltiro.com`):** ~$1.25 USD / mes ($15/año).
 * **COSTO TOTAL MÁXIMO:** **~$45.00 USD / mes** para atender hasta 100 restaurantes.
 
 ### Margen de Ganancia Neta SaaS: **> 95%**
@@ -42,9 +42,9 @@
 
 ---
 
-## 💎 4. ESTRUCTURA DE PRECIOS Y ADD-ONS DE YAPI.EC
+## 💎 4. ESTRUCTURA DE PRECIOS Y ADD-ONS DE KALTIRO.COM
 
-Yapi.ec opera bajo un **Modelo SaaS Modular (A la carta)**. Los negocios pagan una suscripción base muy económica y solo añaden los módulos que realmente necesitan.
+Kaltiro.com opera bajo un **Modelo SaaS Modular (A la carta)**. Los negocios pagan una suscripción base muy económica y solo añaden los módulos que realmente necesitan.
 
 ### 1. 🟢 Plan Base Core — $15 USD / mes
 El motor fundamental para digitalizar cualquier local:

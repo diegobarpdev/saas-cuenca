@@ -12,10 +12,10 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const role = localStorage.getItem('yapi_simulated_role') || 'dueño';
+      const role = localStorage.getItem('kaltiro_simulated_role') || 'dueño';
       if (role !== 'dueño') {
         toast.error('Acceso denegado: solo el Administrador (Dueño) puede acceder al Marketplace.');
-        const _s = JSON.parse(localStorage.getItem('yapi_admin_session') || '{}');
+        const _s = JSON.parse(localStorage.getItem('kaltiro_admin_session') || '{}');
         window.location.href = `/${_s?.business?.slug || ''}/caja`;
       } else {
         setAuthorized(true);
@@ -27,13 +27,13 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
     return (
       <div className="p-12 text-center text-slate-400 font-display text-sm flex items-center justify-center gap-2">
         <RefreshCw className="w-5 h-5 animate-spin text-emerald-400" />
-        <span>Cargando Marketplace de Módulos Yapi.ec...</span>
+        <span>Cargando Marketplace de Módulos Kaltiro.com...</span>
       </div>
     );
   }
 
   const getWhatsAppLink = (moduleName: string, price: string) => {
-    const text = `Hola! Soy de ${business.nombre} (/${business.slug}). Me gustaría solicitar la activación del módulo Add-on de ${moduleName} (${price}) en Yapi.ec.`;
+    const text = `Hola! Soy de ${business.nombre} (/${business.slug}). Me gustaría solicitar la activación del módulo Add-on de ${moduleName} (${price}) en Kaltiro.com.`;
     return `https://wa.me/593969307527?text=${encodeURIComponent(text)}`;
   };
 
@@ -98,7 +98,7 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
       <div className="bg-[#0D1322] p-6 rounded-3xl border border-white/10 glass-panel shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 text-xs font-mono-tech border border-emerald-500/30">
-            <ShoppingCart className="w-3.5 h-3.5 text-amber-400" /> Marketplace Oficial de Módulos Yapi.ec
+            <ShoppingCart className="w-3.5 h-3.5 text-amber-400" /> Marketplace Oficial de Módulos Kaltiro.com
           </div>
           <h1 className="text-2xl font-display font-black text-white tracking-tight mt-2">
             Módulos Add-ons para {business.nombre}

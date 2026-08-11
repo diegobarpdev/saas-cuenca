@@ -15,9 +15,9 @@ export default function AdminLoginPage() {
 
   // Si ya hay sesión activa, redirigir directo al dashboard
   useEffect(() => {
-    const raw = localStorage.getItem('yapi_admin_session');
+    const raw = localStorage.getItem('kaltiro_admin_session');
     if (raw) {
-      const raw = localStorage.getItem('yapi_admin_session');
+      const raw = localStorage.getItem('kaltiro_admin_session');
       if (raw) {
         const s = JSON.parse(raw);
         router.replace(`/${s?.business?.slug || ''}/admin/dashboard`);
@@ -58,7 +58,7 @@ export default function AdminLoginPage() {
   };
 
   const handleDemoLogin = async () => {
-    setEmail('demo@yapiec.com');
+    setEmail('demo@kaltiro.com');
     setPassword('demo1234');
     setError('');
     setLoading(true);
@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'demo@yapiec.com', password: 'demo1234' }),
+        body: JSON.stringify({ email: 'demo@kaltiro.com', password: 'demo1234' }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -98,7 +98,7 @@ export default function AdminLoginPage() {
             <Zap className="w-8 h-8 text-emerald-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-white tracking-tight">Bienvenido a Yapi</h1>
+            <h1 className="text-2xl font-black text-white tracking-tight">Bienvenido a Kaltiro</h1>
             <p className="text-xs text-slate-500 mt-1">
               Ingresa con las credenciales de tu negocio
             </p>
@@ -199,7 +199,7 @@ export default function AdminLoginPage() {
 
         {/* Powered by */}
         <p className="text-center text-[10px] text-slate-700">
-          Yapi.ec — Software de Gestión para Restaurantes
+          Kaltiro.com — Software de Gestión para Restaurantes
         </p>
       </div>
     </div>

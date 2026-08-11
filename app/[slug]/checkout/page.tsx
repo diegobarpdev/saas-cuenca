@@ -267,7 +267,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
 
           // Emitir evento Supabase Realtime Broadcast para notificación instantánea en cualquier navegador
           try {
-            const channelName = `yapi-orders-${business.id}`;
+            const channelName = `kaltiro-orders-${business.id}`;
             const rtChannel = supabase.channel(channelName);
             await new Promise<void>((resolve) => {
               rtChannel.subscribe(async (status: string) => {

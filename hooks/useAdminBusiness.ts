@@ -13,7 +13,7 @@ export function useAdminBusiness(slug?: string) {
       try {
         // Leer sesión guardada (siempre existe si el usuario está logueado)
         const sessionRaw = typeof window !== 'undefined'
-          ? localStorage.getItem('yapi_admin_session')
+          ? localStorage.getItem('kaltiro_admin_session')
           : null;
         const session = sessionRaw ? JSON.parse(sessionRaw) : null;
 
@@ -62,13 +62,13 @@ export function useAdminBusiness(slug?: string) {
             setBusiness(res.data as Business);
             // Actualizar el ID en localStorage por compatibilidad
             if (typeof window !== 'undefined') {
-              localStorage.setItem('yapi_admin_business_id', res.data.id);
+              localStorage.setItem('kaltiro_admin_business_id', res.data.id);
             }
           } else {
             // Sesión inválida — redirigir a login
             if (typeof window !== 'undefined') {
-              localStorage.removeItem('yapi_admin_session');
-              localStorage.removeItem('yapi_admin_business_id');
+              localStorage.removeItem('kaltiro_admin_session');
+              localStorage.removeItem('kaltiro_admin_business_id');
               window.location.href = '/admin/login';
             }
           }

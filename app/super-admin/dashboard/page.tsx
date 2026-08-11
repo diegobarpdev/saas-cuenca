@@ -55,7 +55,7 @@ export default function SuperAdminDashboardPage() {
 
   const handleEnterAsAdmin = (businessId: string) => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('yapi_admin_business_id', businessId);
+      localStorage.setItem('kaltiro_admin_business_id', businessId);
       sessionStorage.setItem('is_super_admin_impersonating', 'true');
     }
     router.push('/admin/dashboard');

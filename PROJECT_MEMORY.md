@@ -1,14 +1,14 @@
-# 🧠 MEMORIA DEL PROYECTO — YAPI.EC (SaaS Pedidos Multi-Empresa)
+# 🧠 MEMORIA DEL PROYECTO — KALTIRO.COM (SaaS Pedidos Multi-Empresa)
 
 Este archivo sirve como **fuente única de verdad y memoria técnica** para cualquier sesión o agente AI en este proyecto.
 
 ---
 
 ## 📌 1. Identidad de Marca & Visión
-* **Nombre Comercial Oficial:** **`Yapi`** (`Yapi.ec` / `yapiec.com`)
+* **Nombre Comercial Oficial:** **`Kaltiro`** (`kaltiro.com`)
 * **Contacto Oficial / WhatsApp Admin:** **`+593 96 930 7527`** (`593969307527`)
 * **Propósito:** Plataforma SaaS multi-inquilino (*multi-tenant*) de comercio electrónico y pedidos en línea en tiempo real para restaurantes, panaderías, cafeterías y tiendas en **Cuenca y Ecuador**.
-* **Diferenciador Clave:** 0% comisiones por venta (Modelo SaaS de Plan Base $15/mes + Add-ons a la carta). El concepto "Yapi" evoca la "yapa" o beneficio directo para el negocio y cliente.
+* **Diferenciador Clave:** 0% comisiones por venta (Modelo SaaS de Plan Base $15/mes + Add-ons a la carta).
 
 ---
 
@@ -50,5 +50,5 @@ El esquema completo está sincronizado en [`supabase/schema.sql`](file:///C:/Use
 ---
 
 ## 📄 5. Enlaces a Documentación Relevante
-* **Plan Financiero y Estrategia Comercial:** [`PLAN_FINANCIERO_YAPI.md`](file:///C:/Users/soportectin/Documents/dbdp/saas-cuenca/PLAN_FINANCIERO_YAPI.md)
+* **Plan Financiero y Estrategia Comercial:** [`PLAN_FINANCIERO_KALTIRO.md`](file:///C:/Users/soportectin/Documents/dbdp/saas-cuenca/PLAN_FINANCIERO_KALTIRO.md)
 * **Esquema SQL de Supabase:** [`supabase/schema.sql`](file:///C:/Users/soportectin/Documents/dbdp/saas-cuenca/supabase/schema.sql)
