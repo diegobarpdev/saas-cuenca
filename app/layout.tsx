@@ -1,22 +1,57 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { CustomToaster } from '@/components/ui/CustomToaster';
 import './globals.css';
 
-export const metadata: Metadata = {
-  title: 'Kaltiro.com — Pedidos directos para tu restaurante. $20/mes, 0% de comisión.',
-  description: 'Kaltiro es la plataforma de pedidos para restaurantes, cafeterías y negocios de comida en Ecuador. Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y cero comisión por venta. Plan fijo $20/mes.',
-  keywords: [
-    'kaltiro', 'kaltiro.com', 'catálogo digital restaurante ecuador',
-    'pedidos whatsapp restaurante', 'menú digital QR cuenca',
-    'plataforma pedidos sin comisión', 'sistema pedidos restaurante cuenca',
-    'payphone restaurant', 'pedidos online ecuador', '0 comision delivery',
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#080B11' },
+    { media: '(prefers-color-scheme: light)', color: '#080B11' },
   ],
 };
 
-export const viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
+export const metadata: Metadata = {
+  metadataBase: new URL('https://kaltiro.com'),
+  title: {
+    default: 'Kaltiro — Pedidos directos para tu restaurante. $20/mes, 0% de comisión.',
+    template: '%s | Kaltiro',
+  },
+  description:
+    'Kaltiro es la plataforma de pedidos para restaurantes, cafeterías y negocios de comida en Ecuador. Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y cero comisión por venta. Plan fijo $20/mes.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'es_EC',
+    url: 'https://kaltiro.com',
+    siteName: 'Kaltiro',
+    title: 'Kaltiro — Pedidos directos para tu restaurante. $20/mes, 0% de comisión.',
+    description:
+      'Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y cero comisión por venta. Plan fijo $20/mes.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Kaltiro — Plataforma de pedidos para restaurantes en Ecuador',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Kaltiro — Pedidos directos para tu restaurante',
+    description:
+      'Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y 0% de comisión. $20/mes.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

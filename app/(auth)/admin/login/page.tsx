@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, ArrowRight, Eye, EyeOff, Zap } from 'lucide-react';
+import Link from 'next/link';
+import { Lock, Mail, ArrowRight, Eye, EyeOff, Zap, ArrowLeft } from 'lucide-react';
 import { saveSession } from '@/hooks/useAdminSession';
 
 export default function AdminLoginPage() {
@@ -195,6 +196,17 @@ export default function AdminLoginPage() {
             <Zap className="w-3.5 h-3.5" />
             Acceder con cuenta Demo
           </button>
+        </div>
+
+        {/* Volver a la landing */}
+        <div className="text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Volver al inicio
+          </Link>
         </div>
 
         {/* Powered by */}

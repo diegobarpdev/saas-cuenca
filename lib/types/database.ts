@@ -116,9 +116,32 @@ export interface Business {
   has_pos_printing?: boolean;
   has_crm_export?: boolean;
   has_custom_domain?: boolean;
+  has_facturacion_sri?: boolean;
   custom_domain?: string | null;
   branding?: BusinessBranding;
   configuracion_operativa?: OperationalSettings;
+  plan_max_productos?: number;
+  plan_max_pedidos_mes?: number;
+  created_at: string;
+}
+
+export type BillingEstado = 'pendiente' | 'pagado' | 'vencido';
+export type BillingTipoReceptor = 'ruc' | 'cedula' | 'consumidor_final';
+
+export interface BillingRecord {
+  id: string;
+  business_id: string;
+  mes: string;
+  monto: number;
+  estado: BillingEstado;
+  tipo_receptor: BillingTipoReceptor;
+  num_doc?: string | null;
+  razon_social?: string | null;
+  email_receptor?: string | null;
+  metodo_pago?: 'transferencia' | 'efectivo' | 'payphone' | null;
+  fecha_pago?: string | null;
+  comprobante_url?: string | null;
+  notas?: string | null;
   created_at: string;
 }
 

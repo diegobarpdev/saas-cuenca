@@ -1,7 +1,7 @@
 'use client';
 
 import React, { use, useState, useEffect } from 'react';
-import { ShoppingCart, CreditCard, Volume2, Printer, Download, Globe, Sparkles, CheckCircle2, ShieldCheck, RefreshCw, MessageSquare } from 'lucide-react';
+import { ShoppingCart, CreditCard, Volume2, Printer, Download, Globe, Sparkles, CheckCircle2, ShieldCheck, RefreshCw, MessageSquare, Receipt } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { toast } from '@/lib/utils/toast';
 
@@ -88,6 +88,19 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
         'Exportación en 1-clic de ventas y facturación a Excel',
         'Historial de pedidos por fecha, estado y método de pago',
         'Directorio CRM de clientes (WhatsApp, Dirección, RUC) para marketing',
+      ],
+    },
+    {
+      id: 'facturacion_sri',
+      title: 'Facturación Electrónica SRI',
+      price: '+$12 / mes',
+      icon: Receipt,
+      active: !!business.has_facturacion_sri,
+      description: 'Emite facturas electrónicas válidas ante el SRI directamente desde tu panel de administración, sin necesidad de sistemas externos.',
+      benefits: [
+        'Facturas electrónicas autorizadas por el SRI al instante',
+        'Envío automático de la factura al cliente por email',
+        'Registros y comprobantes integrados en tu historial de pedidos',
       ],
     },
   ];

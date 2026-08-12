@@ -3,12 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Building2, PlusCircle, ShieldAlert, LogOut, ArrowLeft } from 'lucide-react';
+import { Building2, PlusCircle, ShieldAlert, LogOut, ArrowLeft, Menu, X, Receipt } from 'lucide-react';
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Verificar protección de autenticación para Super Admin
   useEffect(() => {
@@ -26,6 +27,8 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
       setIsAuthenticated(true);
     }
   }, [pathname, router]);
+
+  useEffect(() => { setIsSidebarOpen(false); }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('super_admin_logged');
@@ -50,13 +53,36 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
 
   const navItems = [
     { label: 'Gestión de Empresas', href: '/super-admin/dashboard', icon: Building2 },
+    { label: 'Facturación', href: '/super-admin/facturacion', icon: Receipt },
     { label: 'Crear Nueva Empresa', href: '/super-admin/negocios/nuevo', icon: PlusCircle },
   ];
 
   return (
-    <div className="min-h-screen bg-[#070A11] text-slate-100 font-sans flex flex-col md:flex-row w-full">
-      {/* Sidebar Super Admin */}
-      <aside className="w-full md:w-64 bg-[#0A0E1A] border-b md:border-b-0 md:border-r border-purple-500/20 p-5 flex flex-col justify-between flex-shrink-0">
+    <div className="h-screen bg-[#070A11] text-slate-100 font-sans flex flex-col md:flex-row w-full overflow-hidden">
+
+      {/* Header móvil */}
+      <header className="md:hidden w-full h-14 bg-[#0A0E1A] border-b border-purple-500/20 flex items-center justify-between px-4 shrink-0 z-30">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400">
+            <ShieldAlert className="w-4 h-4" />
+          </div>
+          <span className="font-display font-black text-xs text-white">Super Admin</span>
+        </div>
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="w-9 h-9 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white"
+        >
+          {isSidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+        </button>
+      </header>
+
+      {/* Backdrop móvil */}
+      {isSidebarOpen && (
+        <div onClick={() => setIsSidebarOpen(false)} className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40" />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed md:static inset-y-0 left-0 w-64 h-full bg-[#0A0E1A] border-r border-purple-500/20 p-5 flex flex-col justify-between flex-shrink-0 z-50 transition-transform duration-300 ease-out md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="space-y-6">
           {/* Logo Master */}
           <div className="flex items-center gap-3 px-2">
@@ -110,8 +136,8 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
         </div>
       </aside>
 
-      {/* Contenido Principal Full Width */}
-      <main className="flex-1 p-5 md:p-8 overflow-y-auto w-full min-w-0">
+      {/* Contenido Principal */}
+      <main className="flex-1 h-full overflow-y-auto p-5 md:p-8 w-full min-w-0">
         {children}
       </main>
     </div>

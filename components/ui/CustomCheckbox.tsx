@@ -38,11 +38,11 @@ export function CustomCheckbox({
 
   return (
     <label
-      className={`inline-flex items-start gap-3 cursor-pointer select-none group ${
+      className={`inline-flex items-center gap-3 cursor-pointer select-none group ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       } ${className}`}
     >
-      <div className="relative flex items-center pt-0.5">
+      <div className="relative flex items-center">
         <input
           type="checkbox"
           checked={checked}

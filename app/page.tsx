@@ -102,7 +102,7 @@ export default function LandingPage() {
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/restaurante-demo"
+              href="/demo"
               className="text-sm text-slate-400 hover:text-white transition-colors hidden sm:inline"
             >
               Ver demo
@@ -142,7 +142,7 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <Link
-                href="/restaurante-demo"
+                href="/demo"
                 className="px-7 py-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-brand-500/20"
               >
                 Ver demo en vivo
@@ -454,7 +454,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Link
-                href="/restaurante-demo"
+                href="/demo"
                 className="px-8 py-4 rounded-xl bg-white text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 hover:bg-slate-100 transition-all active:scale-95 cursor-pointer"
               >
                 Abrir catálogo demo
