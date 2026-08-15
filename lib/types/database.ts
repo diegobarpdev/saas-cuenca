@@ -217,6 +217,53 @@ export interface OrderItem {
   opciones_seleccionadas?: any;
 }
 
+export interface BusinessSriConfig {
+  id: string;
+  business_id: string;
+  ruc_emisor: string;
+  razon_social: string;
+  nombre_comercial?: string | null;
+  direccion_matriz: string;
+  codigo_establecimiento: string;
+  codigo_punto_emision: string;
+  secuencial_actual: number;
+  ambiente: 'pruebas' | 'produccion';
+  certificado_p12_base64?: string | null;
+  certificado_clave?: string | null;
+  activo: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type FacturaEstado = 'generada' | 'enviada' | 'en_proceso' | 'autorizada' | 'rechazada' | 'anulada';
+
+export interface FacturaElectronica {
+  id: string;
+  business_id: string;
+  order_id: string;
+  clave_acceso: string;
+  numero_autorizacion?: string | null;
+  fecha_autorizacion?: string | null;
+  ambiente: 'pruebas' | 'produccion';
+  estado: FacturaEstado;
+  xml_firmado?: string | null;
+  xml_autorizado?: string | null;
+  ride_pdf_url?: string | null;
+  numero_secuencial: string;
+  fecha_emision: string;
+  subtotal_sin_impuestos: number;
+  iva: number;
+  total: number;
+  receptor_tipo_doc: 'RUC' | 'CEDULA' | 'PASAPORTE';
+  receptor_num_doc: string;
+  receptor_razon_social: string;
+  receptor_email?: string | null;
+  receptor_direccion?: string | null;
+  email_enviado: boolean;
+  errores: string[];
+  created_at: string;
+}
+
 export interface CartItem {
   product: Product;
   cantidad: number;

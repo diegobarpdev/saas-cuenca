@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useState, useEffect, use } from 'react';
-import { 
-  Store, 
-  ShoppingCart, 
-  Plus, 
-  Minus, 
-  Search, 
-  Trash2, 
-  User, 
-  Phone, 
-  Receipt, 
+import {
+  Store,
+  ShoppingCart,
+  Plus,
+  Minus,
+  Search,
+  Trash2,
+  User,
+  Phone,
+  Receipt,
   AlertCircle,
   ArrowLeft,
   Maximize2,
@@ -18,8 +18,11 @@ import {
   Lock,
   Unlock,
   TrendingUp,
-  Coins
+  Coins,
+  FileText,
+  ChevronDown,
 } from 'lucide-react';
+import type { BillingData } from '@/lib/types/database';
 import { toast } from '@/lib/utils/toast';
 import { Product, Category, Order, CartItem } from '@/lib/types/database';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -68,6 +71,21 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   const [numeroMesa, setNumeroMesa] = useState('');
   const [metodoPago, setMetodoPago] = useState<'efectivo' | 'transferencia' | 'payphone'>('efectivo');
   const [estadoPago, setEstadoPago] = useState<'pendiente' | 'pagado'>('pagado');
+
+  // Factura electrónica
+  const [requiereFactura, setRequiereFactura] = useState(false);
+  const [datosFact, setDatosFact] = useState<BillingData>({
+    tipo_doc: 'CEDULA',
+    num_doc: '',
+    razon_social: '',
+    email: '',
+    direccion: '',
+  });
+
+  // CRM autocomplete
+  const [crmQuery, setCrmQuery] = useState('');
+  const [crmResults, setCrmResults] = useState<{ nombre: string; telefono: string }[]>([]);
+  const [showCrmDrop, setShowCrmDrop] = useState(false);
 
   const [isSaving, setIsSaving] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -448,6 +466,29 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     );
   };
 
+  // Búsqueda CRM
+  const searchCrm = async (q: string) => {
+    setCrmQuery(q);
+    setClienteNombre(q);
+    if (!business || q.trim().length < 2) { setCrmResults([]); setShowCrmDrop(false); return; }
+    const supabase = createClient();
+    const { data } = await supabase
+      .from('business_customers')
+      .select('nombre, telefono')
+      .eq('business_id', business.id)
+      .ilike('nombre', `%${q}%`)
+      .limit(6);
+    setCrmResults(data ?? []);
+    setShowCrmDrop((data?.length ?? 0) > 0);
+  };
+
+  const selectCrmCustomer = (c: { nombre: string; telefono: string }) => {
+    setClienteNombre(c.nombre);
+    setClienteTelefono(c.telefono);
+    setCrmQuery(c.nombre);
+    setShowCrmDrop(false);
+  };
+
   // Limpiar Carrito
   const clearCart = () => {
     setCart([]);
@@ -457,6 +498,10 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     setTipoEntrega('mesa');
     setMetodoPago('efectivo');
     setEstadoPago('pagado');
+    setRequiereFactura(false);
+    setDatosFact({ tipo_doc: 'CEDULA', num_doc: '', razon_social: '', email: '', direccion: '' });
+    setCrmQuery('');
+    setCrmResults([]);
   };
 
   // Cálculo de totales
@@ -511,7 +556,9 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
       metodo_pago: metodoPago,
       estado_pago: estadoPago,
       estado: 'pendiente',
-      shift_id: activeShift && activeShift.id !== 'mock-dueño-shift' ? activeShift.id : null
+      shift_id: activeShift && activeShift.id !== 'mock-dueño-shift' ? activeShift.id : null,
+      requiere_factura: requiereFactura,
+      datos_facturacion: requiereFactura ? datosFact : null,
     };
 
     try {
@@ -924,10 +971,10 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
       </div>
 
       {/* SECCIÓN DERECHA: Resumen de Cuenta & Formulario */}
-      <div className="w-full xl:w-[400px] bg-[#0B0F1B] border border-white/10 rounded-3xl p-5 flex flex-col h-full shadow-2xl shrink-0">
-        
-        {/* Ticket Header */}
-        <div className="border-b border-white/10 pb-4 flex items-center justify-between">
+      <div className="w-full xl:w-[400px] bg-[#0B0F1B] border border-white/10 rounded-3xl flex flex-col h-full shadow-2xl shrink-0 overflow-hidden">
+
+        {/* Ticket Header — fijo arriba */}
+        <div className="border-b border-white/10 px-5 py-4 flex items-center justify-between shrink-0">
           <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
             <ShoppingCart className="w-4.5 h-4.5 text-brand-400" />
             <span>Resumen del Pedido</span>
@@ -937,8 +984,11 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           </span>
         </div>
 
+        {/* Todo el contenido scrolleable: items + form */}
+        <div className="flex-1 overflow-y-auto">
+
         {/* Lista del Carrito */}
-        <div className="flex-1 overflow-y-auto py-3 space-y-3.5 scrollbar-thin">
+        <div className="px-5 py-3 space-y-3.5">
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-slate-500 py-12 text-center">
               <ShoppingCart className="w-8 h-8 mb-2 text-slate-700 animate-bounce" />
@@ -1009,7 +1059,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
         </div>
 
         {/* Formulario Cliente, Modalidad y Pago */}
-        <form onSubmit={handleCreateOrder} className="border-t border-white/10 pt-4 space-y-4 bg-slate-950/20 -mx-5 -mb-5 p-5 rounded-b-3xl">
+        <form onSubmit={handleCreateOrder} className="border-t border-white/10 pt-4 space-y-4 bg-slate-950/20 px-5 pb-5">
           
           {/* Modalidades de Entrega */}
           <div>
@@ -1045,16 +1095,36 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                 Nombre Cliente
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-500">
+                <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-500 z-10">
                   <User className="w-3.5 h-3.5" />
                 </span>
                 <input
                   type="text"
                   required
-                  value={clienteNombre}
-                  onChange={(e) => setClienteNombre(e.target.value)}
-                  className="w-full pl-7.5 pr-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-brand-500"
+                  value={crmQuery || clienteNombre}
+                  onChange={(e) => searchCrm(e.target.value)}
+                  onFocus={() => crmResults.length > 0 && setShowCrmDrop(true)}
+                  onBlur={() => setTimeout(() => setShowCrmDrop(false), 150)}
+                  className="w-full pl-7 pr-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-brand-500"
                 />
+                {showCrmDrop && (
+                  <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-[#0D1322] border border-white/10 rounded-xl overflow-hidden shadow-xl">
+                    {crmResults.map((c, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onMouseDown={() => selectCrmCustomer(c)}
+                        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-brand-500/10 text-left transition-colors"
+                      >
+                        <User className="w-3 h-3 text-brand-400 shrink-0" />
+                        <div>
+                          <p className="text-xs text-white font-medium">{c.nombre}</p>
+                          <p className="text-[10px] text-slate-400 font-mono">{c.telefono}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1143,6 +1213,78 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             </div>
           </div>
 
+          {/* Factura Electrónica */}
+          {business?.has_facturacion_sri && (
+            <div className="border-t border-white/5 pt-3 space-y-3">
+              <button
+                type="button"
+                onClick={() => setRequiereFactura(!requiereFactura)}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl border transition-all ${
+                  requiereFactura
+                    ? 'bg-brand-500/10 border-brand-500/40 text-brand-300'
+                    : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <span className="flex items-center gap-2 text-[11px] font-display font-bold">
+                  <FileText className="w-3.5 h-3.5" />
+                  Requiere Factura Electrónica
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${requiereFactura ? 'rotate-180' : ''}`} />
+              </button>
+
+              {requiereFactura && (
+                <div className="space-y-2 bg-slate-950/60 rounded-xl p-3 border border-white/5">
+                  {/* Tipo documento */}
+                  <div className="grid grid-cols-3 gap-1">
+                    {(['CEDULA', 'RUC', 'PASAPORTE'] as const).map(t => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setDatosFact(prev => ({ ...prev, tipo_doc: t }))}
+                        className={`py-1 rounded-lg text-[9px] font-mono-tech font-bold border transition-all ${
+                          datosFact.tipo_doc === t
+                            ? 'bg-brand-500/20 border-brand-500/50 text-brand-300'
+                            : 'bg-slate-900 border-slate-800 text-slate-500'
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+
+                  <input
+                    type="text"
+                    placeholder={datosFact.tipo_doc === 'RUC' ? 'RUC (13 dígitos)' : datosFact.tipo_doc === 'CEDULA' ? 'Cédula (10 dígitos)' : 'Pasaporte'}
+                    value={datosFact.num_doc}
+                    onChange={e => setDatosFact(prev => ({ ...prev, num_doc: e.target.value }))}
+                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white font-mono placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Razón Social"
+                    value={datosFact.razon_social}
+                    onChange={e => setDatosFact(prev => ({ ...prev, razon_social: e.target.value }))}
+                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email (para enviar la factura)"
+                    value={datosFact.email}
+                    onChange={e => setDatosFact(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Dirección fiscal"
+                    value={datosFact.direccion}
+                    onChange={e => setDatosFact(prev => ({ ...prev, direccion: e.target.value }))}
+                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Totales Cuenta */}
           <div className="border-t border-white/10 pt-3 space-y-1.5">
             <div className="flex justify-between text-xs text-slate-400">
@@ -1182,6 +1324,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             </button>
           </div>
         </form>
+        </div>{/* fin contenedor scrolleable */}
       </div>
     </div>
     )}

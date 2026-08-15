@@ -328,3 +328,58 @@ CREATE TRIGGER trg_sync_order_to_customers
 AFTER INSERT ON orders
 FOR EACH ROW
 EXECUTE FUNCTION sync_order_to_customers();
+
+-- 15. FACTURACIÓN ELECTRÓNICA SRI
+ALTER TABLE businesses ADD COLUMN IF NOT EXISTS has_facturacion_sri BOOLEAN DEFAULT false;
+
+CREATE TABLE IF NOT EXISTS business_sri_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+  ruc_emisor TEXT NOT NULL,
+  razon_social TEXT NOT NULL,
+  nombre_comercial TEXT,
+  direccion_matriz TEXT NOT NULL,
+  codigo_establecimiento TEXT NOT NULL DEFAULT '001',
+  codigo_punto_emision TEXT NOT NULL DEFAULT '001',
+  secuencial_actual INTEGER NOT NULL DEFAULT 1,
+  ambiente TEXT NOT NULL DEFAULT 'pruebas' CHECK (ambiente IN ('pruebas', 'produccion')),
+  certificado_p12_base64 TEXT,
+  certificado_clave TEXT,
+  activo BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(business_id)
+);
+
+CREATE TABLE IF NOT EXISTS facturas_electronicas (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+  order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  clave_acceso TEXT NOT NULL UNIQUE,
+  numero_autorizacion TEXT,
+  fecha_autorizacion TIMESTAMPTZ,
+  ambiente TEXT NOT NULL DEFAULT 'pruebas' CHECK (ambiente IN ('pruebas', 'produccion')),
+  estado TEXT NOT NULL DEFAULT 'generada' CHECK (estado IN ('generada', 'enviada', 'autorizada', 'rechazada', 'anulada')),
+  xml_firmado TEXT,
+  xml_autorizado TEXT,
+  ride_pdf_url TEXT,
+  numero_secuencial TEXT NOT NULL,
+  fecha_emision DATE NOT NULL,
+  subtotal_sin_impuestos NUMERIC(10,2) NOT NULL,
+  iva NUMERIC(10,2) NOT NULL DEFAULT 0,
+  total NUMERIC(10,2) NOT NULL,
+  receptor_tipo_doc TEXT NOT NULL CHECK (receptor_tipo_doc IN ('RUC', 'CEDULA', 'PASAPORTE')),
+  receptor_num_doc TEXT NOT NULL,
+  receptor_razon_social TEXT NOT NULL,
+  receptor_email TEXT,
+  receptor_direccion TEXT,
+  email_enviado BOOLEAN DEFAULT false,
+  errores JSONB DEFAULT '[]'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE business_sri_config ENABLE ROW LEVEL SECURITY;
+ALTER TABLE facturas_electronicas ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow All SRI Config" ON business_sri_config FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow All Facturas" ON facturas_electronicas FOR ALL USING (true) WITH CHECK (true);

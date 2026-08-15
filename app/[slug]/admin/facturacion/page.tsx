@@ -1,11 +1,15 @@
 'use client';
 
-import React, { use, useState, useEffect } from 'react';
-import { Receipt, RefreshCw, FileText, Copy, CheckCircle2, AlertCircle, Clock, Search, ExternalLink } from 'lucide-react';
+import React, { use, useState, useEffect, useCallback } from 'react';
+import {
+  Receipt, RefreshCw, FileText, Copy, CheckCircle2, AlertCircle,
+  Clock, Search, Zap, Loader2, XCircle, ShieldCheck, Timer,
+} from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { createClient } from '@/lib/supabase/client';
 import { formatCurrency } from '@/lib/utils/currency';
 import { toast } from '@/lib/utils/toast';
+import type { FacturaElectronica } from '@/lib/types/database';
 
 interface OrderWithBilling {
   id: string;
@@ -22,6 +26,36 @@ interface OrderWithBilling {
     email: string;
     direccion: string;
   } | null;
+  factura?: FacturaElectronica | null;
+}
+
+function FacturaEstadoBadge({ estado }: { estado: string }) {
+  if (estado === 'autorizada') {
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-mono-tech font-bold">
+        <ShieldCheck className="w-3 h-3" /> AUTORIZADA
+      </span>
+    );
+  }
+  if (estado === 'rechazada') {
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-[10px] font-mono-tech font-bold">
+        <XCircle className="w-3 h-3" /> RECHAZADA
+      </span>
+    );
+  }
+  if (estado === 'en_proceso') {
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-mono-tech font-bold">
+        <Timer className="w-3 h-3" /> EN PROCESO
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-500/10 border border-white/10 text-slate-400 text-[10px] font-mono-tech font-bold">
+      {estado.toUpperCase()}
+    </span>
+  );
 }
 
 export default function AdminFacturacionPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -32,29 +66,59 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [emitiendo, setEmitiendo] = useState<string | null>(null);
+  const [hasSriConfig, setHasSriConfig] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      if (!business) return;
-      setLoading(true);
-      try {
-        const supabase = createClient();
-        const { data } = await supabase
+  const load = useCallback(async () => {
+    if (!business) return;
+    setLoading(true);
+    try {
+      const supabase = createClient();
+
+      const [{ data: ordersData }, { data: facturas }, { data: sriConfig }] = await Promise.all([
+        supabase
           .from('orders')
           .select('id, numero_pedido, cliente_nombre, cliente_telefono, total, created_at, estado, datos_facturacion')
           .eq('business_id', business.id)
           .eq('requiere_factura', true)
           .order('created_at', { ascending: false })
-          .limit(100);
-        setOrders((data as OrderWithBilling[]) || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+          .limit(100),
+        supabase
+          .from('facturas_electronicas')
+          .select('*')
+          .eq('business_id', business.id),
+        supabase
+          .from('business_sri_config')
+          .select('id, activo')
+          .eq('business_id', business.id)
+          .eq('activo', true)
+          .maybeSingle(),
+      ]);
+
+      setHasSriConfig(!!sriConfig);
+
+      const facturaMap = new Map<string, FacturaElectronica>();
+      for (const f of (facturas ?? [])) {
+        // Keep the most recent factura per order
+        if (!facturaMap.has(f.order_id) || new Date(f.created_at) > new Date(facturaMap.get(f.order_id)!.created_at)) {
+          facturaMap.set(f.order_id, f as FacturaElectronica);
+        }
       }
+
+      const merged = (ordersData ?? []).map((o: any) => ({
+        ...o,
+        factura: facturaMap.get(o.id) ?? null,
+      }));
+
+      setOrders(merged as OrderWithBilling[]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-    load();
   }, [business?.id]);
+
+  useEffect(() => { load(); }, [load]);
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -62,6 +126,39 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
       toast.success('Copiado al portapapeles');
       setTimeout(() => setCopiedId(null), 2000);
     });
+  };
+
+  const emitirFactura = async (order: OrderWithBilling) => {
+    if (!business) return;
+    setEmitiendo(order.id);
+    try {
+      const res = await fetch('/api/sri/emitir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: order.id, businessId: business.id }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error ?? 'Error emitiendo factura');
+        return;
+      }
+
+      if (data.estado === 'autorizada') {
+        toast.success(`Factura autorizada por SRI — Auth: ${data.numeroAutorizacion}`);
+      } else if (data.estado === 'en_proceso') {
+        toast.success('Factura enviada al SRI, en proceso de autorización');
+      } else {
+        const errMsg = data.errores?.join(', ') ?? 'Error desconocido';
+        toast.error(`Factura rechazada: ${errMsg}`);
+      }
+
+      await load();
+    } catch (err: any) {
+      toast.error(err.message ?? 'Error de conexión');
+    } finally {
+      setEmitiendo(null);
+    }
   };
 
   if (loadingBusiness || loading) {
@@ -89,6 +186,9 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
     return 'Pasaporte';
   };
 
+  const autorizadas = orders.filter(o => o.factura?.estado === 'autorizada').length;
+  const pendientes = orders.filter(o => !o.factura || o.factura.estado === 'rechazada').length;
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-20">
       {/* Header */}
@@ -98,22 +198,24 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
             <Receipt className="w-3.5 h-3.5" /> Facturación Electrónica SRI
           </div>
           <h1 className="text-2xl font-display font-black text-white tracking-tight mt-2">
-            Solicitudes de Factura
+            Facturas Electrónicas
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Pedidos en los que el cliente solicitó factura con sus datos fiscales. Emite la factura desde tu sistema SRI y regístrala manualmente.
+            Emite facturas electrónicas directamente al SRI con un solo clic.
           </p>
         </div>
 
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs text-amber-300 font-display font-bold max-w-xs shrink-0">
-          <div className="flex items-center gap-2 mb-1">
-            <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>Integración SRI próximamente</span>
+        {!hasSriConfig && (
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs text-amber-300 font-display font-bold max-w-xs shrink-0">
+            <div className="flex items-center gap-2 mb-1">
+              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Configuración SRI pendiente</span>
+            </div>
+            <p className="text-[11px] text-amber-400/80 font-normal">
+              Ve a Configuración → SRI para subir tu certificado digital y datos del emisor.
+            </p>
           </div>
-          <p className="text-[11px] text-amber-400/80 font-normal">
-            Por ahora, usa estos datos para emitir la factura electrónica directamente en el portal del SRI.
-          </p>
-        </div>
+        )}
       </div>
 
       {/* Stats */}
@@ -123,16 +225,12 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
           <p className="text-2xl font-mono-tech font-black text-white">{orders.length}</p>
         </div>
         <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-1">
-          <span className="text-xs text-slate-400 font-medium">Con RUC</span>
-          <p className="text-2xl font-mono-tech font-black text-brand-400">
-            {orders.filter((o) => o.datos_facturacion?.tipo_doc === 'RUC').length}
-          </p>
+          <span className="text-xs text-slate-400 font-medium">Autorizadas SRI</span>
+          <p className="text-2xl font-mono-tech font-black text-emerald-400">{autorizadas}</p>
         </div>
         <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-1">
-          <span className="text-xs text-slate-400 font-medium">Con Cédula</span>
-          <p className="text-2xl font-mono-tech font-black text-slate-300">
-            {orders.filter((o) => o.datos_facturacion?.tipo_doc !== 'RUC').length}
-          </p>
+          <span className="text-xs text-slate-400 font-medium">Pendientes de emitir</span>
+          <p className="text-2xl font-mono-tech font-black text-amber-400">{pendientes}</p>
         </div>
       </div>
 
@@ -159,9 +257,14 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
         <div className="space-y-3">
           {filtered.map((order) => {
             const df = order.datos_facturacion;
+            const factura = order.factura;
             const fecha = new Date(order.created_at).toLocaleDateString('es-EC', {
               day: '2-digit', month: 'short', year: 'numeric',
             });
+            const isEmitiendo = emitiendo === order.id;
+            const yaAutorizada = factura?.estado === 'autorizada';
+            const enProceso = factura?.estado === 'en_proceso';
+
             return (
               <div
                 key={order.id}
@@ -174,17 +277,24 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
                       <FileText className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono-tech font-black text-brand-400 text-sm">
                           #{String(order.numero_pedido).padStart(4, '0')}
                         </span>
                         <span className="text-white font-display font-bold text-sm">{order.cliente_nombre}</span>
+                        {factura && <FacturaEstadoBadge estado={factura.estado} />}
                       </div>
                       <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
                         <Clock className="w-3 h-3" />
                         <span>{fecha}</span>
                         <span>·</span>
                         <span>{order.cliente_telefono}</span>
+                        {factura?.numero_autorizacion && (
+                          <>
+                            <span>·</span>
+                            <span className="text-emerald-400 font-mono-tech">Auth: {factura.numero_autorizacion.slice(-8)}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -196,10 +306,20 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
                   </div>
                 </div>
 
+                {/* Errores SRI */}
+                {factura?.errores && factura.errores.length > 0 && (
+                  <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-3 space-y-1">
+                    {factura.errores.map((e, i) => (
+                      <p key={i} className="text-xs text-rose-300 flex items-start gap-1.5">
+                        <XCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" /> {e}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
                 {/* Datos fiscales */}
                 {df ? (
                   <div className="bg-slate-950/70 border border-white/5 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {/* Tipo + Número doc */}
                     <div>
                       <span className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold block mb-1">
                         {tipoDocLabel(df.tipo_doc)}
@@ -212,13 +332,11 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
                         >
                           {copiedId === `${order.id}-doc`
                             ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                            : <Copy className="w-3.5 h-3.5" />
-                          }
+                            : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       </div>
                     </div>
 
-                    {/* Razón social */}
                     <div>
                       <span className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold block mb-1">Razón Social</span>
                       <div className="flex items-center gap-2">
@@ -229,13 +347,11 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
                         >
                           {copiedId === `${order.id}-rs`
                             ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                            : <Copy className="w-3.5 h-3.5" />
-                          }
+                            : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       </div>
                     </div>
 
-                    {/* Email */}
                     <div>
                       <span className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold block mb-1">Email</span>
                       <div className="flex items-center gap-2">
@@ -246,13 +362,11 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
                         >
                           {copiedId === `${order.id}-email`
                             ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                            : <Copy className="w-3.5 h-3.5" />
-                          }
+                            : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       </div>
                     </div>
 
-                    {/* Dirección */}
                     {df.direccion && (
                       <div className="sm:col-span-2 lg:col-span-3">
                         <span className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold block mb-1">Dirección</span>
@@ -267,17 +381,30 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
                   </div>
                 )}
 
-                {/* Acción SRI */}
+                {/* Acción */}
                 <div className="flex justify-end">
-                  <a
-                    href="https://srienlinea.sri.gob.ec"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 text-xs text-slate-300 font-display font-bold transition-colors"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5 text-brand-400" />
-                    Emitir en portal SRI
-                  </a>
+                  {yaAutorizada ? (
+                    <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 font-display font-bold">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      Factura autorizada por SRI
+                    </div>
+                  ) : enProceso ? (
+                    <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 font-display font-bold">
+                      <Timer className="w-3.5 h-3.5" />
+                      En proceso en SRI
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => emitirFactura(order)}
+                      disabled={isEmitiendo || !hasSriConfig || !df}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-400 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-display font-bold transition-colors shadow-lg shadow-brand-500/20"
+                    >
+                      {isEmitiendo
+                        ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Emitiendo...</>
+                        : <><Zap className="w-3.5 h-3.5" /> {factura?.estado === 'rechazada' ? 'Reintentar' : 'Emitir Factura'}</>
+                      }
+                    </button>
+                  )}
                 </div>
               </div>
             );
