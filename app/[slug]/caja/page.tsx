@@ -77,11 +77,21 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   const [printOrder, setPrintOrder] = useState<any | null>(null);
   const [showPrintUpsell, setShowPrintUpsell] = useState(false);
 
-  const handlePrint = (order: any) => {
-    if (business?.has_pos_printing) {
-      setPrintOrder(order);
-    } else {
+  const handlePrint = async (order: any) => {
+    if (!business?.has_pos_printing) {
       setShowPrintUpsell(true);
+      return;
+    }
+    // Si el pedido no tiene items cargados, los busca primero
+    if (!order.items || order.items.length === 0) {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('order_items')
+        .select('*, product:products(nombre)')
+        .eq('order_id', order.id);
+      setPrintOrder({ ...order, items: data ?? [] });
+    } else {
+      setPrintOrder(order);
     }
   };
 
@@ -90,7 +100,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     const timer = setTimeout(() => {
       window.print();
       setPrintOrder(null);
-    }, 150);
+    }, 300);
     return () => clearTimeout(timer);
   }, [printOrder]);
 
@@ -1446,13 +1456,16 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     {printOrder && business && business.has_pos_printing && (
       <>
         <style dangerouslySetInnerHTML={{ __html: `
+          @media screen {
+            #kaltiro-print-ticket { position: fixed; left: -9999px; top: 0; }
+          }
           @media print {
             body * { visibility: hidden !important; }
             #kaltiro-print-ticket, #kaltiro-print-ticket * { visibility: visible !important; }
-            #kaltiro-print-ticket { position: fixed; left: 0; top: 0; width: 100%; background: white; }
+            #kaltiro-print-ticket { position: fixed !important; left: 0 !important; top: 0 !important; width: 100% !important; background: white !important; }
           }
         `}} />
-        <div id="kaltiro-print-ticket" style={{ display: 'none' }}>
+        <div id="kaltiro-print-ticket">
           <TicketThermal
             order={{ ...printOrder, items: printOrder.items ?? [] }}
             business={business}
