@@ -239,7 +239,7 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
         <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3.5 top-3" />
         <input
           type="text"
-          placeholder="Buscar por pedido, nombre, RUC o razón social..."
+          placeholder="Buscar por pedido, nombre o RUC..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#0B0F1B] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition-colors"
@@ -338,7 +338,7 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
                     </div>
 
                     <div>
-                      <span className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold block mb-1">Razón Social</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold block mb-1">Nombre / Empresa</span>
                       <div className="flex items-center gap-2">
                         <span className="font-display font-bold text-white text-xs truncate">{df.razon_social}</span>
                         <button
@@ -377,7 +377,7 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
                 ) : (
                   <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-3 text-xs text-rose-300 flex items-center gap-2">
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                    El cliente solicitó factura pero no ingresó datos fiscales.
+                    El cliente pidió factura pero no completó sus datos de facturación.
                   </div>
                 )}
 

@@ -184,7 +184,7 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
           <p className="text-2xl font-mono-tech font-black text-white">
             {stats.pedidosHoy}
           </p>
-          <span className="text-[10px] text-slate-500">Comandas registradas hoy</span>
+          <span className="text-[10px] text-slate-500">Pedidos registrados hoy</span>
         </div>
 
         <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-3 shadow-lg relative overflow-hidden">
@@ -197,7 +197,7 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
           <p className="text-2xl font-mono-tech font-black text-amber-400">
             {formatCurrency(stats.ticketPromedio)}
           </p>
-          <span className="text-[10px] text-slate-500">Gasto promedio por comanda</span>
+          <span className="text-[10px] text-slate-500">Ticket promedio por pedido</span>
         </div>
 
         <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-3 shadow-lg relative overflow-hidden">
@@ -221,7 +221,7 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
           <div className="flex items-center justify-between">
             <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
               <Clock className="w-4 h-4 text-brand-400" />
-              Últimas Comandas del Día
+              Últimos Pedidos del Día
             </h3>
             <Link href={`/${slug}/caja`} className="text-xs font-bold text-brand-400 hover:underline flex items-center gap-1">
               Ver todas en Caja POS <ArrowUpRight className="w-3.5 h-3.5" />
@@ -240,7 +240,7 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">
-                      {ord.tipo_entrega}
+                      {ord.tipo_entrega === 'consumo_en_mesa' || ord.tipo_entrega === 'mesa' ? `Mesa ${ord.numero_mesa || ''}` : ord.tipo_entrega === 'para_llevar' || ord.tipo_entrega === 'retiro_local' ? 'Llevar' : 'Domicilio'}
                     </span>
                     <span className="font-mono-tech font-bold text-white">{formatCurrency(ord.total)}</span>
                   </div>

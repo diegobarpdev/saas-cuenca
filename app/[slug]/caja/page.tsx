@@ -813,10 +813,10 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             <button
               onClick={() => setShowTxModal(true)}
               className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 text-amber-400 hover:text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold"
-              title="Movimientos de Caja Chica (Gastos/Ingresos)"
+              title="Gastos e Ingresos Manuales"
             >
               <Coins className="w-4 h-4" />
-              <span className="hidden md:inline">Caja Chica</span>
+              <span className="hidden md:inline">Gastos / Ingresos</span>
             </button>
           )}
 
@@ -919,7 +919,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
                       <div className="text-xs text-slate-300">
                         <p className="font-bold text-white">{order.cliente_nombre}</p>
-                        <p className="text-[11px] text-slate-400">{order.tipo_entrega === 'mesa' ? `Mesa: ${order.numero_mesa || 'N/A'}` : order.tipo_entrega}</p>
+                        <p className="text-[11px] text-slate-400">{(order.tipo_entrega as string) === 'mesa' || (order.tipo_entrega as string) === 'consumo_en_mesa' ? `Mesa: ${order.numero_mesa || 'N/A'}` : (order.tipo_entrega as string) === 'para_llevar' || (order.tipo_entrega as string) === 'retiro_local' ? 'Para llevar' : 'Domicilio'}</p>
                       </div>
 
                       {/* Items */}
@@ -1084,7 +1084,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             <span>Resumen del Pedido</span>
           </h3>
           <span className="text-[10px] font-mono bg-slate-950 px-2 py-0.5 rounded border border-white/5 text-slate-400">
-            {cart.reduce((acc, item) => acc + item.cantidad, 0)} ítems
+            {cart.reduce((acc, item) => acc + item.cantidad, 0)} productos
           </span>
         </div>
 
@@ -1351,7 +1351,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                             : 'bg-slate-900 border-slate-800 text-slate-500'
                         }`}
                       >
-                        {t}
+                        {t === 'CEDULA' ? 'Cédula' : t === 'PASAPORTE' ? 'Pasaporte' : 'RUC'}
                       </button>
                     ))}
                   </div>
@@ -1558,7 +1558,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           </div>
           <div className="bg-slate-950/60 rounded-2xl p-3 space-y-1.5 text-xs text-slate-400">
             <p className="flex items-center gap-2">✓ Tickets 80mm para impresoras térmicas</p>
-            <p className="flex items-center gap-2">✓ Datos fiscales del cliente incluidos</p>
+            <p className="flex items-center gap-2">✓ Datos de factura del cliente incluidos</p>
             <p className="flex items-center gap-2">✓ Logo y datos del negocio</p>
             <p className="flex items-center gap-2 text-brand-300 font-bold">+$7 / mes</p>
           </div>
@@ -1677,7 +1677,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                             : 'bg-slate-900 border-slate-800 text-slate-500'
                         }`}
                       >
-                        {t}
+                        {t === 'CEDULA' ? 'Cédula' : t === 'PASAPORTE' ? 'Pasaporte' : 'RUC'}
                       </button>
                     ))}
                   </div>
@@ -2003,7 +2003,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               disabled={isClosingShift}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-400 hover:to-rose-500 text-white font-display font-black text-xs tracking-wider uppercase disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-bold"
             >
-              {isClosingShift ? 'Guardando Arqueo...' : 'Finalizar Turno & Cerrar Caja'}
+              {isClosingShift ? 'Guardando cierre...' : 'Finalizar Turno & Cerrar Caja'}
             </button>
           </form>
         </div>

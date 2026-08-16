@@ -396,7 +396,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
               </div>
             )}
             <div className="flex justify-between items-center pt-2 border-t border-slate-800">
-              <span className="text-slate-400">Método de Pago:</span>
+              <span className="text-slate-400">Forma de pago:</span>
               <PaymentBadge status={order.estado_pago} method={order.metodo_pago} />
             </div>
           </div>
@@ -406,7 +406,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
             <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-white/5 text-xs space-y-1">
               <p className="font-display font-bold text-brand-400">Factura solicitada a:</p>
               <p><span className="text-slate-400">{order.datos_facturacion.tipo_doc}:</span> {order.datos_facturacion.num_doc}</p>
-              <p><span className="text-slate-400">Razón Social:</span> {order.datos_facturacion.razon_social}</p>
+              <p><span className="text-slate-400">Nombre:</span> {order.datos_facturacion.razon_social}</p>
               <p><span className="text-slate-400">Email:</span> {order.datos_facturacion.email}</p>
             </div>
           )}

@@ -73,7 +73,7 @@ export function buildTicketEscPos(order: any, business: any): string {
 
   // ── CLIENTE ─────────────────────────────────────────────────
   t += CMD.BOLD_ON + 'CLIENTE:' + CMD.BOLD_OFF + LF;
-  t += (order.cliente_nombre || 'Consumidor Final').substring(0, W) + LF;
+  t += (order.cliente_nombre || 'Cliente general').substring(0, W) + LF;
   if (order.cliente_telefono) t += 'Telf: ' + order.cliente_telefono + LF;
   t += sep();
 

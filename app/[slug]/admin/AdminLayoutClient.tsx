@@ -61,7 +61,7 @@ export default function AdminLayoutClient({
     { label: 'Monitor Cocina KDS',        href: `/${slug}/cocina`,               icon: Tv,          roles: ['dueño', 'cocinero'],                show: true },
     { label: 'Productos y Categorías',    href: `/${slug}/admin/productos`,       icon: Package,     roles: ['dueño'],                           show: true },
     { label: 'Apariencia & Branding',     href: `/${slug}/admin/apariencia`,     icon: Palette,     roles: ['dueño'],                           show: true },
-    { label: 'Facturación Electrónica',   href: `/${slug}/admin/facturacion`,    icon: Receipt,     roles: ['dueño'],                           show: !!business?.has_facturacion_sri },
+    { label: 'Facturas',                  href: `/${slug}/admin/facturacion`,    icon: Receipt,     roles: ['dueño'],                           show: !!business?.has_facturacion_sri },
     { label: 'Configuración SRI',         href: `/${slug}/admin/sri-config`,     icon: KeyRound,    roles: ['dueño'],                           show: !!business?.has_facturacion_sri },
     { label: 'Marketplace Add-ons',       href: `/${slug}/admin/marketplace`,    icon: ShoppingCart,roles: ['dueño'],                           show: true },
     { label: 'Configuración Negocio',     href: `/${slug}/admin/configuracion`,  icon: Settings,    roles: ['dueño'],                           show: true },

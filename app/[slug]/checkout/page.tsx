@@ -564,7 +564,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
                 </div>
 
                 <div ref={setRef('factura_razon') as any}>
-                  <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Razón Social / Nombre Completo *</label>
+                  <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Nombre para la factura *</label>
                   <input
                     type="text"
                     placeholder="Ej: Comercializadora Cuenca S.A."
@@ -600,7 +600,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
                     )}
                   </div>
                   <div>
-                    <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Dirección Fiscal</label>
+                    <label className="block text-xs font-display font-semibold text-slate-300 mb-1">Dirección</label>
                     <input
                       type="text"
                       placeholder="Cuenca, Ecuador"
@@ -618,7 +618,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
           <div className="glass-card p-5 md:p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl">
             <h2 className="font-display font-black text-base text-white flex items-center gap-2.5">
               <span className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 text-xs flex items-center justify-center font-mono-tech border border-amber-500/30">4</span>
-              Método de Pago
+              ¿Cómo vas a pagar?
             </h2>
 
             <div className="space-y-2">
@@ -828,7 +828,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
             <h3 className="font-display font-bold text-sm text-white">Resumen del Pedido</h3>
             <div className="space-y-2 text-xs text-slate-300">
               <div className="flex justify-between">
-                <span>Subtotal ({items.length} ítems):</span>
+                <span>Subtotal ({items.length} {items.length === 1 ? 'producto' : 'productos'}):</span>
                 <span className="font-mono-tech">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between">
