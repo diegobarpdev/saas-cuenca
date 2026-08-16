@@ -228,86 +228,78 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
       try {
         const supabase = createClient();
-        
-        const randomOrderNum = Math.floor(Math.random() * 899) + 100;
-        
-        const { data: orderData, error: orderError } = await supabase
-          .from('orders')
-          .insert({
-            business_id: business.id,
-            numero_pedido: randomOrderNum,
-            cliente_nombre: clienteNombre,
-            cliente_telefono: clienteTelefono,
-            cliente_direccion: clienteDireccion || null,
-            tipo_entrega: tipoEntrega,
-            numero_mesa: numeroMesa || null,
-            costo_envio: costoEnvio,
-            subtotal: subtotal,
-            total: total,
-            metodo_pago: metodoPago,
-            estado_pago: metodoPago === 'payphone' ? 'pagado' : 'pendiente',
-            comprobante_pago_url: comprobanteUrl,
-            payphone_transaction_id: metodoPago === 'payphone' ? `PYP-${Math.floor(Math.random() * 899999 + 100000)}` : null,
-            requiere_factura: requiereFactura,
-            datos_facturacion: requiereFactura ? datosFacturacion : null,
-            estado: 'pendiente',
-          })
-          .select()
-          .single();
 
-        if (orderError) {
-          const errMsg = orderError.message || orderError.details || JSON.stringify(orderError);
-          console.error('Error guardando en Supabase:', errMsg);
-          toast.error(`Aviso: Se registró pedido local. (${errMsg})`);
-        } else if (orderData) {
-          createdOrderId = orderData.id;
+        // Construir array de items para el RPC
+        const rpcItems = items.map((item) => ({
+          product_id: isUuid(item.product.id) ? item.product.id : null,
+          nombre_producto: item.product.nombre,
+          cantidad: item.cantidad,
+          precio_unitario: item.product.en_oferta && item.product.precio_oferta
+            ? item.product.precio_oferta
+            : item.product.precio,
+          notas: item.notas || null,
+          opciones_seleccionadas: item.opciones_seleccionadas ?? null,
+        }));
 
-          const orderItemsToInsert = items.map((item) => ({
-            order_id: orderData.id,
-            product_id: isUuid(item.product.id) ? item.product.id : null,
-            cantidad: item.cantidad,
-            precio_unitario: item.product.precio_oferta && item.product.en_oferta ? item.product.precio_oferta : item.product.precio,
-            notas: item.notas || null,
-          }));
+        // RPC atómico: número secuencial + orden + items en una transacción
+        const { data: rpcData, error: rpcError } = await supabase.rpc('create_order_atomic', {
+          p_business_id:       business.id,
+          p_cliente_nombre:    clienteNombre,
+          p_cliente_telefono:  clienteTelefono,
+          p_cliente_direccion: clienteDireccion || '',
+          p_tipo_entrega:      tipoEntrega,
+          p_numero_mesa:       numeroMesa || '',
+          p_costo_envio:       costoEnvio,
+          p_subtotal:          subtotal,
+          p_total:             total,
+          p_metodo_pago:       metodoPago,
+          p_estado_pago:       'pendiente',
+          p_comprobante_url:   comprobanteUrl || '',
+          p_payphone_tx_id:    '',
+          p_requiere_factura:  requiereFactura,
+          p_datos_facturacion: requiereFactura ? datosFacturacion : null,
+          p_items:             rpcItems,
+        });
 
-          const { error: itemsErr } = await supabase.from('order_items').insert(orderItemsToInsert);
-          if (itemsErr) {
-            console.error('Error guardando order_items:', itemsErr.message || itemsErr.details);
-          }
+        if (rpcError) {
+          const errMsg = rpcError.message || rpcError.details || JSON.stringify(rpcError);
+          console.error('Error en create_order_atomic:', errMsg);
+          toast.error(`No se pudo registrar el pedido. Intenta de nuevo.`);
+          setIsSubmitting(false);
+          return;
+        }
 
-          // Emitir evento Supabase Realtime Broadcast para notificación instantánea en cualquier navegador
-          try {
-            const channelName = `kaltiro-orders-${business.id}`;
-            const rtChannel = supabase.channel(channelName);
-            await new Promise<void>((resolve) => {
-              rtChannel.subscribe(async (status: string) => {
-                if (status === 'SUBSCRIBED') {
-                  const fullOrderPayload = {
-                    ...orderData,
-                    items: orderItemsToInsert.map((item) => {
-                      const cartMatch = items.find((c: any) => c.product.id === item.product_id);
-                      return {
-                        ...item,
-                        product: cartMatch ? cartMatch.product : null,
-                      };
-                    }),
-                  };
-                  await rtChannel.send({
-                    type: 'broadcast',
-                    event: 'NEW_ORDER',
-                    payload: fullOrderPayload,
-                  });
-                  setTimeout(() => {
-                    supabase.removeChannel(rtChannel);
-                  }, 300);
-                  resolve();
-                }
-              });
-              setTimeout(resolve, 800);
+        createdOrderId = (rpcData as any).id;
+
+        // Broadcast Realtime para notificar a Caja / Cocina
+        try {
+          const channelName = `kaltiro-orders-${business.id}`;
+          const rtChannel = supabase.channel(channelName);
+          await new Promise<void>((resolve) => {
+            rtChannel.subscribe(async (status: string) => {
+              if (status === 'SUBSCRIBED') {
+                await rtChannel.send({
+                  type: 'broadcast',
+                  event: 'NEW_ORDER',
+                  payload: {
+                    id: createdOrderId,
+                    numero_pedido: (rpcData as any).numero_pedido,
+                    business_id: business.id,
+                    cliente_nombre: clienteNombre,
+                    total,
+                    tipo_entrega: tipoEntrega,
+                    numero_mesa: numeroMesa || null,
+                    items: rpcItems,
+                  },
+                });
+                setTimeout(() => supabase.removeChannel(rtChannel), 300);
+                resolve();
+              }
             });
-          } catch (e) {
-            console.log('Error emitiendo broadcast Supabase:', e);
-          }
+            setTimeout(resolve, 800);
+          });
+        } catch (e) {
+          console.log('Error emitiendo broadcast Supabase:', e);
         }
       } catch (err: any) {
         console.error('Excepción al conectar con Supabase:', err?.message || err);

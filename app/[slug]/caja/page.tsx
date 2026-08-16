@@ -636,86 +636,64 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     const costoEnvio = getCostoEnvio();
     const total = getTotal();
 
-    // 1. Generar número de pedido aleatorio como fallback si falla la secuencia
-    const randomOrderNumber = Math.floor(Math.random() * 9000) + 1000;
-
-    const newOrderData = {
-      business_id: business.id,
-      numero_pedido: randomOrderNumber, // El trigger de BD lo reemplazará por la secuencia correcta
-      cliente_nombre: clienteNombre.trim() || 'Consumidor Final',
-      cliente_telefono: clienteTelefono.trim() || '0999999999',
-      cliente_direccion: tipoEntrega === 'domicilio' ? (clienteDireccion.trim() || 'Sin dirección especificada') : null,
-      tipo_entrega: tipoEntrega,
-      numero_mesa: tipoEntrega === 'mesa' ? numeroMesa : null,
-      costo_envio: costoEnvio,
-      subtotal: subtotal,
-      total: total,
-      metodo_pago: metodoPago,
-      estado_pago: estadoPago,
-      estado: 'pendiente',
-      shift_id: activeShift && activeShift.id !== 'mock-dueño-shift' ? activeShift.id : null,
-      requiere_factura: requiereFactura,
-      datos_facturacion: requiereFactura ? datosFact : null,
-    };
-
     try {
       const supabase = createClient();
-      
-      // 1. Insertar el Pedido principal
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .insert(newOrderData)
-        .select()
-        .single();
 
-      if (orderError) throw orderError;
-      if (!orderData) throw new Error('No se recibió la orden creada.');
-
-      // 2. Insertar los ítems del pedido
-      const orderItems = cart.map((item) => ({
-        order_id: orderData.id,
+      const rpcItems = cart.map((item) => ({
         product_id: item.product.id,
+        nombre_producto: item.product.nombre,
         cantidad: item.cantidad,
-        precio_unitario: item.product.en_oferta && item.product.precio_oferta ? item.product.precio_oferta : item.product.precio,
+        precio_unitario: item.product.en_oferta && item.product.precio_oferta
+          ? item.product.precio_oferta
+          : item.product.precio,
         notas: item.notas || null,
+        opciones_seleccionadas: item.opciones_seleccionadas ?? null,
       }));
 
-      const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
-      if (itemsError) throw itemsError;
+      const { data: rpcData, error: rpcError } = await supabase.rpc('create_order_atomic', {
+        p_business_id:       business.id,
+        p_cliente_nombre:    clienteNombre.trim() || 'Consumidor Final',
+        p_cliente_telefono:  clienteTelefono.trim() || '0999999999',
+        p_cliente_direccion: tipoEntrega === 'domicilio' ? (clienteDireccion.trim() || '') : '',
+        p_tipo_entrega:      tipoEntrega,
+        p_numero_mesa:       tipoEntrega === 'mesa' ? numeroMesa : '',
+        p_costo_envio:       costoEnvio,
+        p_subtotal:          subtotal,
+        p_total:             total,
+        p_metodo_pago:       metodoPago,
+        p_estado_pago:       estadoPago,
+        p_comprobante_url:   '',
+        p_payphone_tx_id:    '',
+        p_requiere_factura:  requiereFactura,
+        p_datos_facturacion: requiereFactura ? datosFact : null,
+        p_items:             rpcItems,
+        p_shift_id:          activeShift && activeShift.id !== 'mock-dueño-shift' ? activeShift.id : null,
+      });
 
-      // 3. Emitir notificaciones de WebSockets / Realtime local
-      // Canal local BroadcastChannel
+      if (rpcError) throw new Error(rpcError.message || JSON.stringify(rpcError));
+
+      const numeroPedido = (rpcData as any).numero_pedido;
+      const orderId = (rpcData as any).id;
+
+      // Notificar a Cocina / Monitor via BroadcastChannel local
       if ('BroadcastChannel' in window) {
         const localChannel = new BroadcastChannel('saas-cuenca-orders-channel');
         localChannel.postMessage({
           type: 'NEW_ORDER_CREATED',
-          order: {
-            ...orderData,
-            items: orderItems.map((item, idx) => ({
-              ...item,
-              product: cart[idx].product
-            }))
-          }
+          order: { id: orderId, numero_pedido: numeroPedido, business_id: business.id, items: rpcItems },
         });
         localChannel.close();
       }
 
-      // Canal Supabase Realtime Broadcast
-      const channelName = `kaltiro-orders-${business.id}`;
-      const rtChannel = supabase.channel(channelName);
+      // Notificar via Supabase Realtime Broadcast
+      const rtChannel = supabase.channel(`kaltiro-orders-${business.id}`);
       await rtChannel.send({
         type: 'broadcast',
         event: 'NEW_ORDER',
-        payload: {
-          ...orderData,
-          items: orderItems.map((item, idx) => ({
-            ...item,
-            product: cart[idx].product
-          }))
-        }
+        payload: { id: orderId, numero_pedido: numeroPedido, business_id: business.id, items: rpcItems },
       });
 
-      toast.success(`Pedido #${String(orderData.numero_pedido).padStart(4, '0')} registrado correctamente.`);
+      toast.success(`Pedido #${String(numeroPedido).padStart(4, '0')} registrado correctamente.`);
       clearCart();
     } catch (err: any) {
       console.error('Error creando pedido POS:', err);
