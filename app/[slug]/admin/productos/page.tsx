@@ -263,11 +263,13 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
             .select()
             .single();
 
-          if (!error && data) {
+          if (error) {
+            toast.error(`Error al editar producto: ${error.message}`);
+            return;
+          }
+          if (data) {
             setProducts((prev) => prev.map((p) => (p.id === data.id ? (data as Product) : p)));
             toast.success(`Producto "${nombre}" actualizado correctamente`);
-          } else if (error) {
-            toast.error(`Error al editar producto: ${error.message}`);
           }
         } else {
           const { data, error } = await supabase
@@ -279,12 +281,14 @@ export default function AdminProductsPage({ params }: { params: Promise<{ slug: 
             .select()
             .single();
 
-          if (!error && data) {
+          if (error) {
+            toast.error(`Error al crear producto: ${error.message}`);
+            return;
+          }
+          if (data) {
             targetProductId = data.id;
             setProducts((prev) => [data as Product, ...prev]);
             toast.success(`Producto "${nombre}" creado exitosamente`);
-          } else if (error) {
-            toast.error(`Error al crear producto: ${error.message}`);
           }
         }
 
