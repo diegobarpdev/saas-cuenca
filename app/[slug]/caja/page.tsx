@@ -1042,61 +1042,52 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               return (
                 <div
                   key={p.id}
-                  onClick={() => !agotado && addToCart(p)}
-                  className={`border rounded-xl p-2 flex flex-col justify-between transition-all shadow-md relative overflow-hidden h-40 sm:h-48 group ${
-                    agotado
-                      ? 'bg-slate-950 border-white/5 cursor-not-allowed opacity-60'
-                      : 'bg-[#0B0F1B] border-white/5 hover:border-brand-500/40 cursor-pointer active:scale-95'
+                  className={`border rounded-xl flex flex-col transition-all shadow-md relative overflow-hidden h-40 sm:h-48 ${
+                    agotado ? 'bg-slate-950 border-white/5' : 'bg-[#0B0F1B] border-white/5'
                   }`}
                 >
-                  {/* Foto o fallback */}
-                  <div className="w-full h-18 sm:h-24 rounded-lg bg-slate-950 flex items-center justify-center overflow-hidden relative border border-white/5 shrink-0">
-                    {p.imagen_url ? (
-                      <img
-                        src={p.imagen_url}
-                        alt={p.nombre}
-                        className={`w-full h-full object-cover transition-transform duration-300 ${!agotado && 'group-hover:scale-105'}`}
-                      />
-                    ) : (
-                      <Store className="w-5 h-5 text-slate-700" />
-                    )}
-
-                    {agotado && (
-                      <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center">
-                        <span className="text-[9px] font-black text-rose-400 uppercase tracking-widest">Agotado</span>
-                      </div>
-                    )}
-                    {!agotado && p.en_oferta && (
-                      <div className="absolute top-1 left-1 px-1 py-0.5 rounded bg-amber-500 text-slate-950 text-[8px] font-black uppercase tracking-wider">
-                        PROMO
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Detalles */}
-                  <div className="space-y-0.5 py-1 min-w-0 flex-1 overflow-hidden">
-                    <h4 className={`text-[11px] sm:text-xs font-display font-extrabold line-clamp-1 leading-tight transition-colors ${agotado ? 'text-slate-600' : 'text-white group-hover:text-brand-400'}`}>
+                  {/* Zona de tap para agregar — ocupa todo menos la barra inferior */}
+                  <div
+                    onClick={() => !agotado && addToCart(p)}
+                    className={`flex flex-col flex-1 p-2 min-h-0 ${agotado ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:bg-brand-500/10'}`}
+                  >
+                    {/* Foto */}
+                    <div className="w-full flex-1 rounded-lg bg-slate-950 flex items-center justify-center overflow-hidden relative border border-white/5 min-h-0">
+                      {p.imagen_url ? (
+                        <img src={p.imagen_url} alt={p.nombre} className="w-full h-full object-cover" />
+                      ) : (
+                        <Store className="w-5 h-5 text-slate-700" />
+                      )}
+                      {agotado && (
+                        <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center">
+                          <span className="text-[9px] font-black text-rose-400 uppercase tracking-widest">Agotado</span>
+                        </div>
+                      )}
+                      {!agotado && p.en_oferta && (
+                        <div className="absolute top-1 left-1 px-1 py-0.5 rounded bg-amber-500 text-slate-950 text-[8px] font-black uppercase tracking-wider">
+                          PROMO
+                        </div>
+                      )}
+                    </div>
+                    {/* Nombre */}
+                    <p className={`text-[11px] sm:text-xs font-display font-extrabold line-clamp-1 leading-tight mt-1 ${agotado ? 'text-slate-600' : 'text-white'}`}>
                       {p.nombre}
-                    </h4>
-                    <p className="text-[9px] text-slate-500 line-clamp-1 leading-normal">
-                      {p.descripcion || 'Sin descripción.'}
                     </p>
                   </div>
 
-                  {/* Precio & toggle agotado */}
-                  <div className="flex items-center justify-between pt-1 border-t border-white/5 mt-auto shrink-0">
+                  {/* Barra inferior — precio + botón agotado, siempre visible */}
+                  <div className="flex items-center justify-between px-2 pb-2 shrink-0 gap-1">
                     <span className={`text-[11px] sm:text-xs font-mono font-black ${agotado ? 'text-slate-600' : 'text-brand-400'}`}>
                       {formatCurrency(displayPrice)}
                     </span>
                     <button
                       type="button"
                       onClick={(e) => handleToggleAgotado(e, p)}
-                      className={`text-[8px] font-bold px-1.5 py-0.5 rounded border transition-all ${
+                      className={`text-[9px] font-bold px-2 py-1 rounded-lg border transition-all active:scale-95 min-w-[52px] text-center ${
                         agotado
-                          ? 'border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10'
-                          : 'border-rose-500/30 text-rose-400 opacity-0 group-hover:opacity-100 hover:bg-rose-500/10'
+                          ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/5'
+                          : 'border-rose-500/30 text-rose-400 bg-rose-500/5'
                       }`}
-                      title={agotado ? 'Marcar disponible' : 'Marcar agotado'}
                     >
                       {agotado ? 'Activar' : 'Agotado'}
                     </button>
@@ -1171,22 +1162,24 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                       className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-[10px] text-white focus:outline-none focus:border-brand-500"
                     />
 
-                    {/* +/- controles */}
-                    <div className="flex items-center gap-1.5 bg-slate-900 rounded-lg p-0.5 border border-slate-800">
+                    {/* +/- controles — touch-friendly (44px mínimo) */}
+                    <div className="flex items-center gap-1 bg-slate-900 rounded-xl border border-slate-800">
                       <button
+                        type="button"
                         onClick={() => removeFromCart(item.product.id)}
-                        className="w-5 h-5 rounded-md hover:bg-slate-800 text-slate-400 flex items-center justify-center transition-colors cursor-pointer"
+                        className="w-9 h-9 rounded-l-xl text-slate-300 active:bg-slate-700 flex items-center justify-center transition-colors"
                       >
-                        <Minus className="w-3.5 h-3.5" />
+                        <Minus className="w-4 h-4" />
                       </button>
-                      <span className="text-xs font-bold text-white px-1.5 min-w-[20px] text-center">
+                      <span className="text-sm font-bold text-white min-w-[28px] text-center">
                         {item.cantidad}
                       </span>
                       <button
+                        type="button"
                         onClick={() => addToCart(item.product)}
-                        className="w-5 h-5 rounded-md hover:bg-slate-800 text-slate-400 flex items-center justify-center transition-colors cursor-pointer"
+                        className="w-9 h-9 rounded-r-xl text-brand-400 active:bg-brand-500/20 flex items-center justify-center transition-colors"
                       >
-                        <Plus className="w-3.5 h-3.5" />
+                        <Plus className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -1214,10 +1207,10 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   key={opt.value}
                   type="button"
                   onClick={() => setTipoEntrega(opt.value as any)}
-                  className={`py-1.5 rounded-xl text-[11px] font-display font-bold border transition-all cursor-pointer ${
+                  className={`py-3 rounded-xl text-xs font-display font-bold border transition-all active:scale-95 ${
                     tipoEntrega === opt.value
                       ? 'bg-brand-500/10 border-brand-500 text-white'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                      : 'bg-slate-950 border-slate-800 text-slate-400'
                   }`}
                 >
                   {opt.label}
@@ -1243,7 +1236,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   onChange={(e) => searchCrm(e.target.value)}
                   onFocus={() => crmResults.length > 0 && setShowCrmDrop(true)}
                   onBlur={() => setTimeout(() => setShowCrmDrop(false), 150)}
-                  className="w-full pl-7 pr-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-brand-500"
+                  className="w-full pl-7 pr-2.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-brand-500"
                 />
                 {showCrmDrop && (
                   <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-[#0D1322] border border-white/10 rounded-xl overflow-hidden shadow-xl">
@@ -1277,7 +1270,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   placeholder="Ej: 5"
                   value={numeroMesa}
                   onChange={(e) => setNumeroMesa(e.target.value)}
-                  className="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-brand-500"
+                  className="w-full px-2.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-brand-500"
                 />
               </div>
             ) : (
@@ -1344,7 +1337,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                 <button
                   type="button"
                   onClick={() => setEstadoPago('pagado')}
-                  className={`flex-1 py-1.5 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${
+                  className={`flex-1 py-3 rounded-xl text-xs font-bold border transition-all active:scale-95 ${
                     estadoPago === 'pagado'
                       ? 'bg-brand-500/10 border-brand-500 text-brand-400'
                       : 'bg-slate-950 border-slate-800 text-slate-400'
@@ -1355,7 +1348,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                 <button
                   type="button"
                   onClick={() => setEstadoPago('pendiente')}
-                  className={`flex-1 py-1.5 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${
+                  className={`flex-1 py-3 rounded-xl text-xs font-bold border transition-all active:scale-95 ${
                     estadoPago === 'pendiente'
                       ? 'bg-amber-500/10 border-amber-500 text-amber-400'
                       : 'bg-slate-950 border-slate-800 text-slate-400'
