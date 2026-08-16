@@ -71,6 +71,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   const [clienteTelefono, setClienteTelefono] = useState('');
   const [tipoEntrega, setTipoEntrega] = useState<'domicilio' | 'retiro_local' | 'mesa'>('mesa');
   const [numeroMesa, setNumeroMesa] = useState('');
+  const [clienteDireccion, setClienteDireccion] = useState('');
   const [metodoPago, setMetodoPago] = useState<'efectivo' | 'transferencia' | 'payphone'>('efectivo');
   const [estadoPago, setEstadoPago] = useState<'pendiente' | 'pagado'>('pagado');
   const [montoRecibido, setMontoRecibido] = useState('');
@@ -572,6 +573,16 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     setShowCrmDrop(false);
   };
 
+  // Marcar producto como agotado / disponible
+  const handleToggleAgotado = async (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
+    const nextState = !product.disponible;
+    setProducts((prev) => prev.map((p) => p.id === product.id ? { ...p, disponible: nextState } : p));
+    const supabase = createClient();
+    await supabase.from('products').update({ disponible: nextState }).eq('id', product.id);
+    toast.info(`"${product.nombre}" marcado como ${nextState ? 'disponible' : 'agotado'}`);
+  };
+
   // Limpiar Carrito
   const clearCart = () => {
     setCart([]);
@@ -579,6 +590,8 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     setClienteTelefono('');
     setNumeroMesa('');
     setTipoEntrega('mesa');
+    setNumeroMesa('');
+    setClienteDireccion('');
     setMetodoPago('efectivo');
     setEstadoPago('pagado');
     setMontoRecibido('');
@@ -631,7 +644,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
       numero_pedido: randomOrderNumber, // El trigger de BD lo reemplazará por la secuencia correcta
       cliente_nombre: clienteNombre.trim() || 'Consumidor Final',
       cliente_telefono: clienteTelefono.trim() || '0999999999',
-      cliente_direccion: tipoEntrega === 'domicilio' ? 'Cuenca, Entrega Local (Caja)' : null,
+      cliente_direccion: tipoEntrega === 'domicilio' ? (clienteDireccion.trim() || 'Sin dirección especificada') : null,
       tipo_entrega: tipoEntrega,
       numero_mesa: tipoEntrega === 'mesa' ? numeroMesa : null,
       costo_envio: costoEnvio,
@@ -1025,25 +1038,35 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           ) : (
             filteredProducts.map((p) => {
               const displayPrice = p.en_oferta && p.precio_oferta ? p.precio_oferta : p.precio;
+              const agotado = !p.disponible;
               return (
-                <div 
+                <div
                   key={p.id}
-                  onClick={() => addToCart(p)}
-                  className="bg-[#0B0F1B] border border-white/5 hover:border-brand-500/40 rounded-xl p-2 flex flex-col justify-between cursor-pointer group active:scale-95 transition-all shadow-md relative overflow-hidden h-40 sm:h-48"
+                  onClick={() => !agotado && addToCart(p)}
+                  className={`border rounded-xl p-2 flex flex-col justify-between transition-all shadow-md relative overflow-hidden h-40 sm:h-48 group ${
+                    agotado
+                      ? 'bg-slate-950 border-white/5 cursor-not-allowed opacity-60'
+                      : 'bg-[#0B0F1B] border-white/5 hover:border-brand-500/40 cursor-pointer active:scale-95'
+                  }`}
                 >
                   {/* Foto o fallback */}
                   <div className="w-full h-18 sm:h-24 rounded-lg bg-slate-950 flex items-center justify-center overflow-hidden relative border border-white/5 shrink-0">
                     {p.imagen_url ? (
-                      <img 
-                        src={p.imagen_url} 
-                        alt={p.nombre} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      <img
+                        src={p.imagen_url}
+                        alt={p.nombre}
+                        className={`w-full h-full object-cover transition-transform duration-300 ${!agotado && 'group-hover:scale-105'}`}
                       />
                     ) : (
                       <Store className="w-5 h-5 text-slate-700" />
                     )}
 
-                    {p.en_oferta && (
+                    {agotado && (
+                      <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center">
+                        <span className="text-[9px] font-black text-rose-400 uppercase tracking-widest">Agotado</span>
+                      </div>
+                    )}
+                    {!agotado && p.en_oferta && (
                       <div className="absolute top-1 left-1 px-1 py-0.5 rounded bg-amber-500 text-slate-950 text-[8px] font-black uppercase tracking-wider">
                         PROMO
                       </div>
@@ -1052,22 +1075,31 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
                   {/* Detalles */}
                   <div className="space-y-0.5 py-1 min-w-0 flex-1 overflow-hidden">
-                    <h4 className="text-[11px] sm:text-xs font-display font-extrabold text-white line-clamp-1 group-hover:text-brand-400 transition-colors leading-tight">
+                    <h4 className={`text-[11px] sm:text-xs font-display font-extrabold line-clamp-1 leading-tight transition-colors ${agotado ? 'text-slate-600' : 'text-white group-hover:text-brand-400'}`}>
                       {p.nombre}
                     </h4>
-                    <p className="text-[9px] text-slate-400 line-clamp-1 leading-normal">
+                    <p className="text-[9px] text-slate-500 line-clamp-1 leading-normal">
                       {p.descripcion || 'Sin descripción.'}
                     </p>
                   </div>
 
-                  {/* Precio & Acción */}
-                  <div className="flex items-center justify-between pt-1 border-t border-white/5 mt-auto text-slate-500 group-hover:text-brand-400 transition-colors shrink-0">
-                    <span className="text-[11px] sm:text-xs font-mono font-black text-brand-400">
+                  {/* Precio & toggle agotado */}
+                  <div className="flex items-center justify-between pt-1 border-t border-white/5 mt-auto shrink-0">
+                    <span className={`text-[11px] sm:text-xs font-mono font-black ${agotado ? 'text-slate-600' : 'text-brand-400'}`}>
                       {formatCurrency(displayPrice)}
                     </span>
-                    <span className="text-[8px] font-display font-black tracking-wider uppercase opacity-0 group-hover:opacity-100 transition-all transform translate-x-1 group-hover:translate-x-0">
-                      + AÑADIR
-                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => handleToggleAgotado(e, p)}
+                      className={`text-[8px] font-bold px-1.5 py-0.5 rounded border transition-all ${
+                        agotado
+                          ? 'border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10'
+                          : 'border-rose-500/30 text-rose-400 opacity-0 group-hover:opacity-100 hover:bg-rose-500/10'
+                      }`}
+                      title={agotado ? 'Marcar disponible' : 'Marcar agotado'}
+                    >
+                      {agotado ? 'Activar' : 'Agotado'}
+                    </button>
                   </div>
                 </div>
               );
@@ -1265,6 +1297,22 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                     className="w-full pl-7.5 pr-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-brand-500"
                   />
                 </div>
+              </div>
+            )}
+
+            {/* Dirección — solo para domicilio */}
+            {tipoEntrega === 'domicilio' && (
+              <div className="col-span-2">
+                <label className="block text-[10px] font-display font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                  Dirección de entrega
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: Av. Ordóñez Lasso y Av. de las Américas"
+                  value={clienteDireccion}
+                  onChange={(e) => setClienteDireccion(e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                />
               </div>
             )}
           </div>

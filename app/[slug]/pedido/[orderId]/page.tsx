@@ -15,6 +15,7 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
 
   const [business, setBusiness] = useState<Business>(MOCK_BUSINESS);
   const [order, setOrder] = useState<Order | null>(null);
+  const [orderItems, setOrderItems] = useState<any[]>([]);
 
   // Cargar datos del Negocio Real por slug
   useEffect(() => {
@@ -53,6 +54,13 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
 
           if (!error && data) {
             setOrder(data as Order);
+
+            // Cargar ítems del pedido
+            const { data: items } = await supabase
+              .from('order_items')
+              .select('cantidad, precio_unitario, nombre_producto, notas, order_id')
+              .eq('order_id', orderId);
+            setOrderItems(items ?? []);
           }
         } catch (e) {
           console.error('Error cargando pedido desde Supabase:', e);
@@ -400,6 +408,22 @@ export default function OrderTrackingPage({ params }: { params: Promise<{ slug: 
               <PaymentBadge status={order.estado_pago} method={order.metodo_pago} />
             </div>
           </div>
+
+          {/* Ítems del pedido */}
+          {orderItems.length > 0 && (
+            <div className="border-t border-white/5 pt-3 space-y-1.5">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Lo que pediste</p>
+              {orderItems.map((item, idx) => (
+                <div key={idx} className="flex justify-between items-start text-xs">
+                  <div className="min-w-0 pr-2">
+                    <span className="text-white font-medium">{item.cantidad}× {item.nombre_producto}</span>
+                    {item.notas && <p className="text-[10px] text-slate-500 italic mt-0.5">{item.notas}</p>}
+                  </div>
+                  <span className="text-slate-400 font-mono shrink-0">{formatCurrency(item.precio_unitario * item.cantidad)}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Facturación Ecuador */}
           {order.requiere_factura && order.datos_facturacion && (
