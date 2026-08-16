@@ -1085,8 +1085,7 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
             : <><Save className="w-4 h-4 text-brand-100 group-hover:rotate-12 transition-transform" /><span>Guardar Cambios</span></>
           }
         </button>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
