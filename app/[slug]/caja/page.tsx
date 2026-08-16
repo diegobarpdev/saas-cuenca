@@ -945,30 +945,6 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                         >
                           <FileText className="w-3 h-3" /> Editar
                         </button>
-                        {order.estado === 'pendiente' && (
-                          <button
-                            onClick={() => updateOrderStatus(order.id, 'en_preparacion')}
-                            className="px-2.5 py-1 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/40 text-[10px] font-bold"
-                          >
-                            Cocinar
-                          </button>
-                        )}
-                        {order.estado === 'en_preparacion' && (
-                          <button
-                            onClick={() => updateOrderStatus(order.id, 'listo')}
-                            className="px-2.5 py-1 rounded-lg bg-brand-500/20 hover:bg-brand-500/30 text-brand-300 border border-brand-500/40 text-[10px] font-bold"
-                          >
-                            Listo
-                          </button>
-                        )}
-                        {order.estado === 'listo' && (
-                          <button
-                            onClick={() => updateOrderStatus(order.id, 'entregado')}
-                            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 text-[10px] font-bold"
-                          >
-                            Entregar
-                          </button>
-                        )}
                       </div>
                     </div>
                   </div>
