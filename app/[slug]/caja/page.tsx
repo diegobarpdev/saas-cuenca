@@ -75,13 +75,22 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
   // Imprimir ticket
   const [printOrder, setPrintOrder] = useState<any | null>(null);
+  const [showPrintUpsell, setShowPrintUpsell] = useState(false);
+
+  const handlePrint = (order: any) => {
+    if (business?.has_pos_printing) {
+      setPrintOrder(order);
+    } else {
+      setShowPrintUpsell(true);
+    }
+  };
 
   React.useEffect(() => {
     if (!printOrder) return;
     const timer = setTimeout(() => {
       window.print();
       setPrintOrder(null);
-    }, 150); // pequeño delay para que el DOM se renderice
+    }, 150);
     return () => clearTimeout(timer);
   }, [printOrder]);
 
@@ -878,15 +887,13 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                       </div>
 
                       <div className="flex gap-1.5">
-                        {!!business?.has_pos_printing && (
-                          <button
-                            onClick={() => setPrintOrder(order)}
-                            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] font-bold flex items-center gap-1"
-                            title="Imprimir ticket"
-                          >
-                            <Printer className="w-3 h-3" />
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handlePrint(order)}
+                          className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] font-bold flex items-center gap-1"
+                          title="Imprimir ticket"
+                        >
+                          <Printer className="w-3 h-3" />
+                        </button>
                         <button
                           onClick={() => openEditModal(order)}
                           className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] font-bold flex items-center gap-1"
@@ -1398,6 +1405,44 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     {/* ========================================== */}
     {/* TICKET DE IMPRESIÓN (oculto en pantalla)   */}
     {/* ========================================== */}
+    {/* Modal upsell impresión */}
+    {showPrintUpsell && (
+      <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="bg-[#0D1322] border border-white/10 rounded-3xl w-full max-w-sm shadow-2xl p-6 space-y-4">
+          <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mx-auto">
+            <Printer className="w-6 h-6 text-brand-400" />
+          </div>
+          <div className="text-center space-y-1">
+            <h3 className="font-display font-black text-white text-base">Impresión de Tickets</h3>
+            <p className="text-xs text-slate-400">
+              El add-on <span className="text-brand-300 font-bold">Impresión POS</span> te permite imprimir tickets térmicos directamente desde la caja.
+            </p>
+          </div>
+          <div className="bg-slate-950/60 rounded-2xl p-3 space-y-1.5 text-xs text-slate-400">
+            <p className="flex items-center gap-2">✓ Tickets 80mm para impresoras térmicas</p>
+            <p className="flex items-center gap-2">✓ Datos fiscales del cliente incluidos</p>
+            <p className="flex items-center gap-2">✓ Logo y datos del negocio</p>
+            <p className="flex items-center gap-2 text-brand-300 font-bold">+$7 / mes</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowPrintUpsell(false)}
+              className="flex-1 py-2.5 rounded-2xl bg-slate-900 border border-white/10 text-slate-300 text-xs font-display font-bold hover:bg-slate-800 transition-colors"
+            >
+              Ahora no
+            </button>
+            <a
+              href={`/${slug}/admin/marketplace`}
+              onClick={() => setShowPrintUpsell(false)}
+              className="flex-1 py-2.5 rounded-2xl bg-brand-500 hover:bg-brand-400 text-white text-xs font-display font-bold transition-colors text-center shadow-lg shadow-brand-500/20"
+            >
+              Ver Marketplace
+            </a>
+          </div>
+        </div>
+      </div>
+    )}
+
     {printOrder && business && business.has_pos_printing && (
       <>
         <style dangerouslySetInnerHTML={{ __html: `
