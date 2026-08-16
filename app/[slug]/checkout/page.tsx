@@ -109,13 +109,23 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   const costoEnvio = tipoEntrega === 'domicilio' ? selectedZona?.costo || 1.50 : 0;
   const total = subtotal + costoEnvio;
 
-  const handleUploadSimulated = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setIsUploading(true);
-      setTimeout(() => {
-        setComprobanteUrl('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&q=80');
-        setIsUploading(false);
-      }, 800);
+  const handleUploadComprobante = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const supabase = createClient();
+      const ext = file.name.split('.').pop() ?? 'jpg';
+      const path = `${slug}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from('comprobantes').upload(path, file, { upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage.from('comprobantes').getPublicUrl(path);
+      setComprobanteUrl(data.publicUrl);
+      toast.success('Comprobante subido correctamente');
+    } catch (err: any) {
+      toast.error('Error al subir comprobante: ' + (err.message ?? 'intenta de nuevo'));
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -803,8 +813,8 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
                             : 'border-amber-500/50 bg-amber-500/5 text-amber-300 hover:text-white hover:border-amber-400'
                         }`}>
                           <Upload className="w-4 h-4" />
-                          <span>{isUploading ? 'Subiendo imagen...' : 'Seleccionar foto de comprobante *'}</span>
-                          <input type="file" accept="image/*" onChange={(e) => { handleUploadSimulated(e); clearError('comprobante'); }} className="hidden" />
+                          <span>{isUploading ? 'Subiendo...' : 'Seleccionar foto / PDF del comprobante *'}</span>
+                          <input type="file" accept="image/*,application/pdf" onChange={(e) => { handleUploadComprobante(e); clearError('comprobante'); }} className="hidden" />
                         </label>
                         {errors.comprobante ? (
                           <p className="text-[11px] text-rose-400 flex items-center gap-1 font-medium">
