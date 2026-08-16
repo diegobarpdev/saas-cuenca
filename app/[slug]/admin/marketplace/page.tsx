@@ -1,7 +1,7 @@
 'use client';
 
 import React, { use, useState, useEffect } from 'react';
-import { ShoppingCart, CreditCard, Volume2, Printer, Download, Globe, Sparkles, CheckCircle2, ShieldCheck, RefreshCw, MessageSquare, Receipt, PackageX } from 'lucide-react';
+import { ShoppingCart, CreditCard, Volume2, Printer, Download, Globe, Sparkles, CheckCircle2, ShieldCheck, RefreshCw, MessageSquare, Receipt, Boxes } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { toast } from '@/lib/utils/toast';
 
@@ -107,15 +107,15 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
     },
     {
       id: 'mermas',
-      title: 'Control de Mermas',
-      price: '+$5 / mes',
-      icon: PackageX,
+      title: 'Control de Stock',
+      price: '+$7 / mes',
+      icon: Boxes,
       active: !!business.has_mermas,
-      description: 'Registra y lleva el historial de bajas por daño, caducidad o accidente. Mantén trazabilidad de tus pérdidas sin afectar la caja ni las ventas.',
+      description: 'Lleva el inventario de tus insumos y registra mermas por daño o caducidad. Stock mínimo con alertas, entradas de mercadería y ajustes en un solo módulo.',
       benefits: [
-        'Registra bajas por accidente, caducidad, preparación o robo',
-        'Historial completo con producto, cantidad y responsable',
-        'Resumen mensual por tipo de merma para tomar decisiones',
+        'Inventario de insumos con alertas de stock bajo',
+        'Registra entradas de mercadería y ajusta conteos físicos',
+        'Mermas por accidente, caducidad, robo o preparación',
       ],
     },
   ];

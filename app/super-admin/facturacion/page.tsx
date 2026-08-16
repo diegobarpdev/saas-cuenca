@@ -13,6 +13,7 @@ function calcularMonto(business: Business): number {
   if (business.has_live_kitchen) total += 7;
   if (business.has_pos_printing) total += 7;
   if (business.has_crm_export) total += 5;
+  if (business.has_mermas) total += 7;
   if (business.has_facturacion_sri) total += 12;
   return total;
 }

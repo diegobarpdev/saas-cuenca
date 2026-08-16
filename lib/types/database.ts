@@ -285,6 +285,32 @@ export interface CartItem {
 
 export type MermaMotivo = 'accidente' | 'caducidad' | 'preparacion' | 'robo' | 'otro';
 
+export interface InventarioItem {
+  id: string;
+  business_id: string;
+  nombre: string;
+  categoria: string | null;
+  unidad: string;
+  stock_actual: number;
+  stock_minimo: number;
+  proveedor: string | null;
+  activo: boolean;
+  created_at: string;
+}
+
+export type InventarioMovTipo = 'entrada' | 'ajuste';
+
+export interface InventarioMovimiento {
+  id: string;
+  business_id: string;
+  item_id: string;
+  tipo: InventarioMovTipo;
+  cantidad: number;
+  notas: string | null;
+  registrado_por: string | null;
+  created_at: string;
+}
+
 export interface Merma {
   id: string;
   business_id: string;

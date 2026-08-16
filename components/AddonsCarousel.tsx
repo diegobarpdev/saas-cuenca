@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, CreditCard, Monitor, Printer, BarChart3, Receipt, PackageX } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CreditCard, Monitor, Printer, BarChart3, Receipt, Boxes } from 'lucide-react';
 
 const ADDONS = [
   {
@@ -35,10 +35,10 @@ const ADDONS = [
     price: '+$12/mes',
   },
   {
-    icon: PackageX,
-    name: 'Control de mermas',
-    desc: 'Registra bajas por daño o caducidad sin afectar caja',
-    price: '+$5/mes',
+    icon: Boxes,
+    name: 'Control de Stock',
+    desc: 'Inventario de insumos, entradas y mermas en un módulo',
+    price: '+$7/mes',
   },
 ];
 

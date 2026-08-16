@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft, Building2, Save, CreditCard, Bell, Printer,
   Database, Globe, Receipt, Eye, EyeOff, CheckCircle2,
-  XCircle, RefreshCw, Sparkles, ShieldCheck, ExternalLink, LogIn, PackageX,
+  XCircle, RefreshCw, Sparkles, ShieldCheck, ExternalLink, LogIn, Boxes,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { CustomSelect } from '@/components/ui/CustomSelect';
@@ -386,11 +386,11 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
           <div className={`p-4 rounded-xl border transition-all space-y-1 ${hasMermas ? 'bg-purple-950/30 border-purple-500/40' : 'bg-zinc-950 border-zinc-800'}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <PackageX className={`w-4 h-4 ${hasMermas ? 'text-purple-400' : 'text-zinc-600'}`} />
-                <span className="text-xs font-semibold text-zinc-200">Control de Mermas</span>
+                <Boxes className={`w-4 h-4 ${hasMermas ? 'text-purple-400' : 'text-zinc-600'}`} />
+                <span className="text-xs font-semibold text-zinc-200">Control de Stock</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-zinc-500 font-mono">+$5/m</span>
+                <span className="text-[10px] text-zinc-500 font-mono">+$7/m</span>
                 <input type="checkbox" checked={hasMermas} onChange={(e) => setHasMermas(e.target.checked)} className="rounded accent-purple-500 w-4 h-4" />
               </div>
             </div>
