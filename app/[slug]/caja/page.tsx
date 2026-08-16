@@ -878,13 +878,15 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                       </div>
 
                       <div className="flex gap-1.5">
-                        <button
-                          onClick={() => setPrintOrder(order)}
-                          className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] font-bold flex items-center gap-1"
-                          title="Imprimir ticket"
-                        >
-                          <Printer className="w-3 h-3" />
-                        </button>
+                        {!!business?.has_pos_printing && (
+                          <button
+                            onClick={() => setPrintOrder(order)}
+                            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] font-bold flex items-center gap-1"
+                            title="Imprimir ticket"
+                          >
+                            <Printer className="w-3 h-3" />
+                          </button>
+                        )}
                         <button
                           onClick={() => openEditModal(order)}
                           className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] font-bold flex items-center gap-1"
@@ -1396,7 +1398,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     {/* ========================================== */}
     {/* TICKET DE IMPRESIÓN (oculto en pantalla)   */}
     {/* ========================================== */}
-    {printOrder && business && (
+    {printOrder && business && business.has_pos_printing && (
       <>
         <style dangerouslySetInnerHTML={{ __html: `
           @media print {
