@@ -108,6 +108,11 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
   const [aceptaEfectivo, setAceptaEfectivo] = useState(true);
   const [instruccionesEfectivo, setInstruccionesEfectivo] = useState('Pago en efectivo directamente al entregar el pedido o en caja.');
 
+  // Horarios
+  const [horarioActivo, setHorarioActivo] = useState(false);
+  const [horarioApertura, setHorarioApertura] = useState('08:00');
+  const [horarioCierre, setHorarioCierre] = useState('22:00');
+
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -165,6 +170,10 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
         if (op.acepta_payphone !== undefined) setAceptaPayphone(op.acepta_payphone);
         if (op.acepta_efectivo !== undefined) setAceptaEfectivo(op.acepta_efectivo);
         if (op.instrucciones_efectivo) setInstruccionesEfectivo(op.instrucciones_efectivo);
+
+        if (op.horario_activo !== undefined) setHorarioActivo(op.horario_activo);
+        if (op.horario_apertura) setHorarioApertura(op.horario_apertura);
+        if (op.horario_cierre) setHorarioCierre(op.horario_cierre);
       }
     }
   }, [business]);
@@ -266,6 +275,10 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
 
             acepta_efectivo: aceptaEfectivo,
             instrucciones_efectivo: instruccionesEfectivo,
+
+            horario_activo: horarioActivo,
+            horario_apertura: horarioApertura,
+            horario_cierre: horarioCierre,
           },
         })
         .eq('id', business.id);
@@ -471,6 +484,57 @@ export default function AdminSettingsPage({ params }: { params: Promise<{ slug: 
               </button>
             </div>
           </div>
+        </div>
+
+        {/* 2b. Horarios de Atención */}
+        <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-display font-black text-sm text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                <Clock className="w-4 h-4 text-purple-400" />
+                <span>Horarios de Atención</span>
+              </h2>
+              <p className="text-[11px] text-slate-400 mt-1">
+                Muestra "Abierto" o "Cerrado" a tus clientes según la hora actual de Ecuador (UTC−5).
+              </p>
+            </div>
+            <CustomCheckbox
+              checked={horarioActivo}
+              onChange={setHorarioActivo}
+              label=""
+              accentColor="brand"
+            />
+          </div>
+
+          {horarioActivo && (
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5 animate-in fade-in duration-200">
+              <div>
+                <label className="block text-xs font-display font-semibold text-slate-300 mb-1">
+                  Hora de Apertura
+                </label>
+                <input
+                  type="time"
+                  value={horarioApertura}
+                  onChange={(e) => setHorarioApertura(e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-white font-mono focus:outline-none focus:border-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-display font-semibold text-slate-300 mb-1">
+                  Hora de Cierre
+                </label>
+                <input
+                  type="time"
+                  value={horarioCierre}
+                  onChange={(e) => setHorarioCierre(e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-white font-mono focus:outline-none focus:border-purple-500"
+                />
+              </div>
+              <p className="col-span-2 text-[11px] text-slate-400">
+                Si el cierre es después de medianoche (ej. apertura 18:00 · cierre 02:00), el sistema lo maneja automáticamente.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* 3. Configuración Independiente por Método de Pago */}

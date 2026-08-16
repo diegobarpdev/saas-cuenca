@@ -95,6 +95,11 @@ export interface OperationalSettings {
 
   // Servicio en Mesa
   tipo_servicio_mesa?: 'mesero' | 'barra';
+
+  // Horarios de Apertura (formato "HH:MM" en 24h, ej: "08:00", "22:30")
+  horario_activo?: boolean;
+  horario_apertura?: string;
+  horario_cierre?: string;
 }
 
 export interface Business {

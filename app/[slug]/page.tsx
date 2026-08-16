@@ -88,6 +88,27 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
     );
   }
 
+  // Calcular si el negocio está abierto ahora (Ecuador UTC-5)
+  const isBusinessOpen = (() => {
+    const op = business.configuracion_operativa;
+    if (!op?.horario_activo || !op.horario_apertura || !op.horario_cierre) return null; // null = sin horario configurado
+    const now = new Date();
+    // Hora local Ecuador (UTC-5)
+    const ecOffset = -5 * 60;
+    const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+    const ecMin = ((utcMin + ecOffset) % 1440 + 1440) % 1440;
+    const [aH, aM] = op.horario_apertura.split(':').map(Number);
+    const [cH, cM] = op.horario_cierre.split(':').map(Number);
+    const aMin = aH * 60 + aM;
+    const cMin = cH * 60 + cM;
+    if (aMin < cMin) {
+      return ecMin >= aMin && ecMin < cMin;
+    } else {
+      // Cruza medianoche
+      return ecMin >= aMin || ecMin < cMin;
+    }
+  })();
+
   const promoProductsCount = products.filter((p) => p.en_oferta && p.precio_oferta).length;
 
   const filteredProducts = products.filter((p) => {
@@ -194,10 +215,17 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
                     <h1 className="text-xl sm:text-3xl font-display font-black text-white tracking-tight leading-snug truncate">
                       {business.nombre}
                     </h1>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 text-[10px] font-mono font-bold border border-brand-500/20 shrink-0">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse"></span>
-                      Abierto
-                    </span>
+                    {isBusinessOpen === null ? null : isBusinessOpen ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 text-[10px] font-mono font-bold border border-brand-500/20 shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse"></span>
+                        Abierto
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 text-[10px] font-mono font-bold border border-rose-500/20 shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        Cerrado
+                      </span>
+                    )}
                   </div>
 
                   <p className="text-[11px] sm:text-xs text-slate-300 line-clamp-1 font-normal">
@@ -210,6 +238,12 @@ export default function PublicCatalogPage({ params }: { params: Promise<{ slug: 
                       <Clock className="w-3 h-3 text-brand-400 flex-shrink-0" />
                       <span className="text-slate-200 font-medium">{prepTimeText}</span>
                     </span>
+                    {op?.horario_activo && op.horario_apertura && op.horario_cierre && (
+                      <span className="flex items-center gap-1 bg-slate-900/80 px-2 py-0.5 rounded-full border border-white/10">
+                        <Clock className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                        <span className="text-slate-200 font-medium">{op.horario_apertura} – {op.horario_cierre}</span>
+                      </span>
+                    )}
                     <span className="flex items-center gap-1 bg-slate-900/80 px-2 py-0.5 rounded-full border border-white/10">
                       <Truck className="w-3 h-3 text-amber-400 flex-shrink-0" />
                       <span className="text-slate-200 font-medium">{deliveryText}</span>
