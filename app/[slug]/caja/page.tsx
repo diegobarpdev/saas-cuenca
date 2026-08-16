@@ -1456,7 +1456,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     {printOrder && business && business.has_pos_printing && (
       <>
         <style dangerouslySetInnerHTML={{ __html: `
-          @page { margin: 0; size: 80mm auto; }
+          @page { margin: 4mm; size: 80mm auto; }
           @media screen {
             #kaltiro-print-ticket { position: fixed; left: -9999px; top: 0; }
           }
