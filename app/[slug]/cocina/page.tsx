@@ -142,7 +142,7 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
 
           <div className="pt-2 flex flex-col gap-3">
             <a
-              href={`https://wa.me/593969307527?text=${encodeURIComponent(
+              href={`https://wa.me/${business.telefono_whatsapp}?text=${encodeURIComponent(
                 `Hola! Soy de ${business.nombre} (/${business.slug}). Me gustaría activar el módulo Add-on de Monitor de Cocina KDS (+$7/mes) en Kaltiro.com.`
               )}`}
               target="_blank"
@@ -308,9 +308,18 @@ export default function AdminKDSPage({ params }: { params: Promise<{ slug: strin
                             <span className="font-mono font-black text-amber-400 text-base mr-2 bg-amber-400/10 px-1.5 py-0.5 rounded-lg border border-amber-400/20">
                               {item.cantidad}
                             </span>
-                            {item.product?.nombre || item.product_name || 'Producto'}
+                            {item.product?.nombre || item.nombre_producto || '—'}
                           </span>
                         </div>
+                        {item.opciones_seleccionadas && item.opciones_seleccionadas.length > 0 && (
+                          <div className="ml-10 flex flex-wrap gap-1">
+                            {item.opciones_seleccionadas.map((op: any, oi: number) => (
+                              <span key={oi} className="px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[10px] font-semibold">
+                                {op.opcion_nombre || op.opcion || op}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         {item.notas && (
                           <div className="ml-10 px-2.5 py-1.5 rounded-lg bg-red-500/10 text-red-300 text-xs font-semibold border border-red-500/20 flex items-start gap-1">
                             <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-red-400" />
