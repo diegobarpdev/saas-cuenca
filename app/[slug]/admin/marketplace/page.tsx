@@ -34,8 +34,10 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
 
   const getWhatsAppLink = (moduleName: string, price: string) => {
     const text = `Hola! Soy de ${business.nombre} (/${business.slug}). Me gustaría solicitar la activación del módulo Add-on de ${moduleName} (${price}) en Kaltiro.com.`;
-    return `https://wa.me/593969307527?text=${encodeURIComponent(text)}`;
+    return `https://wa.me/${business.telefono_whatsapp}?text=${encodeURIComponent(text)}`;
   };
+
+  const planLabel = business.plan === 'basico' ? 'BASE ($15/mes)' : business.plan === 'pro' ? 'PRO ($30/mes)' : 'TRIAL (Gratuito)';
 
   const modules = [
     {
@@ -123,7 +125,7 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
 
         <div className="bg-slate-900/90 p-4 rounded-2xl border border-white/10 text-right shrink-0">
           <span className="text-[10px] text-slate-400 uppercase font-mono-tech font-bold block">Tu Plan Actual</span>
-          <span className="text-base font-display font-black text-brand-400">PLAN BASE ($20/mes)</span>
+          <span className="text-base font-display font-black text-brand-400">{planLabel}</span>
           <span className="block text-[11px] text-brand-300 font-mono-tech">Incluye Caja POS & 0% Comisiones</span>
         </div>
       </div>
