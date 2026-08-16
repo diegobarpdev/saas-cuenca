@@ -78,7 +78,7 @@ export async function POST(req: Request) {
     };
 
     const items: FacturaItem[] = (order.order_items ?? []).map((item: any, idx: number) => {
-      const nombre = item.products?.nombre ?? `Ítem ${idx + 1}`;
+      const nombre = item.nombre_producto ?? item.products?.nombre ?? `Ítem ${idx + 1}`;
       return {
         codigo: String(idx + 1).padStart(3, '0'),
         descripcion: nombre,

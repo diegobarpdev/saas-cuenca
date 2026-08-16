@@ -41,11 +41,18 @@ interface AutorizacionResult {
 }
 
 async function callSoapService(wsdlUrl: string, method: string, args: Record<string, string>): Promise<any> {
-  // Usamos soap npm package
   const soap = await import('soap');
   const client = await soap.createClientAsync(wsdlUrl, { wsdl_options: { timeout: 30000 } });
   const result = await (client as any)[`${method}Async`](args);
-  return result[0];
+  let raw = result[0];
+  // El SRI devuelve el body como string JSON en algunos entornos — parsear si es necesario
+  if (typeof raw === 'string') {
+    try { raw = JSON.parse(raw); } catch { /* déjalo como está */ }
+  }
+  // La respuesta viene envuelta en RespuestaRecepcionComprobante o RespuestaAutorizacionComprobante
+  const keys = Object.keys(raw ?? {});
+  if (keys.length === 1 && keys[0].startsWith('Respuesta')) return raw[keys[0]];
+  return raw;
 }
 
 export async function enviarComprobante(
@@ -55,8 +62,9 @@ export async function enviarComprobante(
   const wsdl = ENDPOINTS[ambiente].recepcion;
 
   try {
+    const xmlBase64 = Buffer.from(xmlFirmado, 'utf-8').toString('base64');
     const result: RecepcionResult = await callSoapService(wsdl, 'validarComprobante', {
-      xml: xmlFirmado,
+      xml: xmlBase64,
     });
 
     const errores: string[] = [];
