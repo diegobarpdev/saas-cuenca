@@ -44,7 +44,7 @@ const FLOW_STEPS = [
   {
     icon: PartyPopper,
     title: 'El 100% de esa venta es tuyo',
-    desc: 'Ningún porcentaje para nadie. Sin comisión oculta. La misma tarifa de $20/mes sin importar cuánto vendiste.',
+    desc: 'Ningún porcentaje para nadie. Sin comisión oculta. La misma tarifa de $29.99/mes sin importar cuánto vendiste.',
     highlight: true,
   },
 ];
@@ -103,7 +103,7 @@ export default function LandingPage() {
             <div className="inline-flex items-center gap-2.5 border border-brand-500/40 rounded-full px-4 py-2 bg-brand-500/5">
               <span className="w-2 h-2 rounded-full bg-brand-400 animate-pulse shrink-0" />
               <span className="text-brand-400 text-sm font-mono-tech font-bold tracking-tight">
-                $20/mes · 0% de comisión por venta
+                $29.99/mes · 0% de comisión por venta
               </span>
             </div>
 
@@ -377,7 +377,7 @@ export default function LandingPage() {
                 <div>
                   <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest mb-2">Plan Base</p>
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-5xl font-display font-black text-white">$20</span>
+                    <span className="text-5xl font-display font-black text-white">$29.99</span>
                     <span className="text-slate-500 text-sm">/mes</span>
                   </div>
                   <p className="text-slate-500 text-sm mt-1">Sin comisión. Sin contrato.</p>

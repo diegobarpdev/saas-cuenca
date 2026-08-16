@@ -172,7 +172,7 @@ export default function CreateBusinessPage() {
             <label className="block text-xs font-medium text-zinc-300 mb-1">Plan de Suscripción</label>
             <CustomSelect
               options={[
-                { value: 'basico', label: 'Plan Base Core ($15/mes)' },
+                { value: 'basico', label: 'Plan Base ($29.99/mes)' },
                 { value: 'trial', label: 'Trial (Prueba Gratuita 14 días)' },
               ]}
               value={plan}

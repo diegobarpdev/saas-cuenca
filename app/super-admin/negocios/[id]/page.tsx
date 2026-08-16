@@ -15,7 +15,7 @@ import { Business } from '@/lib/types/database';
 
 const planOptions = [
   { value: 'trial',  label: 'Trial — Prueba Gratuita 14 días' },
-  { value: 'basico', label: 'Plan Base ($15/mes)' },
+  { value: 'basico', label: 'Plan Base ($29.99/mes)' },
 ];
 
 export default function EditBusinessPage({ params }: { params: Promise<{ id: string }> }) {
