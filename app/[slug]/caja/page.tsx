@@ -1447,8 +1447,9 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
       <>
         <style dangerouslySetInnerHTML={{ __html: `
           @media print {
-            body > * { display: none !important; }
-            #kaltiro-print-ticket { display: block !important; position: fixed; inset: 0; z-index: 99999; background: white; }
+            body * { visibility: hidden !important; }
+            #kaltiro-print-ticket, #kaltiro-print-ticket * { visibility: visible !important; }
+            #kaltiro-print-ticket { position: fixed; left: 0; top: 0; width: 100%; background: white; }
           }
         `}} />
         <div id="kaltiro-print-ticket" style={{ display: 'none' }}>
