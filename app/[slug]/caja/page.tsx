@@ -864,7 +864,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                 Monitor de Pedidos en Vivo
               </h2>
               <p className="text-xs text-slate-400">
-                Supervisa y actualiza el estado de las comandas recibidas en tiempo real.
+                Mira los pedidos que entran en tiempo real desde la caja y la web.
               </p>
             </div>
             <button
@@ -894,6 +894,16 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                     default: return 'bg-rose-500/10 text-rose-400 border-rose-500/30';
                   }
                 };
+                const getStatusLabel = (st: string) => {
+                  switch (st) {
+                    case 'pendiente':      return 'Pendiente';
+                    case 'en_preparacion': return 'En cocina';
+                    case 'listo':          return 'Listo';
+                    case 'entregado':      return 'Entregado';
+                    case 'cancelado':      return 'Cancelado';
+                    default:               return st;
+                  }
+                };
 
                 return (
                   <div key={order.id} className="bg-[#0B0F1B] border border-white/10 rounded-2xl p-4 space-y-3 flex flex-col justify-between shadow-lg">
@@ -903,7 +913,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                           #{String(order.numero_pedido).padStart(4, '0')}
                         </span>
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono-tech font-bold uppercase border ${getStatusColor(order.estado)}`}>
-                          {order.estado.replace('_', ' ')}
+                          {getStatusLabel(order.estado)}
                         </span>
                       </div>
 
@@ -1158,7 +1168,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           {/* Modalidades de Entrega */}
           <div>
             <label className="block text-[10px] font-display font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Tipo de Entrega
+              ¿Cómo se entrega?
             </label>
             <div className="grid grid-cols-3 gap-2">
               {[
@@ -1261,7 +1271,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           <div className="grid grid-cols-2 gap-3 border-t border-white/5 pt-3">
             <div>
               <label className="block text-[10px] font-display font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
-                Método de Pago
+                ¿Cómo paga?
               </label>
               <CustomSelect
                 options={[
@@ -1278,7 +1288,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
             <div>
               <label className="block text-[10px] font-display font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
-                Estado Pago
+                ¿Ya cobrado?
               </label>
               <div className="flex gap-2">
                 <button
@@ -1321,7 +1331,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               >
                 <span className="flex items-center gap-2 text-[11px] font-display font-bold">
                   <FileText className="w-3.5 h-3.5" />
-                  Requiere Factura Electrónica
+                  ¿El cliente necesita factura?
                 </span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${requiereFactura ? 'rotate-180' : ''}`} />
               </button>
@@ -1355,7 +1365,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   />
                   <input
                     type="text"
-                    placeholder="Razón Social"
+                    placeholder="Nombre completo o empresa"
                     value={datosFact.razon_social}
                     onChange={e => setDatosFact(prev => ({ ...prev, razon_social: e.target.value }))}
                     className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500"
@@ -1369,7 +1379,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   />
                   <input
                     type="text"
-                    placeholder="Dirección fiscal"
+                    placeholder="Dirección del cliente"
                     value={datosFact.direccion}
                     onChange={e => setDatosFact(prev => ({ ...prev, direccion: e.target.value }))}
                     className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500"
@@ -1622,7 +1632,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
             {/* Items del pedido (read-only) */}
             <div>
-              <p className="text-[10px] font-mono-tech font-bold text-slate-500 uppercase mb-2">Ítems del pedido</p>
+              <p className="text-[10px] font-mono-tech font-bold text-slate-500 uppercase mb-2">Productos del pedido</p>
               <div className="space-y-1.5">
                 {((editOrder as any).items || []).map((it: any, idx: number) => (
                   <div key={idx} className="flex justify-between text-xs text-slate-300 bg-slate-950/50 px-3 py-1.5 rounded-lg">
@@ -1635,7 +1645,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
             {/* Sección Factura */}
             <div className="border-t border-white/5 pt-3 space-y-3">
-              <p className="text-[10px] font-mono-tech font-bold text-slate-500 uppercase">Factura Electrónica</p>
+              <p className="text-[10px] font-mono-tech font-bold text-slate-500 uppercase">Factura</p>
 
               <button
                 type="button"
@@ -1648,7 +1658,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               >
                 <span className="flex items-center gap-2 text-xs font-display font-bold">
                   <Receipt className="w-3.5 h-3.5" />
-                  {editRequiereFactura ? 'Requiere factura — activo' : 'Sin factura (Consumidor Final)'}
+                  {editRequiereFactura ? 'Con factura — activo' : 'Sin factura'}
                 </span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${editRequiereFactura ? 'rotate-180' : ''}`} />
               </button>
@@ -1680,7 +1690,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   />
                   <input
                     type="text"
-                    placeholder="Razón Social"
+                    placeholder="Nombre completo o empresa"
                     value={editDatosFact.razon_social}
                     onChange={e => setEditDatosFact(prev => ({ ...prev, razon_social: e.target.value }))}
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500"
@@ -1694,7 +1704,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   />
                   <input
                     type="text"
-                    placeholder="Dirección fiscal"
+                    placeholder="Dirección del cliente"
                     value={editDatosFact.direccion}
                     onChange={e => setEditDatosFact(prev => ({ ...prev, direccion: e.target.value }))}
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500"
@@ -1734,7 +1744,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
             <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
               <Lock className="w-6 h-6 animate-pulse" />
             </div>
-            <h2 className="text-xl font-display font-black text-white tracking-tight">Caja Registradora Cerrada</h2>
+            <h2 className="text-xl font-display font-black text-white tracking-tight">La caja está cerrada</h2>
             <p className="text-xs text-slate-400">
               Debes abrir turno e ingresar el fondo de caja inicial para comenzar a facturar en {business?.nombre}.
             </p>
@@ -1793,7 +1803,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           <div className="flex items-center justify-between border-b border-white/5 pb-3">
             <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
               <Coins className="w-4.5 h-4.5 text-amber-400" />
-              <span>Movimiento de Caja Chica</span>
+              <span>Registrar Gasto o Ingreso</span>
             </h3>
             <button 
               onClick={() => setShowTxModal(false)}
@@ -1891,7 +1901,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           <div className="flex items-center justify-between border-b border-white/5 pb-3">
             <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
               <Lock className="w-4.5 h-4.5 text-rose-400 animate-pulse" />
-              <span>Arqueo y Cierre de Caja — {activeRegister.nombre_caja}</span>
+              <span>Cierre de Caja — {activeRegister.nombre_caja}</span>
             </h3>
             <button 
               onClick={() => setShowCloseModal(false)}

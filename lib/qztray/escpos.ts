@@ -78,14 +78,14 @@ export function buildTicketEscPos(order: any, business: any): string {
   t += sep();
 
   // ── FACTURACIÓN ─────────────────────────────────────────────
-  t += CMD.BOLD_ON + 'DATOS FACTURACION:' + CMD.BOLD_OFF + LF;
+  t += CMD.BOLD_ON + 'FACTURACION:' + CMD.BOLD_OFF + LF;
   if (order.requiere_factura && order.datos_facturacion) {
     const df = order.datos_facturacion;
     t += (df.tipo_doc || 'DOC').toUpperCase() + ': ' + (df.num_doc || '') + LF;
-    t += 'RAZON SOCIAL: ' + (df.razon_social || '').substring(0, W - 14) + LF;
+    t += 'NOMBRE: ' + (df.razon_social || '').substring(0, W - 8) + LF;
     if (df.email) t += 'EMAIL: ' + df.email.substring(0, W - 7) + LF;
   } else {
-    t += CMD.BOLD_ON + 'CONSUMIDOR FINAL' + CMD.BOLD_OFF + LF;
+    t += CMD.BOLD_ON + 'SIN FACTURA' + CMD.BOLD_OFF + LF;
   }
   t += sep();
 
@@ -130,7 +130,7 @@ export function buildTicketEscPos(order: any, business: any): string {
   const estado = (order.estado_pago ?? '').toUpperCase();
   t += CMD.CENTER;
   t += CMD.BOLD_ON + 'PAGO: ' + pago + CMD.BOLD_OFF + LF;
-  t += 'ESTADO: ' + estado + LF;
+  t += (order.estado_pago === 'pagado' ? 'COBRADO' : 'PENDIENTE DE COBRO') + LF;
   t += sep();
 
   // ── PIE ─────────────────────────────────────────────────────

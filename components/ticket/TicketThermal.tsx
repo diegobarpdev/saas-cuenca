@@ -49,15 +49,15 @@ export function TicketThermal({ order, business }: TicketThermalProps) {
 
       {/* Datos de Facturación (Ecuador) */}
       <div className="py-2 border-b border-dashed border-black">
-        <p className="font-bold">DATOS FACTURACIÓN:</p>
+        <p className="font-bold">FACTURACIÓN:</p>
         {order.requiere_factura && order.datos_facturacion ? (
           <>
             <p><span className="font-semibold">{order.datos_facturacion.tipo_doc}:</span> {order.datos_facturacion.num_doc}</p>
-            <p><span className="font-semibold">RAZÓN SOCIAL:</span> {order.datos_facturacion.razon_social}</p>
+            <p><span className="font-semibold">NOMBRE:</span> {order.datos_facturacion.razon_social}</p>
             <p className="text-[10px]"><span className="font-semibold">EMAIL:</span> {order.datos_facturacion.email}</p>
           </>
         ) : (
-          <p className="font-semibold">CONSUMIDOR FINAL</p>
+          <p className="font-semibold">SIN FACTURA</p>
         )}
       </div>
 
@@ -115,7 +115,7 @@ export function TicketThermal({ order, business }: TicketThermalProps) {
       {/* Método de Pago */}
       <div className="py-2 text-center">
         <p className="font-bold text-xs uppercase">PAGO: {formatPaymentMethod(order.metodo_pago)}</p>
-        <p className="text-[10px] uppercase">ESTADO PAGO: {order.estado_pago}</p>
+        <p className="text-[10px] uppercase">{order.estado_pago === 'pagado' ? 'COBRADO' : 'PENDIENTE DE COBRO'}</p>
         {order.payphone_transaction_id && (
           <p className="text-[9px]">ID PayPhone: {order.payphone_transaction_id}</p>
         )}
