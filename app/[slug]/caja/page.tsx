@@ -872,7 +872,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               className="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-bold text-xs flex items-center gap-2 shadow-lg shadow-brand-500/20"
             >
               <Plus className="w-4 h-4" />
-              <span>+ Nueva Comanda POS</span>
+              <span>Nueva Comanda</span>
             </button>
           </div>
 
