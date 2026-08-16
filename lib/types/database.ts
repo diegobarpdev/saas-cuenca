@@ -115,6 +115,7 @@ export interface Business {
   cuentas_bancarias?: BankDetails[];
   zonas_envio: ShippingZone[];
   payphone_token: string | null;
+  payphone_ambiente?: 'pruebas' | 'produccion' | null;
   plan: 'trial' | 'basico' | 'pro';
   has_payphone?: boolean;
   has_live_kitchen?: boolean;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Building2, Plus, ExternalLink, Edit3, Trash2, X, Save, Search, RefreshCw, LogIn, CreditCard, Bell, Printer, Database, Globe, AlertTriangle, Receipt } from 'lucide-react';
+import { Building2, Plus, ExternalLink, Edit3, Trash2, X, Save, Search, RefreshCw, LogIn, CreditCard, Bell, Printer, Database, Globe, AlertTriangle, Receipt, Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Business } from '@/lib/types/database';
 import { CustomSelect } from '@/components/ui/CustomSelect';
@@ -28,6 +28,14 @@ export default function SuperAdminDashboardPage() {
   const [editHasCrmExport, setEditHasCrmExport] = useState(false);
   const [editHasCustomDomain, setEditHasCustomDomain] = useState(false);
   const [editHasFacturacionSri, setEditHasFacturacionSri] = useState(false);
+
+  // PayPhone config
+  const [editPayphoneToken, setEditPayphoneToken] = useState('');
+  const [editPayphoneAmbiente, setEditPayphoneAmbiente] = useState<'pruebas' | 'produccion'>('pruebas');
+  const [showPayphoneToken, setShowPayphoneToken] = useState(false);
+  const [testingPayphone, setTestingPayphone] = useState(false);
+  const [payphoneTestResult, setPayphoneTestResult] = useState<'ok' | 'error' | null>(null);
+
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [deletingBusiness, setDeletingBusiness] = useState<Business | null>(null);
@@ -79,6 +87,10 @@ export default function SuperAdminDashboardPage() {
     setEditHasCrmExport(b.has_crm_export || false);
     setEditHasCustomDomain(b.has_custom_domain || false);
     setEditHasFacturacionSri(b.has_facturacion_sri || false);
+    setEditPayphoneToken(b.payphone_token || '');
+    setEditPayphoneAmbiente((b.payphone_ambiente as any) || 'pruebas');
+    setPayphoneTestResult(null);
+    setShowPayphoneToken(false);
   };
 
   const handleSaveEditBusiness = async (e: React.FormEvent) => {
@@ -108,6 +120,8 @@ export default function SuperAdminDashboardPage() {
           has_crm_export: editHasCrmExport,
           has_custom_domain: editHasCustomDomain,
           has_facturacion_sri: editHasFacturacionSri,
+          payphone_token: editHasPayphone && editPayphoneToken.trim() ? editPayphoneToken.trim() : null,
+          payphone_ambiente: editHasPayphone ? editPayphoneAmbiente : null,
         })
         .eq('id', editingBusiness.id);
 
@@ -161,6 +175,33 @@ export default function SuperAdminDashboardPage() {
       setErrorMsg(`Excepción: ${err.message}`);
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleTestPayphone = async () => {
+    if (!editPayphoneToken.trim()) return;
+    setTestingPayphone(true);
+    setPayphoneTestResult(null);
+    try {
+      // PayPhone Ecuador: verificar token haciendo una consulta de saldo/info
+      const baseUrl = editPayphoneAmbiente === 'produccion'
+        ? 'https://pay.payphonetodoesunchoice.com'
+        : 'https://pay.payphonetodoesunchoice.com'; // mismo endpoint, diferente token
+      const res = await fetch(`${baseUrl}/api/button/V2/Prepare`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${editPayphoneToken.trim()}` },
+        body: JSON.stringify({ amount: 1, amountWithTax: 0, amountWithoutTax: 1, tax: 0, currency: 'USD', clientTransactionId: 'test-ping-000' }),
+      });
+      // 200 o 400 con error de monto = token válido; 401 = token inválido
+      if (res.status === 401) {
+        setPayphoneTestResult('error');
+      } else {
+        setPayphoneTestResult('ok');
+      }
+    } catch {
+      setPayphoneTestResult('error');
+    } finally {
+      setTestingPayphone(false);
     }
   };
 
@@ -422,7 +463,7 @@ export default function SuperAdminDashboardPage() {
                 <label className="block text-xs font-semibold text-purple-400">Módulos & Add-ons Habilitados</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-zinc-300">
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-purple-500/30 transition-colors">
-                    <input type="checkbox" checked={editHasPayphone} onChange={(e) => setEditHasPayphone(e.target.checked)} className="rounded accent-purple-500" />
+                    <input type="checkbox" checked={editHasPayphone} onChange={(e) => { setEditHasPayphone(e.target.checked); setPayphoneTestResult(null); }} className="rounded accent-purple-500" />
                     <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-purple-400" /> PayPhone Tarjetas (+$9/m)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 p-2 rounded-lg border border-zinc-800 hover:border-purple-500/30 transition-colors">
@@ -446,6 +487,83 @@ export default function SuperAdminDashboardPage() {
                     <span className="flex items-center gap-1.5"><Receipt className="w-3.5 h-3.5 text-purple-400" /> Facturación SRI (+$12/m)</span>
                   </label>
                 </div>
+
+                {/* Configuración PayPhone (expandible si está activo) */}
+                {editHasPayphone && (
+                  <div className="col-span-2 mt-1 p-4 rounded-xl bg-purple-950/30 border border-purple-500/30 space-y-3">
+                    <p className="text-[11px] font-semibold text-purple-300 flex items-center gap-1.5">
+                      <CreditCard className="w-3.5 h-3.5" /> Configuración PayPhone Ecuador
+                    </p>
+
+                    {/* Ambiente */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { setEditPayphoneAmbiente('pruebas'); setPayphoneTestResult(null); }}
+                        className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${editPayphoneAmbiente === 'pruebas' ? 'bg-amber-500/20 border-amber-500/50 text-amber-300' : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:border-zinc-700'}`}
+                      >
+                        Pruebas (Sandbox)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setEditPayphoneAmbiente('produccion'); setPayphoneTestResult(null); }}
+                        className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${editPayphoneAmbiente === 'produccion' ? 'bg-green-500/20 border-green-500/50 text-green-300' : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:border-zinc-700'}`}
+                      >
+                        Producción (Real)
+                      </button>
+                    </div>
+
+                    {/* Token */}
+                    <div>
+                      <label className="block text-[11px] font-medium text-zinc-400 mb-1">
+                        Token JWT del Comercio
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPayphoneToken ? 'text' : 'password'}
+                          placeholder="Bearer token proporcionado por PayPhone Ecuador"
+                          value={editPayphoneToken}
+                          onChange={(e) => { setEditPayphoneToken(e.target.value); setPayphoneTestResult(null); }}
+                          className="w-full px-3 py-2 pr-8 rounded-lg bg-zinc-950 border border-zinc-700 text-[11px] text-zinc-100 font-mono focus:outline-none focus:border-purple-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPayphoneToken((v) => !v)}
+                          className="absolute right-2.5 top-2 text-zinc-500 hover:text-zinc-300"
+                          tabIndex={-1}
+                        >
+                          {showPayphoneToken ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Botón de prueba */}
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={handleTestPayphone}
+                        disabled={testingPayphone || !editPayphoneToken.trim()}
+                        className="px-3 py-1.5 rounded-lg bg-purple-700 hover:bg-purple-600 disabled:opacity-40 text-white text-[11px] font-semibold flex items-center gap-1.5 transition-all"
+                      >
+                        {testingPayphone ? <RefreshCw className="w-3 h-3 animate-spin" /> : <CreditCard className="w-3 h-3" />}
+                        {testingPayphone ? 'Probando...' : 'Probar conexión'}
+                      </button>
+                      {payphoneTestResult === 'ok' && (
+                        <span className="flex items-center gap-1 text-[11px] text-green-400 font-semibold">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Token válido — listo para activar
+                        </span>
+                      )}
+                      {payphoneTestResult === 'error' && (
+                        <span className="flex items-center gap-1 text-[11px] text-rose-400 font-semibold">
+                          <XCircle className="w-3.5 h-3.5" /> Token inválido o sin acceso
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-zinc-500">
+                      El token se obtiene desde el portal de PayPhone Ecuador. Prueba siempre antes de activar en producción.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-2 pt-2">
