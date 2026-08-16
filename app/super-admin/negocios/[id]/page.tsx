@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowLeft, Building2, Save, CreditCard, Bell, Printer,
   Database, Globe, Receipt, Eye, EyeOff, CheckCircle2,
-  XCircle, RefreshCw, Sparkles, ShieldCheck, ExternalLink, LogIn,
+  XCircle, RefreshCw, Sparkles, ShieldCheck, ExternalLink, LogIn, PackageX,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { CustomSelect } from '@/components/ui/CustomSelect';
@@ -14,8 +14,8 @@ import { CustomCheckbox } from '@/components/ui/CustomCheckbox';
 import { Business } from '@/lib/types/database';
 
 const planOptions = [
-  { value: 'basico', label: 'Plan Base Core ($15/mes)' },
-  { value: 'trial', label: 'Trial — Prueba Gratuita 14 días' },
+  { value: 'trial',  label: 'Trial — Prueba Gratuita 14 días' },
+  { value: 'basico', label: 'Plan Base ($15/mes)' },
 ];
 
 export default function EditBusinessPage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,7 +34,7 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
   const [ruc, setRuc] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [direccion, setDireccion] = useState('');
-  const [plan, setPlan] = useState<'trial' | 'basico'>('trial');
+  const [plan, setPlan] = useState<'trial' | 'basico' | string>('trial');
 
   // Módulos
   const [hasPayphone, setHasPayphone] = useState(false);
@@ -43,6 +43,7 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
   const [hasCrmExport, setHasCrmExport] = useState(false);
   const [hasCustomDomain, setHasCustomDomain] = useState(false);
   const [hasFacturacionSri, setHasFacturacionSri] = useState(false);
+  const [hasMermas, setHasMermas] = useState(false);
 
   // PayPhone config
   const [payphoneToken, setPayphoneToken] = useState('');
@@ -64,13 +65,14 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
       setRuc(b.ruc || '');
       setWhatsapp(b.telefono_whatsapp || '');
       setDireccion(b.direccion || '');
-      setPlan(b.plan === 'basico' ? 'basico' : 'trial');
+      setPlan(b.plan || 'trial');
       setHasPayphone(b.has_payphone || false);
       setHasLiveKitchen(b.has_live_kitchen || false);
       setHasPosPrinting(b.has_pos_printing || false);
       setHasCrmExport(b.has_crm_export || false);
       setHasCustomDomain(b.has_custom_domain || false);
       setHasFacturacionSri(b.has_facturacion_sri || false);
+      setHasMermas(b.has_mermas || false);
       setPayphoneToken(b.payphone_token || '');
       setPayphoneAmbiente((b.payphone_ambiente as any) || 'pruebas');
       setLoading(false);
@@ -102,6 +104,7 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
         has_crm_export: hasCrmExport,
         has_custom_domain: hasCustomDomain,
         has_facturacion_sri: hasFacturacionSri,
+        has_mermas: hasMermas,
         payphone_token: hasPayphone && payphoneToken.trim() ? payphoneToken.trim() : null,
         payphone_ambiente: hasPayphone ? payphoneAmbiente : null,
       }).eq('id', id);
@@ -164,7 +167,7 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <form onSubmit={handleSave} className="space-y-5 max-w-5xl">
+    <form onSubmit={handleSave} className="space-y-5 w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -364,21 +367,6 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
             <p className="text-[10px] text-zinc-500">Exportación de clientes y ventas</p>
           </div>
 
-          {/* Dominio */}
-          <div className={`p-4 rounded-xl border transition-all space-y-1 ${hasCustomDomain ? 'bg-purple-950/30 border-purple-500/40' : 'bg-zinc-950 border-zinc-800'}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Globe className={`w-4 h-4 ${hasCustomDomain ? 'text-purple-400' : 'text-zinc-600'}`} />
-                <span className="text-xs font-semibold text-zinc-200">Dominio Personalizado</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-zinc-500 font-mono">+$9/m</span>
-                <input type="checkbox" checked={hasCustomDomain} onChange={(e) => setHasCustomDomain(e.target.checked)} className="rounded accent-purple-500 w-4 h-4" />
-              </div>
-            </div>
-            <p className="text-[10px] text-zinc-500">Ej: menu.mirestaurante.com</p>
-          </div>
-
           {/* SRI */}
           <div className={`p-4 rounded-xl border transition-all space-y-1 ${hasFacturacionSri ? 'bg-purple-950/30 border-purple-500/40' : 'bg-zinc-950 border-zinc-800'}`}>
             <div className="flex items-center justify-between">
@@ -392,6 +380,21 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
               </div>
             </div>
             <p className="text-[10px] text-zinc-500">Facturas electrónicas válidas Ecuador</p>
+          </div>
+
+          {/* Mermas */}
+          <div className={`p-4 rounded-xl border transition-all space-y-1 ${hasMermas ? 'bg-purple-950/30 border-purple-500/40' : 'bg-zinc-950 border-zinc-800'}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <PackageX className={`w-4 h-4 ${hasMermas ? 'text-purple-400' : 'text-zinc-600'}`} />
+                <span className="text-xs font-semibold text-zinc-200">Control de Mermas</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-zinc-500 font-mono">+$5/m</span>
+                <input type="checkbox" checked={hasMermas} onChange={(e) => setHasMermas(e.target.checked)} className="rounded accent-purple-500 w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-[10px] text-zinc-500">Bajas por daño, caducidad o pérdida</p>
           </div>
         </div>
 

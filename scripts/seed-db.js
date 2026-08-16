@@ -18,7 +18,7 @@ async function seed() {
       '593987654321',
       'Calle Larga 8-23 y Luis Cordero, Cuenca',
       'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80',
-      'pro'
+      'basico'
     )
     ON CONFLICT (slug) DO NOTHING;
 

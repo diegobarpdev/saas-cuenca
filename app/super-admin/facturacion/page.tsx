@@ -8,7 +8,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 
 function calcularMonto(business: Business): number {
-  let total = business.plan === 'pro' ? 30 : 15;
+  let total = 15;
   if (business.has_payphone) total += 9;
   if (business.has_live_kitchen) total += 7;
   if (business.has_pos_printing) total += 7;

@@ -37,7 +37,7 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
     return `https://wa.me/${business.telefono_whatsapp}?text=${encodeURIComponent(text)}`;
   };
 
-  const planLabel = business.plan === 'basico' ? 'BASE ($15/mes)' : business.plan === 'pro' ? 'PRO ($30/mes)' : 'TRIAL (Gratuito)';
+  const planLabel = business.plan === 'basico' ? 'BASE ($15/mes)' : 'TRIAL (Gratuito)';
 
   const modules = [
     {

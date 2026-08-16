@@ -54,7 +54,7 @@ export const MOCK_BUSINESS: Business = {
     { id: 'z4', zona: 'Challuabamba / Ricaurte', costo: 3.50 },
   ],
   payphone_token: 'mock-payphone-token-12345',
-  plan: 'pro',
+  plan: 'basico',
   created_at: new Date().toISOString(),
 };
 

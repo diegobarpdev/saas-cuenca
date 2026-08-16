@@ -116,7 +116,7 @@ export interface Business {
   zonas_envio: ShippingZone[];
   payphone_token: string | null;
   payphone_ambiente?: 'pruebas' | 'produccion' | null;
-  plan: 'trial' | 'basico' | 'pro';
+  plan: 'trial' | 'basico';
   has_payphone?: boolean;
   has_live_kitchen?: boolean;
   has_pos_printing?: boolean;
