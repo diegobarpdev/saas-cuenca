@@ -219,6 +219,7 @@ export interface OrderItem {
   cantidad: number;
   precio_unitario: number;
   notas: string | null;
+  nombre_producto?: string | null;
   product?: Product;
   opciones_seleccionadas?: any;
 }
