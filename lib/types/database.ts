@@ -292,6 +292,7 @@ export interface Merma {
   nombre_producto: string;
   cantidad: number;
   unidad: string;
+  precio_unitario: number;
   motivo: MermaMotivo;
   notas: string | null;
   registrado_por: string | null;

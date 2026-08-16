@@ -221,7 +221,7 @@ export default function SriConfigPage({ params }: { params: Promise<{ slug: stri
   }
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto pb-20">
+    <div className="space-y-6 w-full pb-20">
       {/* Header */}
       <div className="p-6 rounded-3xl bg-[#0D1322] border border-white/10 shadow-xl">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 text-brand-300 text-xs font-mono-tech border border-brand-500/30 mb-3">
