@@ -32,7 +32,8 @@ import Link from 'next/link';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 import { ProductVariantsDrawer } from '@/components/catalog/ProductVariantsDrawer';
 import { useRealtimeOrders } from '@/hooks/useRealtimeOrders';
-import { Clock, CheckCircle2, AlertTriangle, Truck, ShoppingBag, Eye } from 'lucide-react';
+import { Clock, CheckCircle2, AlertTriangle, Truck, ShoppingBag, Eye, Printer } from 'lucide-react';
+import { TicketThermal } from '@/components/ticket/TicketThermal';
 
 export default function CajaPOSPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
@@ -71,6 +72,18 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   const [numeroMesa, setNumeroMesa] = useState('');
   const [metodoPago, setMetodoPago] = useState<'efectivo' | 'transferencia' | 'payphone'>('efectivo');
   const [estadoPago, setEstadoPago] = useState<'pendiente' | 'pagado'>('pagado');
+
+  // Imprimir ticket
+  const [printOrder, setPrintOrder] = useState<any | null>(null);
+
+  React.useEffect(() => {
+    if (!printOrder) return;
+    const timer = setTimeout(() => {
+      window.print();
+      setPrintOrder(null);
+    }, 150); // pequeño delay para que el DOM se renderice
+    return () => clearTimeout(timer);
+  }, [printOrder]);
 
   // Modal editar pedido
   const [editOrder, setEditOrder] = useState<any | null>(null);
@@ -866,6 +879,13 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
                       <div className="flex gap-1.5">
                         <button
+                          onClick={() => setPrintOrder(order)}
+                          className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] font-bold flex items-center gap-1"
+                          title="Imprimir ticket"
+                        >
+                          <Printer className="w-3 h-3" />
+                        </button>
+                        <button
                           onClick={() => openEditModal(order)}
                           className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] font-bold flex items-center gap-1"
                         >
@@ -1371,6 +1391,26 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
         </div>{/* fin contenedor scrolleable */}
       </div>
     </div>
+    )}
+
+    {/* ========================================== */}
+    {/* TICKET DE IMPRESIÓN (oculto en pantalla)   */}
+    {/* ========================================== */}
+    {printOrder && business && (
+      <>
+        <style dangerouslySetInnerHTML={{ __html: `
+          @media print {
+            body > * { display: none !important; }
+            #kaltiro-print-ticket { display: block !important; position: fixed; inset: 0; z-index: 99999; background: white; }
+          }
+        `}} />
+        <div id="kaltiro-print-ticket" style={{ display: 'none' }}>
+          <TicketThermal
+            order={{ ...printOrder, items: printOrder.items ?? [] }}
+            business={business}
+          />
+        </div>
+      </>
     )}
 
     {/* ========================================== */}
