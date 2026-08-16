@@ -115,7 +115,7 @@ export function AddonsCarousel() {
       <div
         ref={trackRef}
         onScroll={checkScroll}
-        className="flex gap-3 overflow-x-auto scroll-smooth pb-2 px-1"
+        className="flex gap-3 overflow-x-auto scroll-smooth pb-2 px-6"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {addons.map((addon) => {

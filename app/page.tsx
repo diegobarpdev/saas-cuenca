@@ -411,15 +411,20 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* Add-ons carrusel */}
-            <div className="p-6 rounded-2xl border border-white/[0.06] bg-[#0A0D15]">
-              <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest mb-4">
-                Módulos opcionales
-              </p>
-              <AddonsCarousel />
-            </div>
           </div>
         </div>
+      </section>
+
+      {/* ── ADDONS CAROUSEL ─────────────────────────────────────────────── */}
+      <section className="relative border-t border-white/[0.06] bg-[#0A0D15] py-10 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0"
+          style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 100%, rgba(254,106,70,0.05) 0%, transparent 70%)' }} />
+        <div className="relative max-w-6xl mx-auto px-5 mb-5">
+          <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest">
+            Módulos opcionales
+          </p>
+        </div>
+        <AddonsCarousel />
       </section>
 
       {/* ── DEMO CTA ────────────────────────────────────────────────────── */}
