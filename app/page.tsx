@@ -344,31 +344,31 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── PRICING ─────────────────────────────────────────────────────── */}
-      <section className="relative max-w-6xl mx-auto px-5 py-20 lg:py-28">
+      {/* ── PRICING + ADDONS ────────────────────────────────────────────── */}
+      <section className="relative py-20 lg:py-28 overflow-hidden">
         {/* Top glow */}
         <div className="pointer-events-none absolute top-0 right-1/4 w-[600px] h-[400px]"
           style={{ background: 'radial-gradient(ellipse at top right, rgba(254,106,70,0.07) 0%, transparent 65%)' }} />
 
-        <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+        {/* Headline + plan card */}
+        <div className="relative max-w-6xl mx-auto px-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
 
-          {/* Left — headline */}
-          <div>
-            <p className="text-xs font-mono-tech text-slate-500 uppercase tracking-widest mb-4">
-              Precio
-            </p>
-            <h2 className="text-4xl sm:text-5xl font-display font-black text-white leading-tight mb-5">
-              Un plan.<br />Un precio.<br />
-              <span className="text-brand-400">Sin sorpresas.</span>
-            </h2>
-            <p className="text-slate-400 text-base leading-relaxed max-w-md">
-              Empezás con el Plan Base que cubre todo lo que necesita un restaurante o cafetería para operar digitalmente. Si querés agregar pantalla de cocina, cobros con tarjeta o impresión de comandas, los sumás por separado.
-            </p>
-          </div>
+            {/* Left — headline */}
+            <div>
+              <p className="text-xs font-mono-tech text-slate-500 uppercase tracking-widest mb-4">
+                Precio
+              </p>
+              <h2 className="text-4xl sm:text-5xl font-display font-black text-white leading-tight mb-5">
+                Un plan.<br />Un precio.<br />
+                <span className="text-brand-400">Sin sorpresas.</span>
+              </h2>
+              <p className="text-slate-400 text-base leading-relaxed max-w-md">
+                Empezás con el Plan Base que cubre todo lo que necesita un restaurante o cafetería para operar digitalmente. Si querés agregar pantalla de cocina, cobros con tarjeta o impresión de comandas, los sumás por separado.
+              </p>
+            </div>
 
-          {/* Right — pricing card */}
-          <div className="space-y-4">
-            {/* Main plan */}
+            {/* Right — pricing card */}
             <div className="relative p-8 rounded-2xl border border-brand-500/20 bg-[#0D1117] overflow-hidden">
               {/* Inner top glow */}
               <div className="pointer-events-none absolute inset-0 rounded-2xl"
@@ -410,21 +410,16 @@ export default function LandingPage() {
                 Comenzar con Plan Base
               </Link>
             </div>
-
           </div>
         </div>
-      </section>
 
-      {/* ── ADDONS CAROUSEL ─────────────────────────────────────────────── */}
-      <section className="relative border-t border-white/[0.06] bg-[#0A0D15] py-10 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 100%, rgba(254,106,70,0.05) 0%, transparent 70%)' }} />
-        <div className="relative max-w-6xl mx-auto px-5 mb-5">
-          <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest">
+        {/* Addons carousel — full width, parte del mismo plan */}
+        <div className="relative mt-14">
+          <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest max-w-6xl mx-auto px-5 mb-5">
             Módulos opcionales
           </p>
+          <AddonsCarousel />
         </div>
-        <AddonsCarousel />
       </section>
 
       {/* ── DEMO CTA ────────────────────────────────────────────────────── */}

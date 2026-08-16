@@ -113,11 +113,12 @@ export function AddonsCarousel() {
 
       {/* Track */}
       <div
+        className="overflow-x-auto scroll-smooth pb-2"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         ref={trackRef}
         onScroll={checkScroll}
-        className="flex gap-3 overflow-x-auto scroll-smooth pb-2 px-6"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
+        <div className="flex gap-3 px-6 justify-center" style={{ width: 'max(100%, max-content)' }}>
         {addons.map((addon) => {
           const Icon = addon.icon;
           return (
@@ -140,6 +141,7 @@ export function AddonsCarousel() {
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );
