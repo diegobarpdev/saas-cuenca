@@ -83,10 +83,10 @@ const ADDONS = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#080B11] text-slate-100 font-sans">
+    <div className="min-h-screen bg-[#080B11] text-slate-100 font-sans overflow-x-hidden">
 
       {/* ── NAV ─────────────────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 bg-[#080B11]/95 backdrop-blur-sm border-b border-white/[0.06]">
+      <nav className="sticky top-0 z-50 bg-[#080B11]/90 backdrop-blur-md border-b border-white/[0.06]">
         <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Image
@@ -118,12 +118,17 @@ export default function LandingPage() {
       </nav>
 
       {/* ── HERO ────────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-5 pt-16 pb-20 lg:pt-24 lg:pb-28 overflow-x-hidden">
+      <section className="relative max-w-6xl mx-auto px-5 pt-16 pb-20 lg:pt-24 lg:pb-28">
+        {/* Ambient glow blobs */}
+        <div className="pointer-events-none absolute -top-20 -left-32 w-[700px] h-[600px] rounded-full opacity-100"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(254,106,70,0.10) 0%, transparent 70%)' }} />
+        <div className="pointer-events-none absolute top-1/2 right-[-10%] w-[500px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(254,106,70,0.06) 0%, transparent 70%)' }} />
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
           {/* Copy */}
           <div className="space-y-7 order-1">
-            {/* Price badge — hero level */}
             <div className="inline-flex items-center gap-2.5 border border-brand-500/40 rounded-full px-4 py-2 bg-brand-500/5">
               <span className="w-2 h-2 rounded-full bg-brand-400 animate-pulse shrink-0" />
               <span className="text-brand-400 text-sm font-mono-tech font-bold tracking-tight">
@@ -143,7 +148,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <Link
                 href="/demo"
-                className="px-7 py-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-brand-500/20"
+                className="px-7 py-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-brand-500/30"
               >
                 Ver demo en vivo
                 <ArrowRight className="w-4 h-4" />
@@ -156,7 +161,6 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* Trust anchors — no fake metrics */}
             <div className="flex items-center gap-5 pt-2 text-sm text-slate-500">
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-brand-500 shrink-0" />
@@ -173,7 +177,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Phone mockup — interactive, real food photos, no generated image */}
+          {/* Phone mockup */}
           <div className="order-2 flex justify-center lg:justify-end pt-4 lg:pt-0">
             <CatalogMockup />
           </div>
@@ -181,8 +185,13 @@ export default function LandingPage() {
       </section>
 
       {/* ── MATH HOOK ───────────────────────────────────────────────────── */}
-      <section className="border-y border-white/[0.06] bg-[#0D1117]">
-        <div className="max-w-6xl mx-auto px-5 py-16 lg:py-20">
+      <section className="relative border-y border-white/[0.06]"
+        style={{ background: 'linear-gradient(180deg, #0D1117 0%, #090C14 100%)' }}>
+        {/* Subtle glow top-center */}
+        <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px]"
+          style={{ background: 'radial-gradient(ellipse at top, rgba(254,106,70,0.06) 0%, transparent 70%)' }} />
+
+        <div className="relative max-w-6xl mx-auto px-5 py-16 lg:py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
 
             <div>
@@ -218,17 +227,20 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              <div className="p-6 rounded-2xl border border-brand-500/30 bg-brand-950/20">
-                <p className="text-brand-400 font-mono-tech text-[11px] uppercase tracking-widest mb-4">
+              <div className="relative p-6 rounded-2xl border border-brand-500/30 bg-brand-950/20 overflow-hidden">
+                {/* Inner glow */}
+                <div className="pointer-events-none absolute inset-0 rounded-2xl"
+                  style={{ background: 'radial-gradient(ellipse at top right, rgba(254,106,70,0.12) 0%, transparent 60%)' }} />
+                <p className="relative text-brand-400 font-mono-tech text-[11px] uppercase tracking-widest mb-4">
                   Kaltiro
                 </p>
-                <p className="text-4xl font-display font-black text-brand-400 mb-1 leading-none">
+                <p className="relative text-4xl font-display font-black text-brand-400 mb-1 leading-none">
                   $20
                   <br />
                   fijos
                 </p>
-                <p className="text-slate-400 text-xs mt-2 mb-5">al mes, vendas lo que vendas</p>
-                <ul className="space-y-2 text-sm text-slate-400">
+                <p className="relative text-slate-400 text-xs mt-2 mb-5">al mes, vendas lo que vendas</p>
+                <ul className="relative space-y-2 text-sm text-slate-400">
                   <li>0% de comisión por venta</li>
                   <li>Los clientes son tuyos</li>
                   <li>Tu catálogo, tu WhatsApp, tu marca</li>
@@ -241,8 +253,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── FLOW ────────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-5 py-20 lg:py-28">
-        <div className="mb-14">
+      <section className="relative max-w-6xl mx-auto px-5 py-20 lg:py-28">
+        {/* Centered ambient glow */}
+        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px]"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(254,106,70,0.05) 0%, transparent 65%)' }} />
+
+        <div className="relative mb-14">
           <p className="text-xs font-mono-tech text-slate-500 uppercase tracking-widest mb-4">
             Flujo completo
           </p>
@@ -251,19 +267,23 @@ export default function LandingPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {FLOW_STEPS.map((step, i) => {
             const Icon = step.icon;
             return (
               <div
                 key={i}
-                className={`p-6 rounded-2xl border transition-colors ${
+                className={`relative p-6 rounded-2xl border transition-colors overflow-hidden ${
                   step.highlight
                     ? 'border-brand-500/40 bg-brand-950/25'
                     : 'border-white/[0.07] bg-[#0D1117]'
                 }`}
               >
-                <div className="flex items-start gap-4">
+                {step.highlight && (
+                  <div className="pointer-events-none absolute inset-0 rounded-2xl"
+                    style={{ background: 'radial-gradient(ellipse at top left, rgba(254,106,70,0.15) 0%, transparent 60%)' }} />
+                )}
+                <div className="relative flex items-start gap-4">
                   <div
                     className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${
                       step.highlight ? 'bg-brand-500/20' : 'bg-white/[0.06]'
@@ -283,13 +303,13 @@ export default function LandingPage() {
                   </span>
                 </div>
                 <h3
-                  className={`font-display font-bold text-base mt-4 mb-2 leading-snug ${
+                  className={`relative font-display font-bold text-base mt-4 mb-2 leading-snug ${
                     step.highlight ? 'text-brand-400' : 'text-white'
                   }`}
                 >
                   {step.title}
                 </h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{step.desc}</p>
+                <p className="relative text-slate-500 text-sm leading-relaxed">{step.desc}</p>
               </div>
             );
           })}
@@ -297,18 +317,26 @@ export default function LandingPage() {
       </section>
 
       {/* ── PRODUCT SHOWCASE ─────────────────────────────────────────────── */}
-      <section className="border-t border-white/[0.06] bg-[#0D1117]">
-        <div className="max-w-6xl mx-auto px-5 py-20 lg:py-28">
+      <section className="relative border-t border-white/[0.06]"
+        style={{ background: 'linear-gradient(180deg, #0A0D15 0%, #080B11 100%)' }}>
+        {/* Glow behind dashboard image */}
+        <div className="pointer-events-none absolute top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px]"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(254,106,70,0.10) 0%, transparent 65%)' }} />
+
+        <div className="relative max-w-6xl mx-auto px-5 py-20 lg:py-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
             {/* Dashboard mockup */}
-            <div className="flex justify-center lg:justify-start">
+            <div className="relative flex justify-center lg:justify-start">
+              {/* Outer glow ring */}
+              <div className="absolute inset-0 rounded-2xl blur-2xl opacity-20"
+                style={{ background: 'radial-gradient(ellipse at center, rgba(254,106,70,0.6) 0%, transparent 70%)' }} />
               <Image
                 src="/mockup-dashboard.jpg"
                 alt="Panel de pedidos en tiempo real de Kaltiro.com — vista del negocio"
                 width={680}
                 height={383}
-                className="rounded-2xl w-full shadow-2xl shadow-black/60 border border-white/[0.07]"
+                className="relative rounded-2xl w-full shadow-2xl shadow-black/60 border border-white/[0.07]"
               />
             </div>
 
@@ -346,8 +374,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── PRICING ─────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-5 py-20 lg:py-28">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+      <section className="relative max-w-6xl mx-auto px-5 py-20 lg:py-28">
+        {/* Top glow */}
+        <div className="pointer-events-none absolute top-0 right-1/4 w-[600px] h-[400px]"
+          style={{ background: 'radial-gradient(ellipse at top right, rgba(254,106,70,0.07) 0%, transparent 65%)' }} />
+
+        <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
 
           {/* Left — headline */}
           <div>
@@ -366,8 +398,11 @@ export default function LandingPage() {
           {/* Right — pricing card */}
           <div className="space-y-4">
             {/* Main plan */}
-            <div className="p-8 rounded-2xl border border-white/10 bg-[#0D1117]">
-              <div className="flex items-start justify-between mb-6">
+            <div className="relative p-8 rounded-2xl border border-brand-500/20 bg-[#0D1117] overflow-hidden">
+              {/* Inner top glow */}
+              <div className="pointer-events-none absolute inset-0 rounded-2xl"
+                style={{ background: 'radial-gradient(ellipse at top, rgba(254,106,70,0.08) 0%, transparent 55%)' }} />
+              <div className="relative flex items-start justify-between mb-6">
                 <div>
                   <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest mb-2">Plan Base</p>
                   <div className="flex items-baseline gap-1.5">
@@ -381,7 +416,7 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <ul className="space-y-3 pt-6 border-t border-white/[0.06] mb-6">
+              <ul className="relative space-y-3 pt-6 border-t border-white/[0.06] mb-6">
                 {[
                   'Catálogo digital con fotos ilimitado',
                   'Código QR para mesas, vitrina o delivery',
@@ -399,13 +434,13 @@ export default function LandingPage() {
 
               <Link
                 href="/admin/login"
-                className="w-full py-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-brand-500/20 block text-center"
+                className="relative w-full py-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-brand-500/25 block text-center"
               >
                 Comenzar con Plan Base
               </Link>
             </div>
 
-            {/* Add-ons — simplified, no jargon */}
+            {/* Add-ons */}
             <div className="p-6 rounded-2xl border border-white/[0.06] bg-[#0A0D15]">
               <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest mb-4">
                 Módulos opcionales
@@ -440,8 +475,15 @@ export default function LandingPage() {
       </section>
 
       {/* ── DEMO CTA ────────────────────────────────────────────────────── */}
-      <section className="border-t border-white/[0.06]">
-        <div className="max-w-6xl mx-auto px-5 py-20 lg:py-28">
+      <section className="relative border-t border-white/[0.06] overflow-hidden">
+        {/* Dramatic radial gradient background */}
+        <div className="pointer-events-none absolute inset-0"
+          style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(254,106,70,0.13) 0%, transparent 70%)' }} />
+        {/* Bottom fade to footer */}
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32"
+          style={{ background: 'linear-gradient(to bottom, transparent, #080B11)' }} />
+
+        <div className="relative max-w-6xl mx-auto px-5 py-20 lg:py-28">
           <div className="max-w-2xl mx-auto text-center space-y-7">
             <p className="text-xs font-mono-tech text-slate-500 uppercase tracking-widest">
               Demo real — sin registro
@@ -455,7 +497,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Link
                 href="/demo"
-                className="px-8 py-4 rounded-xl bg-white text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 hover:bg-slate-100 transition-all active:scale-95 cursor-pointer"
+                className="px-8 py-4 rounded-xl bg-white text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 hover:bg-slate-100 transition-all active:scale-95 cursor-pointer shadow-xl shadow-white/10"
               >
                 Abrir catálogo demo
                 <ArrowRight className="w-4 h-4" />
