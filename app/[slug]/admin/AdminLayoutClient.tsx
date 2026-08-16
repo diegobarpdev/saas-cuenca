@@ -4,7 +4,7 @@ import React, { use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ShoppingBag, Package, Settings, LogOut, ExternalLink, Store, ShieldAlert, Palette, ShoppingCart, Menu, X, Tv, TrendingUp, Receipt, KeyRound, PackageX } from 'lucide-react';
+import { ShoppingBag, Package, Settings, LogOut, ExternalLink, Store, ShieldAlert, Palette, ShoppingCart, Menu, X, Tv, TrendingUp, Receipt, PackageX } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 
@@ -62,7 +62,6 @@ export default function AdminLayoutClient({
     { label: 'Productos y Categorías',    href: `/${slug}/admin/productos`,       icon: Package,     roles: ['dueño'],                           show: true },
     { label: 'Apariencia & Branding',     href: `/${slug}/admin/apariencia`,     icon: Palette,     roles: ['dueño'],                           show: true },
     { label: 'Facturas',                  href: `/${slug}/admin/facturacion`,    icon: Receipt,     roles: ['dueño'],                           show: !!business?.has_facturacion_sri },
-    { label: 'Configuración SRI',         href: `/${slug}/admin/sri-config`,     icon: KeyRound,    roles: ['dueño'],                           show: !!business?.has_facturacion_sri },
     { label: 'Control de Mermas',         href: `/${slug}/admin/mermas`,         icon: PackageX,    roles: ['dueño'],                           show: !!business?.has_mermas },
     { label: 'Marketplace Add-ons',       href: `/${slug}/admin/marketplace`,    icon: ShoppingCart,roles: ['dueño'],                           show: true },
     { label: 'Configuración Negocio',     href: `/${slug}/admin/configuracion`,  icon: Settings,    roles: ['dueño'],                           show: true },
