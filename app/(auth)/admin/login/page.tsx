@@ -16,15 +16,16 @@ export default function AdminLoginPage() {
 
   // Si ya hay sesión activa, redirigir directo al dashboard
   useEffect(() => {
-    const raw = localStorage.getItem('kaltiro_admin_session');
-    if (raw) {
+    try {
       const raw = localStorage.getItem('kaltiro_admin_session');
       if (raw) {
         const s = JSON.parse(raw);
-        router.replace(`/${s?.business?.slug || ''}/admin/dashboard`);
-      } else {
-        router.replace('/admin/login');
+        if (s?.business?.slug) {
+          router.replace(`/${s.business.slug}/admin/dashboard`);
+        }
       }
+    } catch {
+      localStorage.removeItem('kaltiro_admin_session');
     }
   }, []);
 

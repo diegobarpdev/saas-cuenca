@@ -73,7 +73,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   const [numeroMesa, setNumeroMesa] = useState('');
   const [clienteDireccion, setClienteDireccion] = useState('');
   const [metodoPago, setMetodoPago] = useState<'efectivo' | 'transferencia' | 'payphone'>('efectivo');
-  const [estadoPago, setEstadoPago] = useState<'pendiente' | 'pagado'>('pagado');
+  const [estadoPago, setEstadoPago] = useState<'pendiente' | 'pagado'>('pendiente');
   const [montoRecibido, setMontoRecibido] = useState('');
 
   // Imprimir ticket
@@ -593,7 +593,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     setNumeroMesa('');
     setClienteDireccion('');
     setMetodoPago('efectivo');
-    setEstadoPago('pagado');
+    setEstadoPago('pendiente');
     setMontoRecibido('');
     setRequiereFactura(false);
     setDatosFact({ tipo_doc: 'CEDULA', num_doc: '', razon_social: '', email: '', direccion: '' });
