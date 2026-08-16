@@ -46,8 +46,11 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
       setLoading(true);
       try {
         const supabase = createClient();
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
+        // Medianoche en Ecuador (UTC-5), independiente del timezone del browser
+        const EC_OFFSET_MS = 5 * 60 * 60 * 1000; // UTC-5 en ms
+        const nowInEc = new Date(Date.now() - EC_OFFSET_MS); // hora actual expresada como UTC-5
+        nowInEc.setUTCHours(0, 0, 0, 0);                     // truncar a medianoche Ecuador
+        const startOfDay = new Date(nowInEc.getTime() + EC_OFFSET_MS); // volver a UTC real
 
         // 1. Pedidos de hoy
         const { data: ordersToday } = await supabase
