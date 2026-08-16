@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CreditCard, Building2, Banknote, ShieldCheck, CheckCircle2, Upload, Sparkles, Copy, Check, Landmark, Truck, Store, Utensils, AlertCircle } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
-import { MOCK_BUSINESS } from '@/lib/supabase/mock-data';
 import { useCart } from '@/hooks/useCart';
 import { useCustomerOrders } from '@/hooks/useCustomerOrders';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -29,7 +28,8 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   const slug = resolvedParams.slug;
   const router = useRouter();
 
-  const [business, setBusiness] = useState<Business>(MOCK_BUSINESS);
+  const [business, setBusiness] = useState<Business | null>(null);
+  const [loadingBusiness, setLoadingBusiness] = useState(true);
   const { items, subtotal, clearCart } = useCart(slug);
   const { profile, saveCustomerProfile, addOrderIdToHistory } = useCustomerOrders(slug);
 
@@ -38,9 +38,9 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   const [clienteTelefono, setClienteTelefono] = useState('');
   const [clienteDireccion, setClienteDireccion] = useState('');
   const [tipoEntrega, setTipoEntrega] = useState<DeliveryType>('domicilio');
-  const [selectedZonaId, setSelectedZonaId] = useState<string>(MOCK_BUSINESS.zonas_envio[0]?.id || '');
+  const [selectedZonaId, setSelectedZonaId] = useState<string>('');
   const [numeroMesa, setNumeroMesa] = useState('');
-  const [metodoPago, setMetodoPago] = useState<PaymentMethod>('payphone');
+  const [metodoPago, setMetodoPago] = useState<PaymentMethod>('efectivo');
   const [comprobanteUrl, setComprobanteUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,27 +56,27 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   // Cargar Negocio Real desde Supabase por slug
   useEffect(() => {
     async function loadBusinessData() {
-      if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
-        try {
-          const supabase = createClient();
-          const { data } = await supabase
-            .from('businesses')
-            .select('*')
-            .eq('slug', slug)
-            .single();
+      setLoadingBusiness(true);
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('businesses')
+          .select('*')
+          .eq('slug', slug)
+          .single();
 
-          if (data) {
-            setBusiness(data as Business);
-            if (!data.has_payphone && metodoPago === 'payphone') {
-              setMetodoPago('transferencia');
-            }
-            if (data.zonas_envio && data.zonas_envio.length > 0) {
-              setSelectedZonaId(data.zonas_envio[0].id);
-            }
+        if (data) {
+          setBusiness(data as Business);
+          // Método de pago: efectivo por defecto, payphone solo si está activo
+          setMetodoPago(data.has_payphone ? 'payphone' : 'efectivo');
+          if (data.zonas_envio && data.zonas_envio.length > 0) {
+            setSelectedZonaId(data.zonas_envio[0].id);
           }
-        } catch (err) {
-          console.error('Error cargando negocio en checkout:', err);
         }
+      } catch (err) {
+        console.error('Error cargando negocio en checkout:', err);
+      } finally {
+        setLoadingBusiness(false);
       }
     }
     loadBusinessData();
@@ -105,7 +105,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
     }
   }, [profile]);
 
-  const selectedZona = business.zonas_envio?.find((z: ShippingZone) => z.id === selectedZonaId);
+  const selectedZona = business?.zonas_envio?.find((z: ShippingZone) => z.id === selectedZonaId);
   const costoEnvio = tipoEntrega === 'domicilio' ? selectedZona?.costo || 1.50 : 0;
   const total = subtotal + costoEnvio;
 
@@ -199,6 +199,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   // Enviar Pedido a Supabase Real / Fallback Local
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!business) return;
 
     const errs = validate();
     if (Object.keys(errs).length > 0) {
@@ -332,6 +333,18 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
         >
           Volver al Catálogo
         </Link>
+      </div>
+    );
+  }
+
+  if (loadingBusiness || !business) {
+    return (
+      <div className="min-h-screen bg-[#070A11] flex items-center justify-center gap-2 text-slate-400 text-xs">
+        <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.3" />
+          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+        Cargando datos del local...
       </div>
     );
   }
