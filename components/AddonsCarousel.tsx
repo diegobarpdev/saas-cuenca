@@ -1,16 +1,43 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, LucideIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CreditCard, Monitor, Printer, BarChart3, Receipt } from 'lucide-react';
 
-interface Addon {
-  icon: LucideIcon;
-  name: string;
-  desc: string;
-  price: string;
-}
+const ADDONS = [
+  {
+    icon: CreditCard,
+    name: 'Cobros con tarjeta',
+    desc: 'Visa / Mastercard / débito via PayPhone',
+    price: '+$9/mes',
+  },
+  {
+    icon: Monitor,
+    name: 'Pantalla de cocina',
+    desc: 'Vista en vivo de pedidos activos con alertas',
+    price: '+$7/mes',
+  },
+  {
+    icon: Printer,
+    name: 'Impresión de comandas',
+    desc: 'Compatible con ticketeras térmicas 58mm / 80mm',
+    price: '+$7/mes',
+  },
+  {
+    icon: BarChart3,
+    name: 'Historial y reportes',
+    desc: 'Exporta ventas, analiza tus productos top',
+    price: '+$5/mes',
+  },
+  {
+    icon: Receipt,
+    name: 'Facturación SRI',
+    desc: 'Emite facturas electrónicas autorizadas al SRI',
+    price: '+$12/mes',
+  },
+];
 
-export function AddonsCarousel({ addons }: { addons: Addon[] }) {
+export function AddonsCarousel() {
+  const addons = ADDONS;
   const trackRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);

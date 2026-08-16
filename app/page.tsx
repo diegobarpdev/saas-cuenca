@@ -11,11 +11,6 @@ import {
   ChefHat,
   Wallet,
   PartyPopper,
-  CreditCard,
-  Printer,
-  Monitor,
-  BarChart3,
-  Receipt,
 } from 'lucide-react';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -54,38 +49,6 @@ const FLOW_STEPS = [
   },
 ];
 
-const ADDONS = [
-  {
-    icon: CreditCard,
-    name: 'Cobros con tarjeta',
-    desc: 'Visa / Mastercard / débito via PayPhone',
-    price: '+$9/mes',
-  },
-  {
-    icon: Monitor,
-    name: 'Pantalla de cocina',
-    desc: 'Vista en vivo de pedidos activos con alertas',
-    price: '+$7/mes',
-  },
-  {
-    icon: Printer,
-    name: 'Impresión de comandas',
-    desc: 'Compatible con ticketeras térmicas 58mm / 80mm',
-    price: '+$7/mes',
-  },
-  {
-    icon: BarChart3,
-    name: 'Historial y reportes',
-    desc: 'Exporta ventas, analiza tus productos top',
-    price: '+$5/mes',
-  },
-  {
-    icon: Receipt,
-    name: 'Facturación SRI',
-    desc: 'Emite facturas electrónicas autorizadas al SRI',
-    price: '+$12/mes',
-  },
-];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -453,7 +416,7 @@ export default function LandingPage() {
               <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest mb-4">
                 Módulos opcionales
               </p>
-              <AddonsCarousel addons={ADDONS} />
+              <AddonsCarousel />
             </div>
           </div>
         </div>
