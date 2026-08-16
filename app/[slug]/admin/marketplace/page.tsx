@@ -1,7 +1,7 @@
 'use client';
 
 import React, { use, useState, useEffect } from 'react';
-import { ShoppingCart, CreditCard, Volume2, Printer, Download, Globe, Sparkles, CheckCircle2, ShieldCheck, RefreshCw, MessageSquare, Receipt } from 'lucide-react';
+import { ShoppingCart, CreditCard, Volume2, Printer, Download, Globe, Sparkles, CheckCircle2, ShieldCheck, RefreshCw, MessageSquare, Receipt, PackageX } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { toast } from '@/lib/utils/toast';
 
@@ -103,6 +103,19 @@ export default function AdminMarketplacePage({ params }: { params: Promise<{ slu
         'Facturas electrónicas autorizadas por el SRI al instante',
         'Envío automático de la factura al cliente por email',
         'Registros y comprobantes integrados en tu historial de pedidos',
+      ],
+    },
+    {
+      id: 'mermas',
+      title: 'Control de Mermas',
+      price: '+$5 / mes',
+      icon: PackageX,
+      active: !!business.has_mermas,
+      description: 'Registra y lleva el historial de bajas por daño, caducidad o accidente. Mantén trazabilidad de tus pérdidas sin afectar la caja ni las ventas.',
+      benefits: [
+        'Registra bajas por accidente, caducidad, preparación o robo',
+        'Historial completo con producto, cantidad y responsable',
+        'Resumen mensual por tipo de merma para tomar decisiones',
       ],
     },
   ];
