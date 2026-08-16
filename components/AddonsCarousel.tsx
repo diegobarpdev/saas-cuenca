@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, CreditCard, Monitor, Printer, BarChart3, Receipt } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CreditCard, Monitor, Printer, BarChart3, Receipt, PackageX } from 'lucide-react';
 
 const ADDONS = [
   {
@@ -33,6 +33,12 @@ const ADDONS = [
     name: 'Facturación SRI',
     desc: 'Emite facturas electrónicas autorizadas al SRI',
     price: '+$12/mes',
+  },
+  {
+    icon: PackageX,
+    name: 'Control de mermas',
+    desc: 'Registra bajas por daño o caducidad sin afectar caja',
+    price: '+$5/mes',
   },
 ];
 
