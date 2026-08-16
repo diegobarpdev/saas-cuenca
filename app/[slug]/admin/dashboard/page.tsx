@@ -70,16 +70,17 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
 
         setRecentOrders(ordersList.slice(0, 5));
 
-        // 2. Productos más vendidos
+        // 2. Productos más vendidos (solo de este negocio)
         const { data: orderItems } = await supabase
           .from('order_items')
-          .select('nombre_producto, cantidad, subtotal')
-          .order('cantidad', { ascending: false })
-          .limit(20);
+          .select('nombre_producto, cantidad, subtotal, orders!inner(business_id)')
+          .eq('orders.business_id', business.id)
+          .limit(500);
 
         if (orderItems) {
           const map: Record<string, { nombre: string; cantidad: number; total: number }> = {};
           orderItems.forEach((item: any) => {
+            if (!item.nombre_producto) return;
             if (!map[item.nombre_producto]) {
               map[item.nombre_producto] = { nombre: item.nombre_producto, cantidad: 0, total: 0 };
             }

@@ -73,6 +73,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   const [numeroMesa, setNumeroMesa] = useState('');
   const [metodoPago, setMetodoPago] = useState<'efectivo' | 'transferencia' | 'payphone'>('efectivo');
   const [estadoPago, setEstadoPago] = useState<'pendiente' | 'pagado'>('pagado');
+  const [montoRecibido, setMontoRecibido] = useState('');
 
   // Imprimir ticket
   const [printOrder, setPrintOrder] = useState<any | null>(null);
@@ -580,6 +581,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
     setTipoEntrega('mesa');
     setMetodoPago('efectivo');
     setEstadoPago('pagado');
+    setMontoRecibido('');
     setRequiereFactura(false);
     setDatosFact({ tipo_doc: 'CEDULA', num_doc: '', razon_social: '', email: '', direccion: '' });
     setCrmQuery('');
@@ -1406,6 +1408,37 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               <span className="text-md font-mono-tech text-brand-400">{formatCurrency(getTotal())}</span>
             </div>
           </div>
+
+          {/* Calculadora de cambio — solo efectivo cobrado */}
+          {metodoPago === 'efectivo' && estadoPago === 'pagado' && (
+            <div className="bg-slate-950 border border-white/5 rounded-2xl p-3 space-y-2">
+              <label className="text-[10px] font-mono-tech font-bold text-slate-500 uppercase">Monto recibido del cliente</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 text-sm font-mono">$</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={montoRecibido}
+                  onChange={e => setMontoRecibido(e.target.value)}
+                  className="w-full pl-7 pr-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-sm text-white font-mono focus:outline-none focus:border-brand-500"
+                />
+              </div>
+              {montoRecibido && (() => {
+                const recibido = parseFloat(montoRecibido) || 0;
+                const cambio = recibido - getTotal();
+                return (
+                  <div className={`flex justify-between items-center px-3 py-2 rounded-xl font-mono-tech font-black text-sm ${
+                    cambio >= 0 ? 'bg-emerald-500/10 text-emerald-300' : 'bg-rose-500/10 text-rose-300'
+                  }`}>
+                    <span>{cambio >= 0 ? 'Cambio a devolver:' : 'Falta:'}</span>
+                    <span>{formatCurrency(Math.abs(cambio))}</span>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
 
           {/* Acciones del Formulario */}
           <div className="flex gap-2 pt-1.5">
