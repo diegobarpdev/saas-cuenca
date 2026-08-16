@@ -32,8 +32,9 @@ import Link from 'next/link';
 import { CustomSelect } from '@/components/ui/CustomSelect';
 import { ProductVariantsDrawer } from '@/components/catalog/ProductVariantsDrawer';
 import { useRealtimeOrders } from '@/hooks/useRealtimeOrders';
-import { Clock, CheckCircle2, AlertTriangle, Truck, ShoppingBag, Eye, Printer } from 'lucide-react';
+import { Clock, CheckCircle2, AlertTriangle, Truck, ShoppingBag, Eye, Printer, Settings2, Wifi, WifiOff, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { TicketThermal } from '@/components/ticket/TicketThermal';
+import { useQzTray } from '@/hooks/useQzTray';
 
 export default function CajaPOSPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
@@ -76,23 +77,38 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
   // Imprimir ticket
   const [printOrder, setPrintOrder] = useState<any | null>(null);
   const [showPrintUpsell, setShowPrintUpsell] = useState(false);
+  const [showPrinterModal, setShowPrinterModal] = useState(false);
+
+  const { status: qzStatus, printers, selectedPrinter, selectPrinter, errorMsg: qzError, connect: qzConnect, printOrder: qzPrintOrder } = useQzTray();
 
   const handlePrint = async (order: any) => {
     if (!business?.has_pos_printing) {
       setShowPrintUpsell(true);
       return;
     }
-    // Si el pedido no tiene items cargados, los busca primero
+    // Fetch items si no están cargados
+    let fullOrder = order;
     if (!order.items || order.items.length === 0) {
       const supabase = createClient();
       const { data } = await supabase
         .from('order_items')
         .select('*, product:products(nombre)')
         .eq('order_id', order.id);
-      setPrintOrder({ ...order, items: data ?? [] });
-    } else {
-      setPrintOrder(order);
+      fullOrder = { ...order, items: data ?? [] };
     }
+
+    // Intentar QZ Tray primero
+    if (qzStatus === 'connected' && selectedPrinter) {
+      const result = await qzPrintOrder(fullOrder, business);
+      if (result.success) {
+        toast.success('Ticket enviado a la impresora');
+        return;
+      }
+      toast.error('QZ Tray: ' + (result.error ?? 'error') + ' — usando navegador');
+    }
+
+    // Fallback: impresión del navegador
+    setPrintOrder(fullOrder);
   };
 
   React.useEffect(() => {
@@ -773,6 +789,25 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
 
 
         <div className="hidden sm:flex items-center gap-2">
+          {/* Config impresora QZ Tray */}
+          {business?.has_pos_printing && (
+            <button
+              onClick={() => setShowPrinterModal(true)}
+              className={`p-2.5 rounded-xl border transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
+                qzStatus === 'connected'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+                  : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
+              }`}
+              title="Configurar impresora térmica (QZ Tray)"
+            >
+              <Printer className="w-4 h-4" />
+              {qzStatus === 'connected'
+                ? <span className="hidden md:inline text-[11px]">{selectedPrinter ? selectedPrinter.split(' ')[0] : 'Conectado'}</span>
+                : <span className="hidden md:inline text-[11px]">Impresora</span>
+              }
+            </button>
+          )}
+
           {/* Movimientos de Caja Chica */}
           {activeRegister && activeRegister.id !== 'mock-dueño-register' && (
             <button
@@ -1410,6 +1445,113 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
         </div>{/* fin contenedor scrolleable */}
       </div>
     </div>
+    )}
+
+    {/* ========================================== */}
+    {/* MODAL CONFIGURACIÓN IMPRESORA QZ TRAY      */}
+    {/* ========================================== */}
+    {showPrinterModal && (
+      <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="bg-[#0D1322] border border-white/10 rounded-3xl w-full max-w-md shadow-2xl p-6 space-y-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-display font-black text-white text-sm flex items-center gap-2">
+                <Printer className="w-4 h-4 text-brand-400" />
+                Impresora Térmica
+              </h3>
+              <p className="text-[11px] text-slate-400 mt-0.5">Conexión directa vía QZ Tray (sin diálogo del navegador)</p>
+            </div>
+            <button
+              onClick={() => setShowPrinterModal(false)}
+              className="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Estado de conexión */}
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
+            qzStatus === 'connected'     ? 'bg-emerald-500/10 border-emerald-500/30' :
+            qzStatus === 'not_installed' ? 'bg-rose-500/10 border-rose-500/30' :
+            qzStatus === 'error'         ? 'bg-rose-500/10 border-rose-500/30' :
+            qzStatus === 'connecting'    ? 'bg-amber-500/10 border-amber-500/30' :
+                                           'bg-slate-900 border-slate-800'
+          }`}>
+            {qzStatus === 'connected'     && <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />}
+            {qzStatus === 'not_installed' && <XCircle     className="w-4 h-4 text-rose-400 shrink-0" />}
+            {qzStatus === 'error'         && <XCircle     className="w-4 h-4 text-rose-400 shrink-0" />}
+            {qzStatus === 'connecting'    && <Loader2     className="w-4 h-4 text-amber-400 animate-spin shrink-0" />}
+            {qzStatus === 'idle'          && <WifiOff     className="w-4 h-4 text-slate-500 shrink-0" />}
+            <div>
+              <p className={`text-xs font-bold ${
+                qzStatus === 'connected'     ? 'text-emerald-300' :
+                qzStatus === 'connecting'    ? 'text-amber-300' :
+                qzStatus === 'not_installed' || qzStatus === 'error' ? 'text-rose-300' :
+                'text-slate-400'
+              }`}>
+                {qzStatus === 'connected'     && 'QZ Tray conectado'}
+                {qzStatus === 'connecting'    && 'Conectando...'}
+                {qzStatus === 'not_installed' && 'QZ Tray no encontrado'}
+                {qzStatus === 'error'         && 'Error de conexión'}
+                {qzStatus === 'idle'          && 'Sin conectar'}
+              </p>
+              {qzError && <p className="text-[10px] text-rose-400 mt-0.5">{qzError}</p>}
+            </div>
+          </div>
+
+          {/* Instrucción si no está instalado */}
+          {qzStatus === 'not_installed' && (
+            <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 space-y-2 text-xs text-amber-200/80">
+              <p className="font-bold text-amber-300">¿Cómo instalar QZ Tray?</p>
+              <ol className="list-decimal list-inside space-y-1 text-[11px]">
+                <li>Descarga QZ Tray desde <span className="font-mono text-amber-300">qz.io</span></li>
+                <li>Instala y ejecuta la aplicación en tu PC</li>
+                <li>Vuelve aquí y presiona <strong>Conectar</strong></li>
+              </ol>
+              <p className="text-[10px] text-amber-400/60 mt-1">QZ Tray es gratuito y funciona con Epson, Star y la mayoría de impresoras térmicas.</p>
+            </div>
+          )}
+
+          {/* Lista de impresoras */}
+          {qzStatus === 'connected' && printers.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[10px] font-mono-tech font-bold text-slate-500 uppercase">Selecciona la impresora</p>
+              <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                {printers.map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => selectPrinter(p)}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border text-left transition-all ${
+                      selectedPrinter === p
+                        ? 'bg-brand-500/15 border-brand-500/40 text-brand-200'
+                        : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
+                    }`}
+                  >
+                    <Printer className="w-3.5 h-3.5 shrink-0" />
+                    <span className="text-xs font-medium truncate">{p}</span>
+                    {selectedPrinter === p && <CheckCircle className="w-3.5 h-3.5 ml-auto text-brand-400 shrink-0" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Botón conectar / reconectar */}
+          <button
+            onClick={qzConnect}
+            disabled={qzStatus === 'connecting'}
+            className="w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-display font-black text-xs uppercase tracking-wide transition-all flex items-center justify-center gap-2"
+          >
+            {qzStatus === 'connecting' ? <><Loader2 className="w-4 h-4 animate-spin" /> Conectando...</> : <><Wifi className="w-4 h-4" /> {qzStatus === 'connected' ? 'Reconectar / Actualizar' : 'Conectar QZ Tray'}</>}
+          </button>
+
+          {selectedPrinter && qzStatus === 'connected' && (
+            <p className="text-center text-[11px] text-emerald-400 font-medium">
+              Impresora activa: <span className="font-bold">{selectedPrinter}</span>
+            </p>
+          )}
+        </div>
+      </div>
     )}
 
     {/* ========================================== */}
