@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import CatalogMockup from '@/components/CatalogMockup';
+import { AddonsCarousel } from '@/components/AddonsCarousel';
 import {
   ArrowRight,
   CheckCircle2,
@@ -14,6 +15,7 @@ import {
   Printer,
   Monitor,
   BarChart3,
+  Receipt,
 } from 'lucide-react';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -76,6 +78,12 @@ const ADDONS = [
     name: 'Historial y reportes',
     desc: 'Exporta ventas, analiza tus productos top',
     price: '+$5/mes',
+  },
+  {
+    icon: Receipt,
+    name: 'Facturación SRI',
+    desc: 'Emite facturas electrónicas autorizadas al SRI',
+    price: '+$12/mes',
   },
 ];
 
@@ -440,35 +448,12 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* Add-ons */}
+            {/* Add-ons carrusel */}
             <div className="p-6 rounded-2xl border border-white/[0.06] bg-[#0A0D15]">
               <p className="text-slate-500 text-xs font-mono-tech uppercase tracking-widest mb-4">
                 Módulos opcionales
               </p>
-              <div className="space-y-3">
-                {ADDONS.map((addon) => {
-                  const Icon = addon.icon;
-                  return (
-                    <div
-                      key={addon.name}
-                      className="flex items-center justify-between gap-4 py-3 border-b border-white/[0.05] last:border-0"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <Icon className="w-4 h-4 text-slate-500 shrink-0" size={16} />
-                        <div className="min-w-0">
-                          <p className="text-sm text-slate-200 font-display font-semibold leading-none mb-0.5">
-                            {addon.name}
-                          </p>
-                          <p className="text-[11px] text-slate-600">{addon.desc}</p>
-                        </div>
-                      </div>
-                      <span className="font-mono-tech font-bold text-slate-400 text-sm shrink-0">
-                        {addon.price}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+              <AddonsCarousel addons={ADDONS} />
             </div>
           </div>
         </div>
