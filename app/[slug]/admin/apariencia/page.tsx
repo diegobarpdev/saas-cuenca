@@ -130,7 +130,7 @@ export default function AdminBrandingPage({ params }: { params: Promise<{ slug: 
   const [logoUrl, setLogoUrl] = useState('');
   const [bannerUrl, setBannerUrl] = useState('');
   const [faviconUrl, setFaviconUrl] = useState('');
-  const [slogan, setSlogan] = useState('Gastronomía & Especialidades Artesanales en Cuenca');
+  const [slogan, setSlogan] = useState('');
 
   // Colores
   const [colorPrimario, setColorPrimario] = useState('#F59E0B');
