@@ -7,25 +7,35 @@ export type QzStatus = 'idle' | 'connecting' | 'connected' | 'not_installed' | '
 
 const PRINTER_KEY = 'kaltiro_qz_printer';
 
-async function loadQz() {
-  const mod = await import('qz-tray');
-  return (mod as any).default ?? mod;
+/** Carga qz-tray desde /public/qz-tray.js (UMD, accedido por window.qz) */
+async function loadQz(): Promise<any> {
+  if (typeof window === 'undefined') throw new Error('Solo browser');
+  if ((window as any).qz) return (window as any).qz;
+
+  await new Promise<void>((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = '/qz-tray.js';
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('No se pudo cargar qz-tray.js'));
+    document.head.appendChild(s);
+  });
+
+  return (window as any).qz;
 }
 
 export function useQzTray() {
-  const [status, setStatus]               = useState<QzStatus>('idle');
-  const [printers, setPrinters]           = useState<string[]>([]);
-  const [selectedPrinter, _setSelected]   = useState<string>(() =>
+  const [status, setStatus]             = useState<QzStatus>('idle');
+  const [printers, setPrinters]         = useState<string[]>([]);
+  const [selectedPrinter, _setSelected] = useState<string>(() =>
     typeof window !== 'undefined' ? (localStorage.getItem(PRINTER_KEY) ?? '') : ''
   );
-  const [errorMsg, setErrorMsg]           = useState<string | null>(null);
+  const [errorMsg, setErrorMsg]         = useState<string | null>(null);
 
   const selectPrinter = useCallback((name: string) => {
     _setSelected(name);
     localStorage.setItem(PRINTER_KEY, name);
   }, []);
 
-  /** Conecta a QZ Tray y lista impresoras disponibles */
   const connect = useCallback(async (): Promise<boolean> => {
     setStatus('connecting');
     setErrorMsg(null);
@@ -41,7 +51,7 @@ export function useQzTray() {
       return true;
     } catch (e: any) {
       const msg: string = e?.message ?? '';
-      if (msg.includes('Unable to establish') || msg.includes('connect') || msg.includes('refused')) {
+      if (msg.includes('Unable to establish') || msg.includes('refused') || msg.includes('connect')) {
         setStatus('not_installed');
         setErrorMsg('QZ Tray no está instalado o no está corriendo.');
       } else {
@@ -52,7 +62,6 @@ export function useQzTray() {
     }
   }, []);
 
-  /** Imprime un pedido directo en la impresora térmica */
   const printOrder = useCallback(async (
     order: any,
     business: any,
@@ -60,7 +69,6 @@ export function useQzTray() {
   ): Promise<{ success: boolean; error?: string }> => {
     const target = printer ?? selectedPrinter;
     if (!target) return { success: false, error: 'Sin impresora seleccionada' };
-
     try {
       const qz = await loadQz();
       if (!qz.websocket.isActive()) {
@@ -76,13 +84,5 @@ export function useQzTray() {
     }
   }, [selectedPrinter, connect]);
 
-  return {
-    status,
-    printers,
-    selectedPrinter,
-    selectPrinter,
-    errorMsg,
-    connect,
-    printOrder,
-  };
+  return { status, printers, selectedPrinter, selectPrinter, errorMsg, connect, printOrder };
 }
