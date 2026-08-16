@@ -123,6 +123,7 @@ export interface Business {
   has_crm_export?: boolean;
   has_custom_domain?: boolean;
   has_facturacion_sri?: boolean;
+  has_mermas?: boolean;
   custom_domain?: string | null;
   branding?: BusinessBranding;
   configuracion_operativa?: OperationalSettings;
@@ -280,4 +281,19 @@ export interface CartItem {
     opcion_nombre: string;
     precio_adicional: number;
   }[];
+}
+
+export type MermaMotivo = 'accidente' | 'caducidad' | 'preparacion' | 'robo' | 'otro';
+
+export interface Merma {
+  id: string;
+  business_id: string;
+  product_id: string | null;
+  nombre_producto: string;
+  cantidad: number;
+  unidad: string;
+  motivo: MermaMotivo;
+  notas: string | null;
+  registrado_por: string | null;
+  created_at: string;
 }
