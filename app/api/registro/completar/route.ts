@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sanitizeSlug } from '../route';
+import { sendMail } from '@/lib/mailer';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -118,37 +119,28 @@ export async function POST(req: NextRequest) {
     await supabase.from('pending_registrations').delete().eq('token', token);
 
     // Email de bienvenida
-    if (process.env.RESEND_API_KEY) {
-      fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: 'Kaltiro <info@kaltiro.com>',
-          to: [pending.email],
-          subject: `¡Bienvenido a Kaltiro, ${nombre_negocio.trim()}!`,
-          html: `
-            <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;background:#070A11;color:#fff;padding:40px 24px;border-radius:16px;">
-              <p style="font-size:28px;margin:0 0 4px;">🚀</p>
-              <h1 style="font-size:22px;font-weight:900;margin:0 0 8px;">¡Ya eres parte de Kaltiro!</h1>
-              <p style="color:#94a3b8;margin:0 0 24px;">Hola <strong style="color:#fff">${pending.nombre_admin}</strong>, tu negocio está listo para recibir pedidos.</p>
-              <div style="background:#0D1220;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-bottom:24px;">
-                <p style="margin:0 0 6px;font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;">Tu catálogo público</p>
-                <p style="margin:0;font-size:18px;font-weight:700;color:#fe6a46;">kaltiro.com/${slug}</p>
-                <p style="margin:8px 0 0;font-size:12px;color:#64748b;">Comparte este link con tus clientes</p>
-              </div>
-              <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://kaltiro.com'}/app/login"
-                style="display:inline-block;background:#fe6a46;color:#000;font-weight:900;font-size:14px;padding:14px 28px;border-radius:12px;text-decoration:none;">
-                Ir a mi panel →
-              </a>
-              <p style="color:#1e293b;font-size:11px;margin-top:32px;">Kaltiro.com · Software de Gestión para Restaurantes · Cuenca, Ecuador</p>
-            </div>
-          `,
-        }),
-      }).catch(e => console.error('[completar] Email bienvenida falló:', e));
-    }
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://kaltiro.com';
+    sendMail({
+      to: pending.email,
+      subject: `¡Bienvenido a Kaltiro, ${nombre_negocio.trim()}!`,
+      html: `
+        <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;background:#070A11;color:#fff;padding:40px 24px;border-radius:16px;">
+          <p style="font-size:28px;margin:0 0 4px;">🚀</p>
+          <h1 style="font-size:22px;font-weight:900;margin:0 0 8px;">¡Ya eres parte de Kaltiro!</h1>
+          <p style="color:#94a3b8;margin:0 0 24px;">Hola <strong style="color:#fff">${pending.nombre_admin}</strong>, tu negocio está listo para recibir pedidos.</p>
+          <div style="background:#0D1220;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-bottom:24px;">
+            <p style="margin:0 0 6px;font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;">Tu catálogo público</p>
+            <p style="margin:0;font-size:18px;font-weight:700;color:#fe6a46;">kaltiro.com/${slug}</p>
+            <p style="margin:8px 0 0;font-size:12px;color:#64748b;">Comparte este link con tus clientes</p>
+          </div>
+          <a href="${appUrl}/app/login"
+            style="display:inline-block;background:#fe6a46;color:#000;font-weight:900;font-size:14px;padding:14px 28px;border-radius:12px;text-decoration:none;">
+            Ir a mi panel →
+          </a>
+          <p style="color:#1e293b;font-size:11px;margin-top:32px;">Kaltiro.com · Software de Gestión para Restaurantes · Cuenca, Ecuador</p>
+        </div>
+      `,
+    }).catch(e => console.error('[completar] Email bienvenida falló:', e));
 
     const session = {
       userId: newUser.id,

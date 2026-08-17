@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createHash, randomBytes } from 'crypto';
+import { sendMail } from '@/lib/mailer';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -119,44 +120,32 @@ export async function POST(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://kaltiro.com';
     const verifyUrl = `${appUrl}/app/verificar?token=${token}`;
 
-    if (process.env.RESEND_API_KEY) {
-      const emailRes = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: 'Kaltiro <info@kaltiro.com>',
-          to: [emailLower],
-          subject: 'Confirma tu cuenta en Kaltiro',
-          html: `
-            <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;background:#070A11;color:#fff;padding:40px 24px;border-radius:16px;">
-              <p style="font-size:28px;margin:0 0 4px;">✉️</p>
-              <h1 style="font-size:22px;font-weight:900;margin:0 0 8px;">Confirma tu cuenta</h1>
-              <p style="color:#94a3b8;margin:0 0 24px;">
-                Hola <strong style="color:#fff">${nombre_admin.trim()}</strong>, haz clic en el botón para confirmar tu correo y continuar con el registro de tu negocio.
-              </p>
-              <a href="${verifyUrl}"
-                style="display:inline-block;background:#fe6a46;color:#000;font-weight:900;font-size:14px;padding:14px 28px;border-radius:12px;text-decoration:none;">
-                Confirmar mi cuenta →
-              </a>
-              <p style="color:#64748b;font-size:12px;margin-top:24px;">
-                Este link expira en 24 horas. Si no creaste esta cuenta, puedes ignorar este correo.
-              </p>
-              <p style="color:#1e293b;font-size:11px;margin-top:32px;">Kaltiro.com · Software de Gestión para Restaurantes · Cuenca, Ecuador</p>
-            </div>
-          `,
-        }),
+    try {
+      await sendMail({
+        to: emailLower,
+        subject: 'Confirma tu cuenta en Kaltiro',
+        html: `
+          <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;background:#070A11;color:#fff;padding:40px 24px;border-radius:16px;">
+            <p style="font-size:28px;margin:0 0 4px;">✉️</p>
+            <h1 style="font-size:22px;font-weight:900;margin:0 0 8px;">Confirma tu cuenta</h1>
+            <p style="color:#94a3b8;margin:0 0 24px;">
+              Hola <strong style="color:#fff">${nombre_admin.trim()}</strong>, haz clic en el botón para confirmar tu correo y continuar con el registro de tu negocio.
+            </p>
+            <a href="${verifyUrl}"
+              style="display:inline-block;background:#fe6a46;color:#000;font-weight:900;font-size:14px;padding:14px 28px;border-radius:12px;text-decoration:none;">
+              Confirmar mi cuenta →
+            </a>
+            <p style="color:#64748b;font-size:12px;margin-top:24px;">
+              Este link expira en 24 horas. Si no creaste esta cuenta, puedes ignorar este correo.
+            </p>
+            <p style="color:#1e293b;font-size:11px;margin-top:32px;">Kaltiro.com · Software de Gestión para Restaurantes · Cuenca, Ecuador</p>
+          </div>
+        `,
       });
-      if (!emailRes.ok) {
-        const resendErr = await emailRes.text();
-        console.error('[registro] Resend error', emailRes.status, resendErr);
-      } else {
-        console.log('[registro] Email enviado OK a', emailLower);
-      }
-    } else {
-      console.log('[registro] RESEND_API_KEY no configurado. Verify URL:', verifyUrl);
+      console.log('[registro] Email enviado OK a', emailLower);
+    } catch (mailErr) {
+      console.error('[registro] Error enviando email:', mailErr);
+      // No bloqueamos el registro si el email falla — el token queda en DB
     }
 
     return NextResponse.json({ success: true, email: emailLower });
