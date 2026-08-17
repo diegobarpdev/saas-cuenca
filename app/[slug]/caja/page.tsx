@@ -729,7 +729,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
           <div className="flex items-center gap-2">
             {simulatedRole === 'dueño' && (
               <Link
-                href={`/${slug}/admin/dashboard`}
+                href={`/${slug}/app/dashboard`}
                 className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white transition-colors"
                 title="Volver al panel"
               >
@@ -1622,7 +1622,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
               Ahora no
             </button>
             <a
-              href={`/${slug}/admin/marketplace`}
+              href={`/${slug}/app/marketplace`}
               onClick={() => setShowPrintUpsell(false)}
               className="flex-1 py-2.5 rounded-2xl bg-brand-500 hover:bg-brand-400 text-white text-xs font-display font-bold transition-colors text-center shadow-lg shadow-brand-500/20"
             >
@@ -2100,7 +2100,7 @@ export default function CajaPOSPage({ params }: { params: Promise<{ slug: string
                   } else if (roleOpt.value.startsWith('cajero')) {
                     window.location.href = `/${slug}/caja`;
                   } else {
-                    window.location.href = `/${slug}/admin/dashboard`;
+                    window.location.href = `/${slug}/app/dashboard`;
                   }
                 }
               }}

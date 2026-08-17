@@ -39,7 +39,7 @@ export default function SuperAdminDashboardPage() {
       localStorage.setItem('kaltiro_admin_business_id', businessId);
       sessionStorage.setItem('is_super_admin_impersonating', 'true');
     }
-    router.push('/admin/dashboard');
+    router.push('/app/dashboard');
   };
 
   const handleDeleteBusiness = async () => {

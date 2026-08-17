@@ -42,7 +42,7 @@ export function useAdminSession() {
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem('kaltiro_admin_business_id');
     setSession(null);
-    window.location.href = '/admin/login';
+    window.location.href = '/app/login';
   };
 
   return { session, loading, logout };

@@ -199,7 +199,7 @@ export async function POST(req: NextRequest) {
                 <p style="margin:0;font-size:18px;font-weight:700;color:#fe6a46;">kaltiro.com/${slug}</p>
                 <p style="margin:8px 0 0;font-size:12px;color:#64748b;">Comparte este link con tus clientes</p>
               </div>
-              <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://kaltiro.com'}/admin/login"
+              <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://kaltiro.com'}/app/login"
                 style="display:inline-block;background:#fe6a46;color:#000;font-weight:900;font-size:14px;padding:14px 28px;border-radius:12px;text-decoration:none;">
                 Ir a mi panel →
               </a>

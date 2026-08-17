@@ -20,12 +20,12 @@ export default function DemoAutoLoginPage() {
         if (res.ok && data.success) {
           saveSession(data.session);
           sessionStorage.removeItem('is_super_admin_impersonating');
-          router.replace(`/${data.session.business.slug}/admin/dashboard`);
+          router.replace(`/${data.session.business.slug}/app/dashboard`);
         } else {
-          router.replace('/admin/login');
+          router.replace('/app/login');
         }
       } catch {
-        router.replace('/admin/login');
+        router.replace('/app/login');
       }
     }
 

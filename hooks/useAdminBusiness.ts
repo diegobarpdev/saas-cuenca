@@ -37,7 +37,7 @@ export function useAdminBusiness(slug?: string) {
             console.warn('Acceso denegado: negocio no coincide con la sesión activa');
             if (typeof window !== 'undefined') {
               alert('Acceso denegado: No tienes credenciales para gestionar ' + res.data.nombre);
-              window.location.href = '/admin/login';
+              window.location.href = '/app/login';
             }
             setLoading(false);
             return;
@@ -69,7 +69,7 @@ export function useAdminBusiness(slug?: string) {
             if (typeof window !== 'undefined') {
               localStorage.removeItem('kaltiro_admin_session');
               localStorage.removeItem('kaltiro_admin_business_id');
-              window.location.href = '/admin/login';
+              window.location.href = '/app/login';
             }
           }
           setLoading(false);
@@ -78,7 +78,7 @@ export function useAdminBusiness(slug?: string) {
 
         // Sin sesión y sin slug — redirigir a login
         if (typeof window !== 'undefined') {
-          window.location.href = '/admin/login';
+          window.location.href = '/app/login';
         }
       } catch (err) {
         console.error('Error cargando negocio:', err);

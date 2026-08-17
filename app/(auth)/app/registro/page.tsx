@@ -146,7 +146,7 @@ export default function RegistroPage() {
       setSuccess(true);
       saveSession(data.session);
       setTimeout(() => {
-        router.push(`/${data.slug}/admin/dashboard`);
+        router.push(`/${data.slug}/app/dashboard`);
       }, 1500);
     } catch {
       setError('Error de conexión. Intenta nuevamente.');
@@ -402,7 +402,7 @@ export default function RegistroPage() {
         <div className="text-center space-y-3">
           <p className="text-xs text-slate-500">
             ¿Ya tienes cuenta?{' '}
-            <Link href="/admin/login" className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
+            <Link href="/app/login" className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
               Ingresar
             </Link>
           </p>

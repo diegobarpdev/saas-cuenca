@@ -42,7 +42,7 @@ export default function AdminLayoutClient({
       } else if (newRole.startsWith('cajero')) {
         window.location.href = `/${slug}/caja`;
       } else {
-        window.location.href = `/${slug}/admin/dashboard`;
+        window.location.href = `/${slug}/app/dashboard`;
       }
     }
   };
@@ -51,20 +51,20 @@ export default function AdminLayoutClient({
     if (typeof window !== 'undefined') {
       localStorage.removeItem('kaltiro_admin_session');
       localStorage.removeItem('kaltiro_admin_business_id');
-      router.push('/admin/login');
+      router.push('/app/login');
     }
   };
 
   const navItems = [
-    { label: 'Dashboard & Analíticas',    href: `/${slug}/admin/dashboard`,      icon: TrendingUp,  roles: ['dueño'],                           show: true },
+    { label: 'Dashboard & Analíticas',    href: `/${slug}/app/dashboard`,      icon: TrendingUp,  roles: ['dueño'],                           show: true },
     { label: 'Caja POS (Toma & Pedidos)', href: `/${slug}/caja`,                 icon: Store,       roles: ['dueño', 'cajero-1', 'cajero-2'],   show: true },
     { label: 'Monitor Cocina KDS',        href: `/${slug}/cocina`,               icon: Tv,          roles: ['dueño', 'cocinero'],                show: true },
-    { label: 'Productos y Categorías',    href: `/${slug}/admin/productos`,       icon: Package,     roles: ['dueño'],                           show: true },
-    { label: 'Apariencia & Branding',     href: `/${slug}/admin/apariencia`,     icon: Palette,     roles: ['dueño'],                           show: true },
-    { label: 'Facturas',                  href: `/${slug}/admin/facturacion`,    icon: Receipt,     roles: ['dueño'],                           show: !!business?.has_facturacion_sri },
-    { label: 'Control de Stock',           href: `/${slug}/admin/mermas`,         icon: Boxes,       roles: ['dueño'],                           show: !!business?.has_mermas },
-    { label: 'Marketplace Add-ons',       href: `/${slug}/admin/marketplace`,    icon: ShoppingCart,roles: ['dueño'],                           show: true },
-    { label: 'Configuración Negocio',     href: `/${slug}/admin/configuracion`,  icon: Settings,    roles: ['dueño'],                           show: true },
+    { label: 'Productos y Categorías',    href: `/${slug}/app/productos`,       icon: Package,     roles: ['dueño'],                           show: true },
+    { label: 'Apariencia & Branding',     href: `/${slug}/app/apariencia`,     icon: Palette,     roles: ['dueño'],                           show: true },
+    { label: 'Facturas',                  href: `/${slug}/app/facturacion`,    icon: Receipt,     roles: ['dueño'],                           show: !!business?.has_facturacion_sri },
+    { label: 'Control de Stock',           href: `/${slug}/app/mermas`,         icon: Boxes,       roles: ['dueño'],                           show: !!business?.has_mermas },
+    { label: 'Marketplace Add-ons',       href: `/${slug}/app/marketplace`,    icon: ShoppingCart,roles: ['dueño'],                           show: true },
+    { label: 'Configuración Negocio',     href: `/${slug}/app/configuracion`,  icon: Settings,    roles: ['dueño'],                           show: true },
   ].filter((item) => item.roles.includes(simulatedRole) && item.show);
 
   return (

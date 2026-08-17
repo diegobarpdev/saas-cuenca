@@ -147,7 +147,7 @@ export default function EditBusinessPage({ params }: { params: Promise<{ id: str
       localStorage.setItem('kaltiro_admin_business_id', id);
       sessionStorage.setItem('is_super_admin_impersonating', 'true');
     }
-    router.push('/admin/dashboard');
+    router.push('/app/dashboard');
   };
 
   if (loading) {

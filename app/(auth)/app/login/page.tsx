@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
       if (raw) {
         const s = JSON.parse(raw);
         if (s?.business?.slug) {
-          router.replace(`/${s.business.slug}/admin/dashboard`);
+          router.replace(`/${s.business.slug}/app/dashboard`);
         }
       }
     } catch {
@@ -52,7 +52,7 @@ export default function AdminLoginPage() {
       // Guardar sesión y redirigir
       saveSession(data.session);
       sessionStorage.removeItem('is_super_admin_impersonating');
-      router.push(`/${data.session.business.slug}/admin/dashboard`);
+      router.push(`/${data.session.business.slug}/app/dashboard`);
     } catch (err) {
       setError('Error de conexión. Intenta nuevamente.');
       setLoading(false);
@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
         return;
       }
       saveSession(data.session);
-      router.push(`/${data.session.business.slug}/admin/dashboard`);
+      router.push(`/${data.session.business.slug}/app/dashboard`);
     } catch {
       setError('Error de conexión.');
       setLoading(false);
@@ -94,6 +94,15 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="relative w-full max-w-sm space-y-6">
+        {/* Volver al inicio */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Volver al inicio
+        </Link>
+
         {/* Logo / Marca */}
         <div className="text-center space-y-3">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-brand-600/10 border border-brand-500/30 flex items-center justify-center mx-auto shadow-lg shadow-brand-500/10">
@@ -199,21 +208,14 @@ export default function AdminLoginPage() {
           </button>
         </div>
 
-        {/* Registro + Volver */}
-        <div className="text-center space-y-2">
+        {/* Registro */}
+        <div className="text-center">
           <p className="text-xs text-slate-500">
             ¿No tienes cuenta?{' '}
-            <Link href="/admin/registro" className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
+            <Link href="/app/registro" className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
               Regístrate gratis
             </Link>
           </p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Volver al inicio
-          </Link>
         </div>
 
         {/* Powered by */}

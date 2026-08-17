@@ -79,10 +79,10 @@ export default function LandingPage() {
               Ver demo
             </Link>
             <Link
-              href="/admin/login"
+              href="/app/registro"
               className="px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-bold text-sm transition-all active:scale-95 cursor-pointer"
             >
-              Iniciar sesión
+              Únete ahora
             </Link>
           </div>
         </div>
@@ -125,7 +125,7 @@ export default function LandingPage() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/admin/registro"
+                href="/app/registro"
                 className="px-7 py-4 rounded-xl border border-white/15 hover:border-white/30 text-white font-display font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
               >
                 Comenzar gratis
@@ -404,7 +404,7 @@ export default function LandingPage() {
               </ul>
 
               <Link
-                href="/admin/registro"
+                href="/app/registro"
                 className="relative w-full py-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-display font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-lg shadow-brand-500/25 block text-center"
               >
                 Comenzar con Plan Base
@@ -451,7 +451,7 @@ export default function LandingPage() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/admin/registro"
+                href="/app/registro"
                 className="px-8 py-4 rounded-xl border border-white/15 hover:border-white/30 text-white font-display font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
               >
                 Crear mi catálogo
