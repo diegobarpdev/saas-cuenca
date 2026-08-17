@@ -52,9 +52,38 @@ const FLOW_STEPS = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Kaltiro',
+  url: 'https://kaltiro.com',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  description:
+    'Plataforma de pedidos para restaurantes, cafeterías y negocios de comida en Ecuador. Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y cero comisión.',
+  offers: {
+    '@type': 'Offer',
+    price: '29.99',
+    priceCurrency: 'USD',
+    priceValidUntil: '2027-12-31',
+    availability: 'https://schema.org/InStock',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Kaltiro',
+    url: 'https://kaltiro.com',
+    logo: 'https://kaltiro.com/assets/KALTIRO_FONDO_PRINCIPAL.png',
+  },
+  areaServed: { '@type': 'Country', name: 'Ecuador' },
+};
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#080B11] text-slate-100 font-sans overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* ── NAV ─────────────────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 bg-[#080B11]/90 backdrop-blur-md border-b border-white/[0.06]">

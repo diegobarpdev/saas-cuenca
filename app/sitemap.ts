@@ -16,12 +16,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const catalogPages: MetadataRoute.Sitemap = (businesses || []).map((b) => ({
     url: `${baseUrl}/${b.slug}`,
     lastModified: new Date(b.created_at),
+    changeFrequency: 'daily' as const,
+    priority: 0.8,
   }));
 
   return [
     {
       url: baseUrl,
       lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 1.0,
     },
     ...catalogPages,
   ];

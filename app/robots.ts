@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/admin/', '/super-admin/', '/demo/'],
+        disallow: ['/api/', '/app/', '/super-admin/'],
       },
     ],
     sitemap: 'https://kaltiro.com/sitemap.xml',
