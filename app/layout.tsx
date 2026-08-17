@@ -16,11 +16,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://kaltiro.com'),
   title: {
-    default: 'Kaltiro — Pedidos directos para tu restaurante. $20/mes, 0% de comisión.',
+    default: 'Kaltiro — Pedidos directos para tu restaurante. $29.99/mes, 0% de comisión.',
     template: '%s | Kaltiro',
   },
   description:
-    'Kaltiro es la plataforma de pedidos para restaurantes, cafeterías y negocios de comida en Ecuador. Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y cero comisión por venta. Plan fijo $20/mes.',
+    'Kaltiro es la plataforma de pedidos para restaurantes, cafeterías y negocios de comida en Ecuador. Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y cero comisión por venta. Plan fijo $29.99/mes.',
   alternates: {
     canonical: '/',
   },
@@ -29,9 +29,9 @@ export const metadata: Metadata = {
     locale: 'es_EC',
     url: 'https://kaltiro.com',
     siteName: 'Kaltiro',
-    title: 'Kaltiro — Pedidos directos para tu restaurante. $20/mes, 0% de comisión.',
+    title: 'Kaltiro — Pedidos directos para tu restaurante. $29.99/mes, 0% de comisión.',
     description:
-      'Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y cero comisión por venta. Plan fijo $20/mes.',
+      'Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y cero comisión por venta. Plan fijo $29.99/mes.',
     images: [
       {
         url: '/og-image.png',
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Kaltiro — Pedidos directos para tu restaurante',
     description:
-      'Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y 0% de comisión. $20/mes.',
+      'Catálogo digital con QR, pedidos a WhatsApp, cobros integrados y 0% de comisión. $29.99/mes.',
     images: ['/og-image.png'],
   },
   robots: {
