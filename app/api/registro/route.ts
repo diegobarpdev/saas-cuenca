@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     const verifyUrl = `${appUrl}/app/verificar?token=${token}`;
 
     if (process.env.RESEND_API_KEY) {
-      fetch('https://api.resend.com/emails', {
+      const emailRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
@@ -148,7 +148,13 @@ export async function POST(req: NextRequest) {
             </div>
           `,
         }),
-      }).catch(e => console.error('[registro] Email confirmación falló:', e));
+      });
+      if (!emailRes.ok) {
+        const resendErr = await emailRes.text();
+        console.error('[registro] Resend error', emailRes.status, resendErr);
+      } else {
+        console.log('[registro] Email enviado OK a', emailLower);
+      }
     } else {
       console.log('[registro] RESEND_API_KEY no configurado. Verify URL:', verifyUrl);
     }
