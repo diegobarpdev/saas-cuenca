@@ -129,7 +129,7 @@ export default function RegistroPage() {
 
         <div className="text-center">
           <h1 className="text-2xl font-black text-white tracking-tight">Crea tu cuenta</h1>
-          <p className="text-xs text-slate-500 mt-1">14 días de prueba · Sin tarjeta de crédito</p>
+          <p className="text-xs text-slate-500 mt-1">7 días de prueba · Sin tarjeta de crédito</p>
         </div>
 
         {/* Indicador de pasos */}

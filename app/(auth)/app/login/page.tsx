@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Lock, Mail, ArrowRight, Eye, EyeOff, Zap, ArrowLeft } from 'lucide-react';
+import { Lock, Mail, ArrowRight, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { saveSession } from '@/hooks/useAdminSession';
 
 export default function AdminLoginPage() {
@@ -59,31 +59,6 @@ export default function AdminLoginPage() {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setEmail('demo@kaltiro.com');
-    setPassword('demo1234');
-    setError('');
-    setLoading(true);
-
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'demo@kaltiro.com', password: 'demo1234' }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        setError(data.error || 'Error al ingresar con cuenta demo');
-        setLoading(false);
-        return;
-      }
-      saveSession(data.session);
-      router.push(`/${data.session.business.slug}/app/dashboard`);
-    } catch {
-      setError('Error de conexión.');
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[#070A11] text-white flex items-center justify-center p-4 font-sans relative overflow-hidden">
@@ -187,22 +162,6 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          {/* Divisor */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-[10px] text-slate-600 font-medium">O PRUEBA CON</span>
-            <div className="flex-1 h-px bg-white/10" />
-          </div>
-
-          {/* Botón demo */}
-          <button
-            onClick={handleDemoLogin}
-            disabled={loading}
-            className="w-full py-2.5 px-4 rounded-xl border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 text-amber-400 font-bold text-xs flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <Zap className="w-3.5 h-3.5" />
-            Acceder con cuenta Demo
-          </button>
         </div>
 
         {/* Registro */}

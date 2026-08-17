@@ -67,6 +67,44 @@ export default function AdminLayoutClient({
     { label: 'Configuración Negocio',     href: `/${slug}/app/configuracion`,  icon: Settings,    roles: ['dueño'],                           show: true },
   ].filter((item) => item.roles.includes(simulatedRole) && item.show);
 
+  // Verificar si el trial expiró
+  const trialExpired = (() => {
+    if (!business || business.plan !== 'trial') return false;
+    const created = new Date(business.created_at);
+    const expires = new Date(created.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return new Date() > expires;
+  })();
+
+  if (trialExpired) {
+    return (
+      <div className="min-h-screen bg-[#070A11] text-white flex items-center justify-center p-4">
+        <div className="max-w-sm w-full text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center mx-auto">
+            <ShieldAlert className="w-8 h-8 text-brand-400" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-black text-white">Tu período de prueba terminó</h1>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Los 7 días de prueba de <span className="text-white font-semibold">{business?.nombre}</span> han finalizado.
+              Contáctanos para activar tu plan y seguir recibiendo pedidos.
+            </p>
+          </div>
+          <a
+            href={`https://wa.me/593${process.env.NEXT_PUBLIC_SOPORTE_WA ?? ''}?text=${encodeURIComponent(`Hola, quiero activar mi plan en Kaltiro para el negocio ${business?.nombre} (/${slug})`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 w-full py-3 px-6 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-black text-sm transition-all active:scale-95 shadow-lg shadow-brand-500/20"
+          >
+            Activar mi plan →
+          </a>
+          <button onClick={handleLogout} className="text-xs text-slate-600 hover:text-slate-400 transition-colors">
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen max-h-screen overflow-hidden bg-[#070A11] text-slate-100 font-sans flex flex-col md:flex-row w-full relative">
 
