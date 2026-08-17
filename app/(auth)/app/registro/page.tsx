@@ -181,6 +181,15 @@ export default function RegistroPage() {
       </div>
 
       <div className="relative w-full max-w-md space-y-6 py-8">
+        {/* Volver al inicio */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Volver al inicio
+        </Link>
+
         {/* Logo */}
         <div className="text-center space-y-3">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500/20 to-brand-600/10 border border-brand-500/30 flex items-center justify-center mx-auto shadow-lg shadow-brand-500/10">
@@ -406,13 +415,6 @@ export default function RegistroPage() {
               Ingresar
             </Link>
           </p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Volver al inicio
-          </Link>
         </div>
 
         <p className="text-center text-[10px] text-slate-700">
