@@ -105,9 +105,6 @@ export default function AdminLoginPage() {
 
         {/* Logo / Marca */}
         <div className="text-center space-y-3">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-brand-600/10 border border-brand-500/30 flex items-center justify-center mx-auto shadow-lg shadow-brand-500/10">
-            <Zap className="w-8 h-8 text-brand-400" />
-          </div>
           <div>
             <h1 className="text-2xl font-black text-white tracking-tight">Bienvenido a Kaltiro</h1>
             <p className="text-xs text-slate-500 mt-1">

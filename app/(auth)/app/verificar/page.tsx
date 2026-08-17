@@ -44,10 +44,6 @@ function VerificarContent() {
 
   return (
     <div className="relative text-center space-y-5 max-w-sm w-full">
-      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500/20 to-brand-600/10 border border-brand-500/30 flex items-center justify-center mx-auto">
-        <Zap className="w-7 h-7 text-brand-400" />
-      </div>
-
       {status === 'loading' && (
         <>
           <Loader2 className="w-8 h-8 text-brand-400 animate-spin mx-auto" />
