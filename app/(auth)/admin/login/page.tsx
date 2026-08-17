@@ -199,11 +199,17 @@ export default function AdminLoginPage() {
           </button>
         </div>
 
-        {/* Volver a la landing */}
-        <div className="text-center">
+        {/* Registro + Volver */}
+        <div className="text-center space-y-2">
+          <p className="text-xs text-slate-500">
+            ¿No tienes cuenta?{' '}
+            <Link href="/admin/registro" className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
+              Regístrate gratis
+            </Link>
+          </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Volver al inicio
