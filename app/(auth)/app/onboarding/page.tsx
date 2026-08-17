@@ -194,7 +194,7 @@ export default function OnboardingPage() {
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1.5">Nombre del negocio</label>
             <div className="relative">
-              <Building2 className="w-4 h-4 text-slate-600 absolute left-3.5 top-2.5" />
+              <Building2 className="w-4 h-4 text-slate-600 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input type="text" required placeholder="Ej: Café El Sagrario" value={nombreNegocio} onChange={e => setNombreNegocio(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#070A11] border border-white/10 text-sm text-white placeholder-slate-700 focus:outline-none focus:border-brand-500/60 transition-colors" />
             </div>
@@ -207,7 +207,7 @@ export default function OnboardingPage() {
               <input type="text" required placeholder="mi-negocio" value={slug} onChange={e => handleSlugChange(e.target.value)}
                 className={`w-full pl-28 pr-9 py-2.5 rounded-xl bg-[#070A11] border text-sm text-white placeholder-slate-700 font-mono focus:outline-none transition-colors ${
                   slugOk ? 'border-emerald-500/50' : slugBad ? 'border-rose-500/50' : 'border-white/10 focus:border-brand-500/60'}`} />
-              <span className="absolute right-3 top-2.5">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2">
                 {slugStatus === 'checking' && <Loader2 className="w-4 h-4 text-slate-500 animate-spin" />}
                 {slugOk && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
                 {slugBad && <XCircle className="w-4 h-4 text-rose-400" />}
@@ -220,7 +220,7 @@ export default function OnboardingPage() {
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1.5">WhatsApp del negocio</label>
             <div className="relative">
-              <Phone className="w-4 h-4 text-slate-600 absolute left-3.5 top-2.5" />
+              <Phone className="w-4 h-4 text-slate-600 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input type="tel" required placeholder="593987654321" value={telefono} onChange={e => setTelefono(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#070A11] border border-white/10 text-sm text-white font-mono placeholder-slate-700 focus:outline-none focus:border-brand-500/60 transition-colors" />
             </div>

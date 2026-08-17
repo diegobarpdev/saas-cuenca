@@ -131,7 +131,7 @@ export default function AdminLoginPage() {
                 Correo Electrónico
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-600 absolute left-3.5 top-3" />
+                <Mail className="w-4 h-4 text-slate-600 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
@@ -148,7 +148,7 @@ export default function AdminLoginPage() {
                 Contraseña
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-600 absolute left-3.5 top-3" />
+                <Lock className="w-4 h-4 text-slate-600 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
@@ -160,7 +160,7 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-2.5 text-slate-600 hover:text-slate-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-300 transition-colors"
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
