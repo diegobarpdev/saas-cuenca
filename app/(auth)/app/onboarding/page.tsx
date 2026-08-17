@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Zap, ArrowRight, ArrowLeft, Phone, CheckCircle2, XCircle, Loader2, Building2,
+  ArrowRight, ArrowLeft, Phone, CheckCircle2, XCircle, Loader2, Building2,
 } from 'lucide-react';
 import { saveSession } from '@/hooks/useAdminSession';
 
@@ -34,26 +34,17 @@ export default function OnboardingPage() {
 
   const [nombreNegocio, setNombreNegocio] = useState('');
   const [slug, setSlug] = useState('');
-  const [slugManual, setSlugManual] = useState(false);
-  const [telefono, setTelefono] = useState('');
+  const [digits, setDigits] = useState(''); // solo los 9 dígitos sin el 593
 
   const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  // Cargar token verificado del paso anterior
   useEffect(() => {
     const raw = sessionStorage.getItem('kaltiro_verified_token');
-    if (!raw) {
-      router.replace('/app/registro');
-      return;
-    }
-    try {
-      setVerified(JSON.parse(raw));
-    } catch {
-      router.replace('/app/registro');
-    }
+    if (!raw) { router.replace('/app/registro'); return; }
+    try { setVerified(JSON.parse(raw)); } catch { router.replace('/app/registro'); }
   }, []);
 
   const checkSlug = useCallback(
@@ -65,25 +56,23 @@ export default function OnboardingPage() {
         const data = await res.json();
         setSlugStatus(data.available ? 'available' : 'taken');
         setSlug(data.slug);
-      } catch {
-        setSlugStatus('idle');
-      }
+      } catch { setSlugStatus('idle'); }
     }, 500),
     []
   );
 
+  // Auto-generar slug desde nombre del negocio
   useEffect(() => {
-    if (slugManual) return;
     const generated = slugify(nombreNegocio);
     setSlug(generated);
     if (generated.length >= 3) checkSlug(generated);
     else setSlugStatus('idle');
-  }, [nombreNegocio, slugManual]);
+  }, [nombreNegocio]);
 
-  const handleSlugChange = (val: string) => {
-    setSlugManual(true);
-    setSlug(val);
-    checkSlug(slugify(val));
+  const handleDigitsChange = (val: string) => {
+    // Solo números, máx 9 dígitos
+    const clean = val.replace(/\D/g, '').slice(0, 9);
+    setDigits(clean);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,6 +82,9 @@ export default function OnboardingPage() {
 
     if (slugStatus === 'taken') { setError('La URL del negocio ya está en uso'); return; }
     if (slug.length < 3) { setError('La URL debe tener al menos 3 caracteres'); return; }
+    if (digits.length !== 9) { setError('Ingresa los 9 dígitos de tu número WhatsApp'); return; }
+
+    const telefono = `593${digits}`;
 
     setLoading(true);
     try {
@@ -186,6 +178,7 @@ export default function OnboardingPage() {
             </div>
           )}
 
+          {/* Nombre del negocio */}
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1.5">Nombre del negocio</label>
             <div className="relative">
@@ -195,31 +188,48 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1.5">URL de tu catálogo</label>
-            <div className="relative">
-              <span className="absolute left-3 top-2.5 text-slate-600 text-xs font-mono pointer-events-none">kaltiro.com/</span>
-              <input type="text" required placeholder="mi-negocio" value={slug} onChange={e => handleSlugChange(e.target.value)}
-                className={`w-full pl-28 pr-9 py-2.5 rounded-xl bg-[#070A11] border text-sm text-white placeholder-slate-700 font-mono focus:outline-none transition-colors ${
-                  slugOk ? 'border-emerald-500/50' : slugBad ? 'border-rose-500/50' : 'border-white/10 focus:border-brand-500/60'}`} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2">
-                {slugStatus === 'checking' && <Loader2 className="w-4 h-4 text-slate-500 animate-spin" />}
-                {slugOk && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
-                {slugBad && <XCircle className="w-4 h-4 text-rose-400" />}
-              </span>
+          {/* URL — solo lectura, generada automáticamente */}
+          {slug && (
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 mb-1.5">URL de tu catálogo</label>
+              <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-mono ${
+                slugOk ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-300'
+                : slugBad ? 'bg-rose-500/5 border-rose-500/30 text-rose-300'
+                : 'bg-white/5 border-white/10 text-slate-400'
+              }`}>
+                <span className="text-slate-600">kaltiro.com/</span>
+                <span className="text-white font-semibold">{slug}</span>
+                <span className="ml-auto shrink-0">
+                  {slugStatus === 'checking' && <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-500" />}
+                  {slugOk && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
+                  {slugBad && <XCircle className="w-3.5 h-3.5 text-rose-400" />}
+                </span>
+              </div>
+              {slugBad && <p className="text-[10px] text-rose-400 mt-1">URL en uso — cambia el nombre del negocio</p>}
             </div>
-            {slugOk && <p className="text-[10px] text-emerald-400 mt-1">✓ Disponible</p>}
-            {slugBad && <p className="text-[10px] text-rose-400 mt-1">✗ Ya está en uso — elige otro</p>}
-          </div>
+          )}
 
+          {/* WhatsApp con prefijo fijo +593 */}
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1.5">WhatsApp del negocio</label>
-            <div className="relative">
-              <Phone className="w-4 h-4 text-slate-600 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input type="tel" required placeholder="593987654321" value={telefono} onChange={e => setTelefono(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#070A11] border border-white/10 text-sm text-white font-mono placeholder-slate-700 focus:outline-none focus:border-brand-500/60 transition-colors" />
+            <div className="flex rounded-xl overflow-hidden border border-white/10 focus-within:border-brand-500/60 transition-colors">
+              <div className="flex items-center gap-1.5 px-3 bg-white/5 border-r border-white/10 shrink-0">
+                <Phone className="w-3.5 h-3.5 text-slate-500" />
+                <span className="text-sm text-slate-400 font-mono">+593</span>
+              </div>
+              <input
+                type="tel"
+                required
+                placeholder="987654321"
+                value={digits}
+                onChange={e => handleDigitsChange(e.target.value)}
+                maxLength={9}
+                className="flex-1 px-3 py-2.5 bg-[#070A11] text-sm text-white font-mono placeholder-slate-700 focus:outline-none"
+              />
+              <span className="flex items-center pr-3 text-[10px] text-slate-600 font-mono">
+                {digits.length}/9
+              </span>
             </div>
-            <p className="text-[10px] text-slate-600 mt-1">Número con código de país: 593 + número</p>
           </div>
 
           <button type="submit" disabled={loading || slugBad || slugStatus === 'checking'}
