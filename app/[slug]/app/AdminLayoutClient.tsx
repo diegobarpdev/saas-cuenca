@@ -231,7 +231,7 @@ export default function AdminLayoutClient({
           )}
 
           <div className="pt-4 border-t border-white/10 mt-3.5 flex items-center justify-center gap-1.5 opacity-50">
-            <Image src="/assets/isotipo.png" alt="Kaltiro" width={14} height={14} className="rounded-sm object-contain" />
+            <Image src="/assets/KALTIRO_FONDO_PRINCIPAL.png" alt="Kaltiro" width={14} height={14} className="rounded-sm object-contain" />
             <span className="text-[9px] font-mono-tech font-medium text-slate-400">Kaltiro.com</span>
           </div>
         </div>

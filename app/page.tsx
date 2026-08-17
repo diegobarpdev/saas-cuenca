@@ -61,7 +61,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Image
-              src="/assets/isotipo.png"
+              src="/assets/KALTIRO_FONDO_PRINCIPAL.png"
               alt="Kaltiro"
               width={32}
               height={32}
@@ -466,7 +466,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-5 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-600">
           <div className="flex items-center gap-2">
             <Image
-              src="/assets/isotipo.png"
+              src="/assets/KALTIRO_FONDO_PRINCIPAL.png"
               alt="Kaltiro"
               width={24}
               height={24}
