@@ -172,23 +172,25 @@ export default function AdminLayoutClient({
             <LogOut className="w-4 h-4" /> Cerrar Sesión
           </button>
 
-          <div className="pt-4 border-t border-white/10 mt-3.5 space-y-2">
-            <label className="block text-[9px] font-mono-tech font-bold uppercase tracking-wider text-amber-400">
-              ⚡ Simulador de Roles
-            </label>
-            <CustomSelect
-              options={[
-                { value: 'dueño', label: 'Dueño / Admin' },
-                { value: 'cajero-1', label: 'Cajero 1 (Principal)' },
-                { value: 'cajero-2', label: 'Cajero 2 (Barra)' },
-                { value: 'cocinero', label: 'Cocinero (KDS)' },
-              ]}
-              value={simulatedRole}
-              onChange={(val) => handleSwitchRole(val as any)}
-              accentColor="amber"
-              className="text-xs"
-            />
-          </div>
+          {(isSuperAdmin || slug === 'demo') && (
+            <div className="pt-4 border-t border-white/10 mt-3.5 space-y-2">
+              <label className="block text-[9px] font-mono-tech font-bold uppercase tracking-wider text-amber-400">
+                ⚡ Simulador de Roles
+              </label>
+              <CustomSelect
+                options={[
+                  { value: 'dueño', label: 'Dueño / Admin' },
+                  { value: 'cajero-1', label: 'Cajero 1 (Principal)' },
+                  { value: 'cajero-2', label: 'Cajero 2 (Barra)' },
+                  { value: 'cocinero', label: 'Cocinero (KDS)' },
+                ]}
+                value={simulatedRole}
+                onChange={(val) => handleSwitchRole(val as any)}
+                accentColor="amber"
+                className="text-xs"
+              />
+            </div>
+          )}
 
           <div className="pt-4 border-t border-white/10 mt-3.5 flex items-center justify-center gap-1.5 opacity-50">
             <Image src="/assets/isotipo.png" alt="Kaltiro" width={14} height={14} className="rounded-sm object-contain" />
