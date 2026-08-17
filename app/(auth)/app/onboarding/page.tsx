@@ -30,7 +30,7 @@ function debounce<T extends (...args: any[]) => any>(fn: T, ms: number): T {
 export default function OnboardingPage() {
   const router = useRouter();
 
-  const [draft, setDraft] = useState<{ nombre_admin: string; email: string; password: string } | null>(null);
+  const [verified, setVerified] = useState<{ token: string; nombre_admin: string; email: string } | null>(null);
 
   const [nombreNegocio, setNombreNegocio] = useState('');
   const [slug, setSlug] = useState('');
@@ -42,15 +42,15 @@ export default function OnboardingPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  // Cargar draft del paso 1
+  // Cargar token verificado del paso anterior
   useEffect(() => {
-    const raw = sessionStorage.getItem('kaltiro_registro_draft');
+    const raw = sessionStorage.getItem('kaltiro_verified_token');
     if (!raw) {
       router.replace('/app/registro');
       return;
     }
     try {
-      setDraft(JSON.parse(raw));
+      setVerified(JSON.parse(raw));
     } catch {
       router.replace('/app/registro');
     }
@@ -88,31 +88,22 @@ export default function OnboardingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!draft) return;
+    if (!verified) return;
     setError('');
 
-    if (slugStatus === 'taken') {
-      setError('La URL del negocio ya está en uso');
-      return;
-    }
-    if (slug.length < 3) {
-      setError('La URL debe tener al menos 3 caracteres');
-      return;
-    }
+    if (slugStatus === 'taken') { setError('La URL del negocio ya está en uso'); return; }
+    if (slug.length < 3) { setError('La URL debe tener al menos 3 caracteres'); return; }
 
     setLoading(true);
     try {
-      const res = await fetch('/api/registro', {
+      const res = await fetch('/api/registro/completar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          token: verified.token,
           nombre_negocio: nombreNegocio,
           slug_raw: slug,
-          nombre_admin: draft.nombre_admin,
-          email: draft.email,
-          password: draft.password,
           telefono,
-          honeypot: '',
         }),
       });
 
@@ -124,12 +115,10 @@ export default function OnboardingPage() {
         return;
       }
 
-      sessionStorage.removeItem('kaltiro_registro_draft');
+      sessionStorage.removeItem('kaltiro_verified_token');
       setSuccess(true);
       saveSession(data.session);
-      setTimeout(() => {
-        router.push(`/${data.slug}/app/dashboard`);
-      }, 1500);
+      setTimeout(() => router.push(`/${data.slug}/app/dashboard`), 1500);
     } catch {
       setError('Error de conexión. Intenta nuevamente.');
       setLoading(false);
@@ -151,7 +140,7 @@ export default function OnboardingPage() {
     );
   }
 
-  if (!draft) return null;
+  if (!verified) return null;
 
   const slugOk = slugStatus === 'available';
   const slugBad = slugStatus === 'taken';
@@ -164,20 +153,18 @@ export default function OnboardingPage() {
       </div>
 
       <div className="relative w-full max-w-sm space-y-6 py-8">
-        {/* Volver al paso 1 */}
         <Link href="/app/registro" className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors">
           <ArrowLeft className="w-3.5 h-3.5" />
           Volver
         </Link>
 
-        {/* Logo */}
         <div className="text-center space-y-3">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500/20 to-brand-600/10 border border-brand-500/30 flex items-center justify-center mx-auto shadow-lg shadow-brand-500/10">
             <Zap className="w-7 h-7 text-brand-400" />
           </div>
           <div>
             <h1 className="text-2xl font-black text-white tracking-tight">Cuéntanos tu negocio</h1>
-            <p className="text-xs text-slate-500 mt-1">Hola {draft.nombre_admin.split(' ')[0]}, casi listo</p>
+            <p className="text-xs text-slate-500 mt-1">Hola {verified.nombre_admin.split(' ')[0]}, casi listo</p>
           </div>
         </div>
 
@@ -196,9 +183,7 @@ export default function OnboardingPage() {
           </div>
         </div>
 
-        {/* Formulario */}
         <form onSubmit={handleSubmit} className="bg-[#0D1220]/80 backdrop-blur-md border border-white/10 rounded-3xl p-7 shadow-2xl space-y-4">
-
           {error && (
             <div className="px-4 py-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium flex items-start gap-2">
               <XCircle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -206,37 +191,22 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Nombre del negocio */}
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1.5">Nombre del negocio</label>
             <div className="relative">
               <Building2 className="w-4 h-4 text-slate-600 absolute left-3.5 top-2.5" />
-              <input
-                type="text"
-                required
-                placeholder="Ej: Café El Sagrario"
-                value={nombreNegocio}
-                onChange={e => setNombreNegocio(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#070A11] border border-white/10 text-sm text-white placeholder-slate-700 focus:outline-none focus:border-brand-500/60 transition-colors"
-              />
+              <input type="text" required placeholder="Ej: Café El Sagrario" value={nombreNegocio} onChange={e => setNombreNegocio(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#070A11] border border-white/10 text-sm text-white placeholder-slate-700 focus:outline-none focus:border-brand-500/60 transition-colors" />
             </div>
           </div>
 
-          {/* Slug */}
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1.5">URL de tu catálogo</label>
             <div className="relative">
               <span className="absolute left-3 top-2.5 text-slate-600 text-xs font-mono pointer-events-none">kaltiro.com/</span>
-              <input
-                type="text"
-                required
-                placeholder="mi-negocio"
-                value={slug}
-                onChange={e => handleSlugChange(e.target.value)}
+              <input type="text" required placeholder="mi-negocio" value={slug} onChange={e => handleSlugChange(e.target.value)}
                 className={`w-full pl-28 pr-9 py-2.5 rounded-xl bg-[#070A11] border text-sm text-white placeholder-slate-700 font-mono focus:outline-none transition-colors ${
-                  slugOk ? 'border-emerald-500/50' : slugBad ? 'border-rose-500/50' : 'border-white/10 focus:border-brand-500/60'
-                }`}
-              />
+                  slugOk ? 'border-emerald-500/50' : slugBad ? 'border-rose-500/50' : 'border-white/10 focus:border-brand-500/60'}`} />
               <span className="absolute right-3 top-2.5">
                 {slugStatus === 'checking' && <Loader2 className="w-4 h-4 text-slate-500 animate-spin" />}
                 {slugOk && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
@@ -247,34 +217,21 @@ export default function OnboardingPage() {
             {slugBad && <p className="text-[10px] text-rose-400 mt-1">✗ Ya está en uso — elige otro</p>}
           </div>
 
-          {/* WhatsApp */}
           <div>
             <label className="block text-xs font-semibold text-slate-400 mb-1.5">WhatsApp del negocio</label>
             <div className="relative">
               <Phone className="w-4 h-4 text-slate-600 absolute left-3.5 top-2.5" />
-              <input
-                type="tel"
-                required
-                placeholder="593987654321"
-                value={telefono}
-                onChange={e => setTelefono(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#070A11] border border-white/10 text-sm text-white font-mono placeholder-slate-700 focus:outline-none focus:border-brand-500/60 transition-colors"
-              />
+              <input type="tel" required placeholder="593987654321" value={telefono} onChange={e => setTelefono(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#070A11] border border-white/10 text-sm text-white font-mono placeholder-slate-700 focus:outline-none focus:border-brand-500/60 transition-colors" />
             </div>
             <p className="text-[10px] text-slate-600 mt-1">Número con código de país: 593 + número</p>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading || slugBad || slugStatus === 'checking'}
-            className="w-full py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-400 disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20 transition-all active:scale-[0.98] mt-2"
-          >
-            {loading ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Creando tu negocio...</>
-            ) : (
-              <><span>Crear mi negocio</span><ArrowRight className="w-4 h-4" /></>
-            )}
+          <button type="submit" disabled={loading || slugBad || slugStatus === 'checking'}
+            className="w-full py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-400 disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20 transition-all active:scale-[0.98] mt-2">
+            {loading
+              ? <><Loader2 className="w-4 h-4 animate-spin" /> Creando tu negocio...</>
+              : <><span>Crear mi negocio</span><ArrowRight className="w-4 h-4" /></>}
           </button>
         </form>
 

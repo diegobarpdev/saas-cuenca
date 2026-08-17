@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createHash } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Rate limiting en memoria — max 5 registros por IP por minuto
+// Rate limiting en memoria — max 5 por IP por minuto
 const rateMap = new Map<string, { count: number; resetAt: number }>();
-
 function checkRate(ip: string): boolean {
   const now = Date.now();
   const entry = rateMap.get(ip);
@@ -22,7 +21,7 @@ function checkRate(ip: string): boolean {
   return true;
 }
 
-function hashPassword(password: string): string {
+export function hashPassword(password: string): string {
   return createHash('sha256').update(password + 'yapi_salt_2026').digest('hex');
 }
 
@@ -52,7 +51,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ available: !data, slug });
 }
 
-// POST /api/registro — crear negocio + usuario admin
+// POST /api/registro — crear pending registration + enviar email de confirmación
 export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     ?? req.headers.get('x-real-ip')
@@ -67,25 +66,13 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const {
-      nombre_negocio,
-      slug_raw,
-      nombre_admin,
-      email,
-      password,
-      telefono,
-      honeypot, // campo trampa anti-bot — debe estar vacío
-    } = body;
+    const { nombre_admin, email, password, honeypot } = body;
 
-    // Anti-bot: si el honeypot tiene algo, rechazar silenciosamente
     if (honeypot) {
-      return NextResponse.json({ success: true, slug: 'blocked' });
+      return NextResponse.json({ success: true });
     }
 
-    // ── Validaciones ──────────────────────────────────────────────────
-    if (!nombre_negocio?.trim() || nombre_negocio.trim().length < 2) {
-      return NextResponse.json({ error: 'Nombre del negocio muy corto' }, { status: 400 });
-    }
+    // Validaciones
     if (!nombre_admin?.trim() || nombre_admin.trim().length < 2) {
       return NextResponse.json({ error: 'Tu nombre es requerido' }, { status: 400 });
     }
@@ -99,85 +86,39 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    if (!telefono?.trim()) {
-      return NextResponse.json({ error: 'Teléfono WhatsApp del negocio requerido' }, { status: 400 });
-    }
 
-    const slug = sanitizeSlug(slug_raw || nombre_negocio);
-    if (!slug || slug.length < 3) {
-      return NextResponse.json({ error: 'URL inválida. Usa letras, números o guiones (mínimo 3 caracteres)' }, { status: 400 });
-    }
+    // Verificar que el email no esté ya registrado
+    const { data: existingUser } = await supabase
+      .from('business_users_local')
+      .select('id')
+      .eq('email', emailLower)
+      .maybeSingle();
 
-    // ── Unicidad ──────────────────────────────────────────────────────
-    const [{ data: existingSlug }, { data: existingEmail }] = await Promise.all([
-      supabase.from('businesses').select('id').eq('slug', slug).maybeSingle(),
-      supabase.from('business_users_local').select('id').eq('email', emailLower).maybeSingle(),
-    ]);
-
-    if (existingSlug) {
-      return NextResponse.json({ error: 'Esa URL ya está en uso. Elige otra.' }, { status: 409 });
-    }
-    if (existingEmail) {
+    if (existingUser) {
       return NextResponse.json({ error: 'Ya existe una cuenta con ese email.' }, { status: 409 });
     }
 
-    // ── Crear negocio ─────────────────────────────────────────────────
-    const { data: business, error: bizErr } = await supabase
-      .from('businesses')
-      .insert({
-        slug,
-        nombre: nombre_negocio.trim(),
-        ruc: null,
-        telefono_whatsapp: telefono.trim(),
-        direccion: null,
-        logo_url: null,
-        plan: 'trial',
-        datos_bancarios: { banco: '', tipo_cuenta: '', numero_cuenta: '', titular: '' },
-        zonas_envio: [
-          { id: 'z1', zona: 'Centro Histórico', costo: 1.50 },
-          { id: 'z2', zona: 'Sector Norte', costo: 2.00 },
-          { id: 'z3', zona: 'Sector Sur', costo: 2.00 },
-        ],
-        configuracion_operativa: {
-          tiempo_preparacion: '15 - 25 min',
-          permite_domicilio: true,
-          permite_retiro: true,
-          acepta_efectivo: true,
-          acepta_transferencia: false,
-          acepta_payphone: false,
-          acepta_deuna: false,
-        },
-      })
-      .select()
-      .single();
+    // Eliminar cualquier pending previo con el mismo email
+    await supabase.from('pending_registrations').delete().eq('email', emailLower);
 
-    if (bizErr || !business) {
-      console.error('[registro] Error creando negocio:', bizErr);
-      return NextResponse.json({ error: 'Error al crear el negocio. Intenta nuevamente.' }, { status: 500 });
+    // Crear pending registration
+    const token = randomBytes(32).toString('hex');
+    const { error: pendingErr } = await supabase.from('pending_registrations').insert({
+      nombre_admin: nombre_admin.trim(),
+      email: emailLower,
+      password_hash: hashPassword(password),
+      token,
+    });
+
+    if (pendingErr) {
+      console.error('[registro] Error creando pending:', pendingErr);
+      return NextResponse.json({ error: 'Error interno. Intenta nuevamente.' }, { status: 500 });
     }
 
-    // ── Crear usuario admin ───────────────────────────────────────────
-    const { data: newUser, error: userErr } = await supabase
-      .from('business_users_local')
-      .insert({
-        business_id: business.id,
-        email: emailLower,
-        password_hash: hashPassword(password),
-        nombre: nombre_admin.trim(),
-        rol: 'dueño',
-        activo: true,
-      })
-      .select('id')
-      .single();
+    // Enviar email de confirmación
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://kaltiro.com';
+    const verifyUrl = `${appUrl}/app/verificar?token=${token}`;
 
-    if (userErr || !newUser) {
-      // Rollback
-      await supabase.from('businesses').delete().eq('id', business.id);
-      console.error('[registro] Error creando usuario:', userErr);
-      return NextResponse.json({ error: 'Error al crear la cuenta. Intenta nuevamente.' }, { status: 500 });
-    }
-
-    // ── Email de bienvenida ───────────────────────────────────────────
     if (process.env.RESEND_API_KEY) {
       fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -186,40 +127,33 @@ export async function POST(req: NextRequest) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Kaltiro <hola@kaltiro.com>',
+          from: 'Kaltiro <info@kaltiro.com>',
           to: [emailLower],
-          subject: `¡Bienvenido a Kaltiro, ${nombre_negocio.trim()}!`,
+          subject: 'Confirma tu cuenta en Kaltiro',
           html: `
             <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;background:#070A11;color:#fff;padding:40px 24px;border-radius:16px;">
-              <p style="font-size:28px;margin:0 0 4px;">🚀</p>
-              <h1 style="font-size:22px;font-weight:900;margin:0 0 8px;">¡Ya eres parte de Kaltiro!</h1>
-              <p style="color:#94a3b8;margin:0 0 24px;">Hola <strong style="color:#fff">${nombre_admin.trim()}</strong>, tu negocio está listo para recibir pedidos.</p>
-              <div style="background:#0D1220;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-bottom:24px;">
-                <p style="margin:0 0 6px;font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;">Tu catálogo público</p>
-                <p style="margin:0;font-size:18px;font-weight:700;color:#fe6a46;">kaltiro.com/${slug}</p>
-                <p style="margin:8px 0 0;font-size:12px;color:#64748b;">Comparte este link con tus clientes</p>
-              </div>
-              <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://kaltiro.com'}/app/login"
+              <p style="font-size:28px;margin:0 0 4px;">✉️</p>
+              <h1 style="font-size:22px;font-weight:900;margin:0 0 8px;">Confirma tu cuenta</h1>
+              <p style="color:#94a3b8;margin:0 0 24px;">
+                Hola <strong style="color:#fff">${nombre_admin.trim()}</strong>, haz clic en el botón para confirmar tu correo y continuar con el registro de tu negocio.
+              </p>
+              <a href="${verifyUrl}"
                 style="display:inline-block;background:#fe6a46;color:#000;font-weight:900;font-size:14px;padding:14px 28px;border-radius:12px;text-decoration:none;">
-                Ir a mi panel →
+                Confirmar mi cuenta →
               </a>
+              <p style="color:#64748b;font-size:12px;margin-top:24px;">
+                Este link expira en 24 horas. Si no creaste esta cuenta, puedes ignorar este correo.
+              </p>
               <p style="color:#1e293b;font-size:11px;margin-top:32px;">Kaltiro.com · Software de Gestión para Restaurantes · Cuenca, Ecuador</p>
             </div>
           `,
         }),
-      }).catch(e => console.error('[registro] Email bienvenida falló (no bloqueante):', e));
+      }).catch(e => console.error('[registro] Email confirmación falló:', e));
+    } else {
+      console.log('[registro] RESEND_API_KEY no configurado. Verify URL:', verifyUrl);
     }
 
-    // ── Devolver sesión para auto-login ───────────────────────────────
-    const session = {
-      userId: newUser.id,
-      email: emailLower,
-      nombre: nombre_admin.trim(),
-      rol: 'dueño',
-      business,
-    };
-
-    return NextResponse.json({ success: true, session, slug });
+    return NextResponse.json({ success: true, email: emailLower });
   } catch (err: any) {
     console.error('[registro] Error inesperado:', err);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
