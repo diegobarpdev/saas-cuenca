@@ -89,21 +89,19 @@ export function firmarXml(xmlSinFirma: string, p12Base64: string, password: stri
   // 2. Construir SignedProperties para computar su digest
   const signedPropsXml = `<xades:SignedProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="${signedPropsId}"><xades:SignedSignatureProperties><xades:SigningTime>${signingTime}</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue xmlns:ds="http://www.w3.org/2000/09/xmldsig#">${p12.certDigestB64}</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName xmlns:ds="http://www.w3.org/2000/09/xmldsig#">${p12.issuerDN}</ds:X509IssuerName><ds:X509SerialNumber xmlns:ds="http://www.w3.org/2000/09/xmldsig#">${p12.serialNumber}</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate></xades:SignedSignatureProperties></xades:SignedProperties>`;
 
-  // C14N del SignedProperties en contexto de documento:
-  // xmlns:xades es heredado de xades:QualifyingProperties → no se renderiza
-  // xmlns:ds es heredado de ds:Signature → no se renderiza en ningún descendiente
-  const signedPropsC14n = signedPropsXml
-    .replace(` xmlns:xades="http://uri.etsi.org/01903/v1.3.2#"`, '')
-    .replace(/ xmlns:ds="http:\/\/www\.w3\.org\/2000\/09\/xmldsig#"/g, '');
-  const signedPropsDigest = sha256Base64(signedPropsC14n);
+  // El digest debe calcularse sobre EXACTAMENTE la misma cadena que queda
+  // embebida en el documento final (signedPropsXml se inyecta tal cual en
+  // signatureBlock más abajo). Quitar los xmlns aquí desincroniza el hash
+  // firmado del contenido real, invalidando la firma ante el SRI.
+  const signedPropsDigest = sha256Base64(signedPropsXml);
 
   // 3. Construir SignedInfo
   const signedInfoXml = `<ds:SignedInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference Id="comprobante-ref" URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>${docDigest}</ds:DigestValue></ds:Reference><ds:Reference Id="xades-ref" Type="http://uri.etsi.org/01903#SignedProperties" URI="#${signedPropsId}"><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>${signedPropsDigest}</ds:DigestValue></ds:Reference></ds:SignedInfo>`;
 
   // 4. Firmar SignedInfo con RSA-SHA256
-  // C14N de SignedInfo en contexto de documento: xmlns:ds heredado de ds:Signature → no se renderiza
-  const signedInfoC14n = signedInfoXml.replace(` xmlns:ds="http://www.w3.org/2000/09/xmldsig#"`, '');
-  const signatureValue = rsaSha256Sign(p12.privateKey, signedInfoC14n);
+  // Igual que arriba: signedInfoXml se embebe tal cual en el documento
+  // final, así que hay que firmar exactamente esa misma cadena.
+  const signatureValue = rsaSha256Sign(p12.privateKey, signedInfoXml);
 
   // 5. Ensamblar el bloque <ds:Signature>
   const signatureBlock = `<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="${signatureId}">${signedInfoXml}<ds:SignatureValue Id="SignatureValue">${signatureValue}</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>${p12.certBase64}</ds:X509Certificate></ds:X509Data></ds:KeyInfo><ds:Object Id="${objectId}"><xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Target="#${signatureId}">${signedPropsXml}</xades:QualifyingProperties></ds:Object></ds:Signature>`;
