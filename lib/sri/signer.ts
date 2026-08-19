@@ -59,9 +59,14 @@ function loadP12(p12Base64: string, password: string): P12Data {
   const certDigest = crypto.createHash('sha256').update(Buffer.from(certDer, 'binary')).digest('base64');
 
   // IssuerName y SerialNumber
+  // X509IssuerName debe ir en formato RFC 2253 (más específico primero: CN, OU, O, ..., C).
+  // forge devuelve los atributos en el orden de codificación DER del certificado
+  // (jerárquico, de raíz a hoja: C, O, OU, CN), por lo que hay que invertirlo.
   const issuerDN = certificate.issuer.attributes
+    .slice()
+    .reverse()
     .map((a: any) => `${a.shortName}=${a.value}`)
-    .join(', ');
+    .join(',');
   // Usar BigInt para evitar pérdida de precisión en seriales grandes
   const serialNumber = BigInt('0x' + certificate.serialNumber).toString(10);
 
