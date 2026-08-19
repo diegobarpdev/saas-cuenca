@@ -76,7 +76,7 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
         // 2. Productos más vendidos (solo de este negocio)
         const { data: orderItems } = await supabase
           .from('order_items')
-          .select('nombre_producto, cantidad, subtotal, orders!inner(business_id)')
+          .select('nombre_producto, cantidad, precio_unitario, orders!inner(business_id)')
           .eq('orders.business_id', business.id)
           .limit(500);
 
@@ -88,7 +88,7 @@ export default function AdminDashboardAnalyticsPage({ params }: { params: Promis
               map[item.nombre_producto] = { nombre: item.nombre_producto, cantidad: 0, total: 0 };
             }
             map[item.nombre_producto].cantidad += item.cantidad;
-            map[item.nombre_producto].total += Number(item.subtotal || 0);
+            map[item.nombre_producto].total += item.cantidad * Number(item.precio_unitario || 0);
           });
           const sorted = Object.values(map).sort((a, b) => b.cantidad - a.cantidad).slice(0, 4);
           setTopProducts(sorted);

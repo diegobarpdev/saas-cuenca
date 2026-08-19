@@ -75,7 +75,7 @@ export default function AdminLayoutClient({
     return new Date() > expires;
   })();
 
-  if (trialExpired) {
+  if (trialExpired && !isSuperAdmin) {
     return (
       <div className="min-h-screen bg-[#070A11] text-white flex items-center justify-center p-4">
         <div className="max-w-sm w-full text-center space-y-6">

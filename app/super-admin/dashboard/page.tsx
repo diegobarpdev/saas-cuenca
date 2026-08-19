@@ -34,12 +34,12 @@ export default function SuperAdminDashboardPage() {
 
   useEffect(() => { loadBusinesses(); }, []);
 
-  const handleEnterAsAdmin = (businessId: string) => {
+  const handleEnterAsAdmin = (business: Business) => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('kaltiro_admin_business_id', businessId);
+      localStorage.setItem('kaltiro_admin_business_id', business.id);
       sessionStorage.setItem('is_super_admin_impersonating', 'true');
     }
-    router.push('/app/dashboard');
+    router.push(`/${business.slug}/app/dashboard`);
   };
 
   const handleDeleteBusiness = async () => {
@@ -195,7 +195,7 @@ export default function SuperAdminDashboardPage() {
                   {/* Acciones */}
                   <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <button
-                      onClick={() => handleEnterAsAdmin(b.id)}
+                      onClick={() => handleEnterAsAdmin(b)}
                       className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
                     >
                       <LogIn className="w-3.5 h-3.5" />
