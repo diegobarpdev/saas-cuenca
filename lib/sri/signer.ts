@@ -103,7 +103,12 @@ export function firmarXml(xmlSinFirma: string, p12Base64: string, password: stri
   // digest Y para embeberla en el documento final — así ambas son
   // idénticas por construcción, sin depender de que la plantilla ya
   // estuviera "casualmente" en forma canónica.
-  const signedPropsTemplate = `<xades:SignedProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="${signedPropsId}"><xades:SignedSignatureProperties><xades:SigningTime>${signingTime}</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod><ds:DigestValue xmlns:ds="http://www.w3.org/2000/09/xmldsig#">${p12.certDigestB64}</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName xmlns:ds="http://www.w3.org/2000/09/xmldsig#">${p12.issuerDN}</ds:X509IssuerName><ds:X509SerialNumber xmlns:ds="http://www.w3.org/2000/09/xmldsig#">${p12.serialNumber}</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate></xades:SignedSignatureProperties></xades:SignedProperties>`;
+  // xmlns:ds se declara en la raíz de SignedProperties porque en el documento
+  // final este nodo hereda xmlns:ds del ancestro <ds:Signature xmlns:ds="...">.
+  // C14N inclusivo renderiza TODOS los namespaces en scope en el elemento raíz
+  // del subset que se canonicaliza. Si el standalone no los declara, el digest
+  // que calculamos difiere del que verifica el SRI → [39] FIRMA INVALIDA.
+  const signedPropsTemplate = `<xades:SignedProperties xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="${signedPropsId}"><xades:SignedSignatureProperties><xades:SigningTime>${signingTime}</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod><ds:DigestValue>${p12.certDigestB64}</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>${p12.issuerDN}</ds:X509IssuerName><ds:X509SerialNumber>${p12.serialNumber}</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate></xades:SignedSignatureProperties></xades:SignedProperties>`;
   const signedPropsXml = canonicalizeXml(signedPropsTemplate);
   const signedPropsDigest = sha256Base64(signedPropsXml);
 
