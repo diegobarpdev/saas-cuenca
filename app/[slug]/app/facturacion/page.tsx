@@ -196,103 +196,138 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
           {orders.length === 0 ? 'Ningún cliente ha solicitado factura aún.' : 'Sin resultados.'}
         </div>
       ) : (
-        <div className="bg-[#0B0F1B] border border-white/10 rounded-2xl overflow-hidden">
-          {filtered.map((order, idx) => {
+        <div className="space-y-2">
+          {filtered.map((order) => {
             const f = order.factura;
             const df = order.datos_facturacion;
-            const isLast = idx === filtered.length - 1;
 
-            // Datos a mostrar — preferimos los del registro factura (más definitivos)
             const numDoc = f?.receptor_num_doc ?? df?.num_doc ?? '—';
             const razonSocial = f?.receptor_razon_social ?? df?.razon_social ?? order.cliente_nombre;
             const tipoDoc = f?.receptor_tipo_doc ?? df?.tipo_doc ?? 'CEDULA';
             const total = f?.total ?? order.total;
+            const subtotal = f?.subtotal_sin_impuestos;
+            const iva = f?.iva;
             const fechaEmision = f?.fecha_emision
-              ? new Date(f.fecha_emision).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: '2-digit' })
-              : new Date(order.created_at).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: '2-digit' });
-            const numFactura = f?.numero_secuencial ?? `Pedido #${String(order.numero_pedido).padStart(4, '0')}`;
+              ? new Date(f.fecha_emision).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' })
+              : new Date(order.created_at).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' });
+            const numFactura = f?.numero_secuencial ?? '—';
             const isEmitiendo = emitiendo === order.id;
             const yaAutorizada = f?.estado === 'autorizada';
             const enProceso = f?.estado === 'en_proceso';
 
             return (
-              <div
-                key={order.id}
-                className={`flex items-center gap-3 px-4 py-3 hover:bg-white/[0.02] transition-colors ${!isLast ? 'border-b border-white/5' : ''}`}
-              >
-                {/* Estado icon */}
-                <div className="shrink-0">
-                  {f ? <EstadoIcon estado={f.estado} /> : <FileText className="w-4 h-4 text-slate-600" />}
-                </div>
+              <div key={order.id} className="bg-[#0B0F1B] border border-white/10 rounded-2xl overflow-hidden">
 
-                {/* Número de factura */}
-                <div className="w-36 shrink-0">
-                  <p className="text-xs font-mono-tech font-bold text-white leading-tight">{numFactura}</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">{fechaEmision}</p>
-                </div>
-
-                {/* Receptor */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-display font-bold text-white truncate">{razonSocial}</p>
-                  <p className="text-[10px] text-slate-500 font-mono-tech">{tipoDoc} · {numDoc}</p>
-                </div>
-
-                {/* Total */}
-                <div className="w-20 text-right shrink-0">
-                  <p className="text-sm font-mono-tech font-black text-white">{formatCurrency(total)}</p>
-                  {f?.numero_autorizacion && (
-                    <p className="text-[10px] text-emerald-500 font-mono-tech mt-0.5">
-                      ···{f.numero_autorizacion.slice(-6)}
-                    </p>
-                  )}
-                </div>
-
-                {/* Estado badge */}
-                <div className="w-24 text-center shrink-0">
-                  {f ? <EstadoBadge estado={f.estado} /> : (
-                    <span className="text-[10px] text-slate-500 font-mono-tech">SIN EMITIR</span>
-                  )}
-                </div>
-
-                {/* Errores inline */}
-                {f?.errores && f.errores.length > 0 && (
-                  <div className="hidden lg:flex items-center gap-1 text-[10px] text-rose-400 max-w-[180px] truncate">
-                    <XCircle className="w-3 h-3 shrink-0" />
-                    <span className="truncate">{f.errores[0]}</span>
+                {/* Cabecera: número factura + estado + acción */}
+                <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
+                  <div className="shrink-0">
+                    {f ? <EstadoIcon estado={f.estado} /> : <FileText className="w-4 h-4 text-slate-600" />}
                   </div>
-                )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono-tech font-black text-white text-sm">
+                        {f ? numFactura : `Pedido #${String(order.numero_pedido).padStart(4, '0')}`}
+                      </span>
+                      {f ? <EstadoBadge estado={f.estado} /> : (
+                        <span className="text-[10px] text-slate-500 font-mono-tech border border-white/10 px-2 py-0.5 rounded-full">SIN EMITIR</span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">{fechaEmision}</p>
+                  </div>
+                  <div className="shrink-0">
+                    {yaAutorizada && f?.ride_pdf_url ? (
+                      <a
+                        href={f.ride_pdf_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs text-white font-display font-bold transition-colors"
+                      >
+                        <Printer className="w-3.5 h-3.5" /> Imprimir RIDE
+                      </a>
+                    ) : enProceso ? null : !yaAutorizada ? (
+                      <button
+                        onClick={() => emitirFactura(order)}
+                        disabled={isEmitiendo || !hasSriConfig || !df}
+                        title={!df ? 'El cliente no completó sus datos de facturación' : undefined}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-400 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-display font-bold transition-colors"
+                      >
+                        {isEmitiendo
+                          ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Emitiendo</>
+                          : <><Zap className="w-3.5 h-3.5" /> {f?.estado === 'rechazada' ? 'Reintentar' : 'Emitir Factura'}</>
+                        }
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
 
-                {/* Acciones */}
-                <div className="shrink-0 flex items-center gap-2">
-                  {yaAutorizada && f?.ride_pdf_url ? (
-                    <a
-                      href={f.ride_pdf_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs text-slate-200 font-display font-bold transition-colors"
-                    >
-                      <Printer className="w-3.5 h-3.5" /> RIDE
-                    </a>
-                  ) : yaAutorizada ? (
-                    <span className="text-[10px] text-emerald-400 font-mono-tech flex items-center gap-1">
-                      <ShieldCheck className="w-3 h-3" /> Autorizada
-                    </span>
-                  ) : enProceso ? (
-                    <span className="text-[10px] text-amber-400 font-mono-tech flex items-center gap-1">
-                      <Timer className="w-3 h-3" /> En proceso
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => emitirFactura(order)}
-                      disabled={isEmitiendo || !hasSriConfig || !df}
-                      title={!df ? 'El cliente no completó sus datos de facturación' : undefined}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-400 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-display font-bold transition-colors"
-                    >
-                      {isEmitiendo
-                        ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Emitiendo</>
-                        : <><Zap className="w-3.5 h-3.5" /> {f?.estado === 'rechazada' ? 'Reintentar' : 'Emitir'}</>
-                      }
-                    </button>
+                {/* Cuerpo: datos fiscales + autorización */}
+                <div className="px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+
+                  {/* Receptor */}
+                  <div>
+                    <p className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold mb-0.5">{tipoDoc}</p>
+                    <p className="text-xs font-mono-tech font-bold text-white">{numDoc}</p>
+                    <p className="text-xs text-slate-300 mt-0.5">{razonSocial}</p>
+                  </div>
+
+                  {/* Totales */}
+                  <div className="flex items-start gap-6">
+                    {subtotal != null && (
+                      <div>
+                        <p className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold mb-0.5">Subtotal</p>
+                        <p className="text-xs font-mono-tech text-slate-300">{formatCurrency(subtotal)}</p>
+                      </div>
+                    )}
+                    {iva != null && (
+                      <div>
+                        <p className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold mb-0.5">IVA</p>
+                        <p className="text-xs font-mono-tech text-slate-300">{formatCurrency(iva)}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold mb-0.5">Total</p>
+                      <p className="text-sm font-mono-tech font-black text-white">{formatCurrency(total)}</p>
+                    </div>
+                  </div>
+
+                  {/* Clave de acceso */}
+                  {f?.clave_acceso && (
+                    <div className="sm:col-span-2">
+                      <p className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold mb-0.5">Clave de Acceso</p>
+                      <p className="text-[11px] font-mono-tech text-slate-400 break-all">{f.clave_acceso}</p>
+                    </div>
+                  )}
+
+                  {/* Número de autorización */}
+                  {f?.numero_autorizacion && (
+                    <div className="sm:col-span-2">
+                      <p className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold mb-0.5">Número de Autorización SRI</p>
+                      <p className="text-[11px] font-mono-tech text-emerald-400 break-all">{f.numero_autorizacion}</p>
+                      {f.fecha_autorizacion && (
+                        <p className="text-[10px] text-slate-500 mt-0.5">
+                          Autorizada el {new Date(f.fecha_autorizacion).toLocaleString('es-EC')}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Errores */}
+                  {f?.errores && f.errores.length > 0 && (
+                    <div className="sm:col-span-2 bg-rose-500/5 border border-rose-500/20 rounded-xl p-2.5 space-y-1">
+                      {f.errores.map((e, i) => (
+                        <p key={i} className="text-[11px] text-rose-300 flex items-start gap-1.5">
+                          <XCircle className="w-3 h-3 shrink-0 mt-0.5" /> {e}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Sin datos de facturación */}
+                  {!f && !df && (
+                    <div className="sm:col-span-2 flex items-center gap-2 text-[11px] text-amber-400">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      El cliente solicitó factura pero no completó sus datos de facturación.
+                    </div>
                   )}
                 </div>
               </div>
