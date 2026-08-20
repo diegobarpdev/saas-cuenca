@@ -210,7 +210,16 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
             const fechaEmision = f?.fecha_emision
               ? new Date(f.fecha_emision).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' })
               : new Date(order.created_at).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' });
-            const numFactura = f?.numero_secuencial ?? '—';
+            // Extraer estab + pto_emision de la clave de acceso (pos 24-26 y 27-29)
+            // para armar el número completo 001-001-000000001
+            const numFactura = (() => {
+              if (!f) return '—';
+              const ca = f.clave_acceso ?? '';
+              if (ca.length >= 39) {
+                return `${ca.slice(24, 27)}-${ca.slice(27, 30)}-${ca.slice(30, 39)}`;
+              }
+              return f.numero_secuencial ?? '—';
+            })();
             const isEmitiendo = emitiendo === order.id;
             const yaAutorizada = f?.estado === 'autorizada';
             const enProceso = f?.estado === 'en_proceso';
