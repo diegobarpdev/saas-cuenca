@@ -92,7 +92,8 @@ function loadP12(p12Base64: string, password: string): P12Data {
 
 export function firmarXml(xmlSinFirma: string, p12Base64: string, password: string): string {
   const p12 = loadP12(p12Base64, password);
-  const signingTime = new Date().toISOString();
+  // ISO 8601 sin milisegundos — algunos validadores del SRI rechazan los ms
+  const signingTime = new Date().toISOString().replace(/\.\d{3}/, '');
   const signatureId = 'Signature';
   const signedPropsId = 'Signature_SignedProperties';
   const objectId = 'Signature_Object';
@@ -115,12 +116,18 @@ export function firmarXml(xmlSinFirma: string, p12Base64: string, password: stri
   // C14N inclusivo renderiza TODOS los namespaces en scope en el elemento raíz
   // del subset que se canonicaliza. Si el standalone no los declara, el digest
   // que calculamos difiere del que verifica el SRI → [39] FIRMA INVALIDA.
-  const signedPropsTemplate = `<xades:SignedProperties xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="${signedPropsId}"><xades:SignedSignatureProperties><xades:SigningTime>${signingTime}</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod><ds:DigestValue>${p12.certDigestB64}</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>${p12.issuerDN}</ds:X509IssuerName><ds:X509SerialNumber>${p12.serialNumber}</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate></xades:SignedSignatureProperties></xades:SignedProperties>`;
+  // SignedProperties: xmlns:ds en raíz para que el C14N standalone coincida
+  // con el C14N en contexto del documento (donde ds: hereda de <ds:Signature>).
+  // Se agrega DataObjectFormat para cumplir con implementaciones SRI Ecuador.
+  const signedPropsTemplate = `<xades:SignedProperties xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="${signedPropsId}"><xades:SignedSignatureProperties><xades:SigningTime>${signingTime}</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod><ds:DigestValue>${p12.certDigestB64}</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>${p12.issuerDN}</ds:X509IssuerName><ds:X509SerialNumber>${p12.serialNumber}</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate></xades:SignedSignatureProperties><xades:SignedDataObjectProperties><xades:DataObjectFormat ObjectReference="#comprobante-ref"><xades:Description>Comprobante electronico SRI Ecuador</xades:Description><xades:MimeType>text/xml</xades:MimeType></xades:DataObjectFormat></xades:SignedDataObjectProperties></xades:SignedProperties>`;
   const signedPropsXml = canonicalizeXml(signedPropsTemplate);
   const signedPropsDigest = sha256Base64(signedPropsXml);
 
   // 3. Construir SignedInfo
-  const signedInfoTemplate = `<ds:SignedInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"></ds:CanonicalizationMethod><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"></ds:SignatureMethod><ds:Reference Id="comprobante-ref" URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"></ds:Transform></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod><ds:DigestValue>${docDigest}</ds:DigestValue></ds:Reference><ds:Reference Id="xades-ref" Type="http://uri.etsi.org/01903#SignedProperties" URI="#${signedPropsId}"><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod><ds:DigestValue>${signedPropsDigest}</ds:DigestValue></ds:Reference></ds:SignedInfo>`;
+  // ORDEN REQUERIDO POR EL SRI: SignedProperties primero, documento segundo.
+  // Usar URI="#comprobante" (referencia al elemento raíz por id) en vez de URI=""
+  // (documento completo) — es el formato que aceptan las implementaciones SRI Ecuador.
+  const signedInfoTemplate = `<ds:SignedInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"></ds:CanonicalizationMethod><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"></ds:SignatureMethod><ds:Reference Id="xades-ref" Type="http://uri.etsi.org/01903#SignedProperties" URI="#${signedPropsId}"><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod><ds:DigestValue>${signedPropsDigest}</ds:DigestValue></ds:Reference><ds:Reference Id="comprobante-ref" URI="#comprobante"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"></ds:Transform></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod><ds:DigestValue>${docDigest}</ds:DigestValue></ds:Reference></ds:SignedInfo>`;
 
   // 4. Canonicalizar SignedInfo y firmarlo (XMLDSig exige firmar la forma
   // canónica, nunca el XML "tal cual se escribió").
