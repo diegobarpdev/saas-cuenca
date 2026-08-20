@@ -239,6 +239,15 @@ export interface BusinessSriConfig {
   certificado_p12_base64?: string | null;
   certificado_clave?: string | null;
   activo: boolean;
+  // Nuevos campos tributarios
+  regimen_tributario?: 'GENERAL' | 'RIMPE_EMPRENDEDOR' | 'RIMPE_NEGOCIO_POPULAR';
+  es_agente_retencion?: boolean;
+  numero_resolucion_retencion?: string | null;
+  es_contribuyente_especial?: boolean;
+  numero_contribuyente_especial?: string | null;
+  obligado_contabilidad?: boolean;
+  secuencial_nota_credito?: number;
+  secuencial_retencion?: number;
   created_at: string;
   updated_at: string;
 }
@@ -322,5 +331,65 @@ export interface Merma {
   motivo: MermaMotivo;
   notas: string | null;
   registrado_por: string | null;
+  created_at: string;
+}
+
+export type NotaCreditoEstado = 'generada' | 'en_proceso' | 'autorizada' | 'rechazada';
+
+export interface NotaCredito {
+  id: string;
+  business_id: string;
+  factura_id: string;
+  clave_acceso: string;
+  numero_autorizacion?: string | null;
+  fecha_autorizacion?: string | null;
+  ambiente: 'pruebas' | 'produccion';
+  estado: NotaCreditoEstado;
+  xml_firmado?: string | null;
+  xml_autorizado?: string | null;
+  ride_pdf_url?: string | null;
+  numero_secuencial: string;
+  fecha_emision: string;
+  motivo: string;
+  cod_doc_modificado: string;
+  num_doc_modificado: string;
+  fecha_emision_doc_sustento: string;
+  subtotal_sin_impuestos: number;
+  iva: number;
+  total: number;
+  receptor_tipo_doc?: string | null;
+  receptor_num_doc?: string | null;
+  receptor_razon_social?: string | null;
+  email_enviado: boolean;
+  errores: string[];
+  created_at: string;
+}
+
+export interface ComprobanteRetencion {
+  id: string;
+  business_id: string;
+  clave_acceso: string;
+  numero_autorizacion?: string | null;
+  fecha_autorizacion?: string | null;
+  ambiente: 'pruebas' | 'produccion';
+  estado: 'generada' | 'en_proceso' | 'autorizada' | 'rechazada';
+  xml_firmado?: string | null;
+  xml_autorizado?: string | null;
+  ride_pdf_url?: string | null;
+  numero_secuencial: string;
+  fecha_emision: string;
+  periodo_fiscal: string;
+  proveedor_tipo_doc: string;
+  proveedor_num_doc: string;
+  proveedor_razon_social: string;
+  proveedor_email?: string | null;
+  num_doc_sustento: string;
+  fecha_doc_sustento: string;
+  num_autorizacion_sustento?: string | null;
+  total_sin_impuestos: number;
+  retenciones: any[];
+  total_retenido: number;
+  email_enviado: boolean;
+  errores: string[];
   created_at: string;
 }

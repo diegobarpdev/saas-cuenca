@@ -27,7 +27,7 @@ function formatFecha(date: Date): string {
 
 export function generarClaveAcceso(params: {
   fecha: Date;
-  tipoComprobante: '01'; // 01 = factura
+  tipoComprobante: '01' | '02' | '04' | '07'; // 01=factura, 04=nota crédito, 07=retención
   ruc: string;           // 13 dígitos
   ambiente: '1' | '2';  // 1=pruebas, 2=produccion
   establecimiento: string; // 3 dígitos

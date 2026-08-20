@@ -13,28 +13,37 @@ interface EnviarRideEmailParams {
   total: number;
   pdfBuffer: Buffer;
   claveAcceso: string;
+  tipoDocumento?: string; // default: 'Factura Electrónica'
+  numeroDocumento?: string; // if different from numeroFactura
 }
 
 export async function enviarRideEmail(params: EnviarRideEmailParams): Promise<{ success: boolean; error?: string }> {
   const {
     toEmail, toNombre, emisorNombre, numeroFactura,
     fechaEmision, total, pdfBuffer, claveAcceso,
+    tipoDocumento = 'Factura Electrónica',
+    numeroDocumento,
   } = params;
 
+  const numDoc = numeroDocumento ?? numeroFactura;
   const totalStr = `$${total.toFixed(2)}`;
+  const labelNumDoc = tipoDocumento === 'Factura Electrónica' ? 'Número de Factura'
+    : tipoDocumento === 'Nota de Crédito' ? 'Número de Nota de Crédito'
+    : tipoDocumento === 'Comprobante de Retención' ? 'Número de Retención'
+    : 'Número de Documento';
 
   try {
     const { error } = await resend.emails.send({
       from: `${emisorNombre} <${FROM_EMAIL}>`,
       to: [toEmail],
-      subject: `Tu factura electrónica ${numeroFactura} — ${emisorNombre}`,
+      subject: `Tu ${tipoDocumento.toLowerCase()} ${numDoc} — ${emisorNombre}`,
       html: `
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Factura Electrónica</title>
+  <title>${tipoDocumento}</title>
 </head>
 <body style="margin:0;padding:0;background:#F3F4F6;font-family:system-ui,-apple-system,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4F6;padding:32px 0;">
@@ -45,7 +54,7 @@ export async function enviarRideEmail(params: EnviarRideEmailParams): Promise<{ 
         <tr>
           <td style="background:#FE6A46;padding:28px 40px;">
             <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:800;letter-spacing:-0.5px;">
-              Factura Electrónica
+              ${tipoDocumento}
             </h1>
             <p style="margin:4px 0 0;color:rgba(255,255,255,0.85);font-size:13px;">
               ${emisorNombre}
@@ -60,7 +69,7 @@ export async function enviarRideEmail(params: EnviarRideEmailParams): Promise<{ 
               Hola <strong>${toNombre}</strong>,
             </p>
             <p style="margin:0 0 24px;color:#6B7280;font-size:14px;line-height:1.6;">
-              Adjunto encontrarás tu factura electrónica autorizada por el SRI.
+              Adjunto encontrarás tu ${tipoDocumento.toLowerCase()} autorizado por el SRI.
             </p>
 
             <!-- Info box -->
@@ -70,8 +79,8 @@ export async function enviarRideEmail(params: EnviarRideEmailParams): Promise<{ 
                   <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                       <td style="padding:5px 0;">
-                        <span style="color:#9CA3AF;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Número de Factura</span><br>
-                        <span style="color:#111827;font-size:14px;font-weight:700;font-family:monospace;">${numeroFactura}</span>
+                        <span style="color:#9CA3AF;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${labelNumDoc}</span><br>
+                        <span style="color:#111827;font-size:14px;font-weight:700;font-family:monospace;">${numDoc}</span>
                       </td>
                       <td style="padding:5px 0;" align="right">
                         <span style="color:#9CA3AF;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Total</span><br>
@@ -90,7 +99,7 @@ export async function enviarRideEmail(params: EnviarRideEmailParams): Promise<{ 
             </table>
 
             <p style="margin:0 0 6px;color:#6B7280;font-size:12px;">
-              Puedes verificar la validez de tu factura en el portal del SRI:
+              Puedes verificar la validez del documento en el portal del SRI:
             </p>
             <a href="https://srienlinea.sri.gob.ec" style="color:#FE6A46;font-size:12px;text-decoration:none;font-weight:600;">
               srienlinea.sri.gob.ec →
@@ -121,7 +130,7 @@ export async function enviarRideEmail(params: EnviarRideEmailParams): Promise<{ 
       `.trim(),
       attachments: [
         {
-          filename: `factura-${numeroFactura.replace(/-/g, '')}.pdf`,
+          filename: `${tipoDocumento.toLowerCase().replace(/\s+/g, '-')}-${numDoc.replace(/-/g, '')}.pdf`,
           content: pdfBuffer,
         },
       ],

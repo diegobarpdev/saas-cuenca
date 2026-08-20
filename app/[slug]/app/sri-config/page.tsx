@@ -4,6 +4,7 @@ import React, { use, useState, useEffect, useRef } from 'react';
 import {
   KeyRound, RefreshCw, Save, Upload, Eye, EyeOff, ShieldCheck,
   AlertCircle, CheckCircle2, FlaskConical, Globe, Loader2, Info, Hash,
+  BookOpen, Receipt, Building2,
 } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { createClient } from '@/lib/supabase/client';
@@ -31,6 +32,12 @@ export default function SriConfigPage({ params }: { params: Promise<{ slug: stri
     ambiente: 'pruebas' as 'pruebas' | 'produccion',
     certificado_p12_base64: '',
     certificado_clave: '',
+    regimen_tributario: 'GENERAL' as 'GENERAL' | 'RIMPE_EMPRENDEDOR' | 'RIMPE_NEGOCIO_POPULAR',
+    obligado_contabilidad: false,
+    es_contribuyente_especial: false,
+    numero_contribuyente_especial: '',
+    es_agente_retencion: false,
+    numero_resolucion_retencion: '',
   });
 
   const [certFileName, setCertFileName] = useState('');
@@ -60,6 +67,12 @@ export default function SriConfigPage({ params }: { params: Promise<{ slug: stri
             ambiente: data.ambiente ?? 'pruebas',
             certificado_p12_base64: '',  // no precargamos el cert por seguridad
             certificado_clave: '',
+            regimen_tributario: (data as any).regimen_tributario ?? 'GENERAL',
+            obligado_contabilidad: (data as any).obligado_contabilidad ?? false,
+            es_contribuyente_especial: (data as any).es_contribuyente_especial ?? false,
+            numero_contribuyente_especial: (data as any).numero_contribuyente_especial ?? '',
+            es_agente_retencion: (data as any).es_agente_retencion ?? false,
+            numero_resolucion_retencion: (data as any).numero_resolucion_retencion ?? '',
           });
           if (data.certificado_p12_base64) {
             setCertLoaded(true);
@@ -142,6 +155,12 @@ export default function SriConfigPage({ params }: { params: Promise<{ slug: stri
         ambiente: form.ambiente,
         activo: true,
         updated_at: new Date().toISOString(),
+        regimen_tributario: form.regimen_tributario,
+        obligado_contabilidad: form.obligado_contabilidad,
+        es_contribuyente_especial: form.es_contribuyente_especial,
+        numero_contribuyente_especial: form.es_contribuyente_especial ? form.numero_contribuyente_especial.trim() || null : null,
+        es_agente_retencion: form.es_agente_retencion,
+        numero_resolucion_retencion: form.es_agente_retencion ? form.numero_resolucion_retencion.trim() || null : null,
       };
 
       // Solo actualizar cert si se subió uno nuevo
@@ -358,6 +377,123 @@ export default function SriConfigPage({ params }: { params: Promise<{ slug: stri
               En producción, cada factura emitida queda registrada en el SRI y tiene valor legal. Asegúrate de que el certificado y los datos sean correctos.
             </div>
           )}
+        </div>
+
+        <div className="border-t border-white/5" />
+
+        {/* Régimen Tributario */}
+        <div>
+          <h2 className="text-sm font-display font-black text-white mb-4 flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-brand-400" /> Régimen Tributario
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {([
+              { value: 'GENERAL', label: 'Régimen General' },
+              { value: 'RIMPE_EMPRENDEDOR', label: 'RIMPE Emprendedor' },
+              { value: 'RIMPE_NEGOCIO_POPULAR', label: 'RIMPE Negocio Popular' },
+            ] as const).map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setForm(prev => ({ ...prev, regimen_tributario: opt.value }))}
+                className={`p-3 rounded-2xl border text-left transition-all ${
+                  form.regimen_tributario === opt.value
+                    ? 'bg-brand-500/10 border-brand-500/30 text-brand-300'
+                    : 'bg-slate-950/40 border-white/5 text-slate-500 hover:border-white/10'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  {form.regimen_tributario === opt.value && <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />}
+                  <span className="font-display font-black text-xs">{opt.label}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="border-t border-white/5" />
+
+        {/* Opciones fiscales */}
+        <div>
+          <h2 className="text-sm font-display font-black text-white mb-4 flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-brand-400" /> Obligaciones Fiscales
+          </h2>
+          <div className="space-y-4">
+
+            {/* Obligado a contabilidad */}
+            <div
+              onClick={() => setForm(prev => ({ ...prev, obligado_contabilidad: !prev.obligado_contabilidad }))}
+              className="flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all bg-slate-950/40 border-white/5 hover:border-white/10"
+            >
+              <div>
+                <p className="text-sm font-display font-bold text-white">Obligado a llevar contabilidad</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Aplica si los ingresos brutos superan $300,000 anuales</p>
+              </div>
+              <div className={`w-10 h-6 rounded-full transition-colors relative ${form.obligado_contabilidad ? 'bg-brand-500' : 'bg-slate-700'}`}>
+                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${form.obligado_contabilidad ? 'left-5' : 'left-1'}`} />
+              </div>
+            </div>
+
+            {/* Contribuyente especial */}
+            <div>
+              <div
+                onClick={() => setForm(prev => ({ ...prev, es_contribuyente_especial: !prev.es_contribuyente_especial }))}
+                className="flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all bg-slate-950/40 border-white/5 hover:border-white/10"
+              >
+                <div>
+                  <p className="text-sm font-display font-bold text-white">Contribuyente especial</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Calificado por el SRI como contribuyente especial</p>
+                </div>
+                <div className={`w-10 h-6 rounded-full transition-colors relative ${form.es_contribuyente_especial ? 'bg-brand-500' : 'bg-slate-700'}`}>
+                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${form.es_contribuyente_especial ? 'left-5' : 'left-1'}`} />
+                </div>
+              </div>
+              {form.es_contribuyente_especial && (
+                <div className="mt-2 ml-4">
+                  <label className="block text-xs font-mono-tech font-bold text-slate-400 uppercase mb-1.5">
+                    Número de Resolución (Contribuyente Especial)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej: 1234"
+                    value={form.numero_contribuyente_especial}
+                    onChange={e => setForm(prev => ({ ...prev, numero_contribuyente_especial: e.target.value }))}
+                    className="w-full px-4 py-2.5 rounded-2xl bg-[#070A11] border border-white/10 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-brand-500/50 transition-colors font-mono"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Agente de retención */}
+            <div>
+              <div
+                onClick={() => setForm(prev => ({ ...prev, es_agente_retencion: !prev.es_agente_retencion }))}
+                className="flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all bg-slate-950/40 border-white/5 hover:border-white/10"
+              >
+                <div>
+                  <p className="text-sm font-display font-bold text-white">Agente de retención</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Habilitado para emitir comprobantes de retención a proveedores</p>
+                </div>
+                <div className={`w-10 h-6 rounded-full transition-colors relative ${form.es_agente_retencion ? 'bg-brand-500' : 'bg-slate-700'}`}>
+                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${form.es_agente_retencion ? 'left-5' : 'left-1'}`} />
+                </div>
+              </div>
+              {form.es_agente_retencion && (
+                <div className="mt-2 ml-4">
+                  <label className="block text-xs font-mono-tech font-bold text-slate-400 uppercase mb-1.5">
+                    Número de Resolución (Agente de Retención)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej: NAC-DNCRASC19-00000001"
+                    value={form.numero_resolucion_retencion}
+                    onChange={e => setForm(prev => ({ ...prev, numero_resolucion_retencion: e.target.value }))}
+                    className="w-full px-4 py-2.5 rounded-2xl bg-[#070A11] border border-white/10 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-brand-500/50 transition-colors font-mono"
+                  />
+                </div>
+              )}
+            </div>
+
+          </div>
         </div>
 
         <div className="border-t border-white/5" />

@@ -12,7 +12,7 @@ interface GenerarXmlParams {
   claveAcceso: string;
 }
 
-function calcularTotales(items: FacturaItem[]) {
+export function calcularTotales(items: FacturaItem[]) {
   let subtotalSinImpuestos = 0;
   let totalIva15 = 0;
   let totalIva0 = 0;
@@ -54,7 +54,7 @@ function calcularTotales(items: FacturaItem[]) {
   };
 }
 
-function formatFechaSRI(date: Date): string {
+export function formatFechaSRI(date: Date): string {
   const dd = date.getDate().toString().padStart(2, '0');
   const mm = (date.getMonth() + 1).toString().padStart(2, '0');
   const aaaa = date.getFullYear();
@@ -87,7 +87,7 @@ export function generarXmlFactura(params: GenerarXmlParams): string {
   const infoFact = root.ele('infoFactura');
   infoFact.ele('fechaEmision').txt(formatFechaSRI(fechaEmision));
   infoFact.ele('dirEstablecimiento').txt(config.direccionMatriz);
-  infoFact.ele('obligadoContabilidad').txt('NO');
+  infoFact.ele('obligadoContabilidad').txt(config.obligadoContabilidad ? 'SI' : 'NO');
   infoFact.ele('tipoIdentificacionComprador').txt(TIPO_DOC_SRI[receptor.tipoDoc]);
   infoFact.ele('razonSocialComprador').txt(receptor.razonSocial);
   infoFact.ele('identificacionComprador').txt(receptor.numDoc);
@@ -157,4 +157,4 @@ export function generarXmlFactura(params: GenerarXmlParams): string {
   return root.end({ prettyPrint: false });
 }
 
-export { calcularTotales };
+// calcularTotales and formatFechaSRI are exported above
