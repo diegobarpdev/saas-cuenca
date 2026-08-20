@@ -26,7 +26,7 @@ export function usePlanLimits(business: Business | null): PlanLimits {
     const raw = business as any;
     const maxProductos: number | null = raw.plan_max_productos ?? null;
     const maxPedidosMes: number | null = raw.plan_max_pedidos_mes ?? null;
-    const isDemo = business.slug === 'demo-yapiec' || business.plan === 'trial';
+    const isDemo = business.slug === 'restaurante-demo' || business.plan === 'trial';
 
     return {
       maxProductos,
