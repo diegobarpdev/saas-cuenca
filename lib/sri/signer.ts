@@ -50,9 +50,16 @@ function loadP12(p12Base64: string, password: string): P12Data {
   const privateKey = (keyBag?.key ?? p12.getBags({ bagType: forge.pki.oids.keyBag })[forge.pki.oids.keyBag]?.[0]?.key) as forge.pki.PrivateKey;
 
   const certBags = p12.getBags({ bagType: forge.pki.oids.certBag });
-  const certBag = certBags[forge.pki.oids.certBag]?.[0];
-  if (!certBag?.cert) throw new Error('No se encontró el certificado en el .p12');
-  const certificate = certBag.cert;
+  const allCerts = certBags[forge.pki.oids.certBag] ?? [];
+  // Buscar el certificado cuyo módulo RSA coincide con la clave privada.
+  // El P12 puede tener varios certificados (entidad + cadena CA) y [0] no
+  // siempre es el de la entidad — tomar el incorrecto causa [39] FIRMA INVALIDA.
+  let certificate = allCerts.find((bag) => {
+    const pub = (bag.cert?.publicKey as any);
+    const priv = (privateKey as any);
+    return pub?.n && priv?.n && pub.n.equals(priv.n);
+  })?.cert ?? allCerts[0]?.cert;
+  if (!certificate) throw new Error('No se encontró el certificado en el .p12');
 
   // Certificado en DER → base64
   const certDer = forge.asn1.toDer(forge.pki.certificateToAsn1(certificate)).getBytes();
