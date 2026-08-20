@@ -2,8 +2,9 @@
 
 import React, { use, useState, useEffect, useCallback } from 'react';
 import {
-  Receipt, RefreshCw, FileText, Copy, CheckCircle2, AlertCircle,
-  Clock, Search, Zap, Loader2, XCircle, ShieldCheck, Timer,
+  Receipt, RefreshCw, FileText, AlertCircle,
+  XCircle, ShieldCheck, Timer, Search, Zap,
+  Loader2, Printer, ExternalLink,
 } from 'lucide-react';
 import { useAdminBusiness } from '@/hooks/useAdminBusiness';
 import { createClient } from '@/lib/supabase/client';
@@ -15,10 +16,8 @@ interface OrderWithBilling {
   id: string;
   numero_pedido: number;
   cliente_nombre: string;
-  cliente_telefono: string;
   total: number;
   created_at: string;
-  estado: string;
   datos_facturacion: {
     tipo_doc: 'RUC' | 'CEDULA' | 'PASAPORTE';
     num_doc: string;
@@ -29,31 +28,22 @@ interface OrderWithBilling {
   factura?: FacturaElectronica | null;
 }
 
-function FacturaEstadoBadge({ estado }: { estado: string }) {
-  if (estado === 'autorizada') {
-    return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-mono-tech font-bold">
-        <ShieldCheck className="w-3 h-3" /> AUTORIZADA
-      </span>
-    );
-  }
-  if (estado === 'rechazada') {
-    return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-[10px] font-mono-tech font-bold">
-        <XCircle className="w-3 h-3" /> RECHAZADA
-      </span>
-    );
-  }
-  if (estado === 'en_proceso') {
-    return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-mono-tech font-bold">
-        <Timer className="w-3 h-3" /> EN PROCESO
-      </span>
-    );
-  }
+function EstadoIcon({ estado }: { estado: string }) {
+  if (estado === 'autorizada') return <ShieldCheck className="w-4 h-4 text-emerald-400" />;
+  if (estado === 'rechazada') return <XCircle className="w-4 h-4 text-rose-400" />;
+  if (estado === 'en_proceso') return <Timer className="w-4 h-4 text-amber-400" />;
+  return <FileText className="w-4 h-4 text-slate-500" />;
+}
+
+function EstadoBadge({ estado }: { estado: string }) {
+  const map: Record<string, string> = {
+    autorizada: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
+    rechazada: 'bg-rose-500/10 border-rose-500/30 text-rose-300',
+    en_proceso: 'bg-amber-500/10 border-amber-500/30 text-amber-300',
+  };
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-500/10 border border-white/10 text-slate-400 text-[10px] font-mono-tech font-bold">
-      {estado.toUpperCase()}
+    <span className={`inline-flex px-2 py-0.5 rounded-full border text-[10px] font-mono-tech font-bold uppercase ${map[estado] ?? 'bg-slate-500/10 border-white/10 text-slate-400'}`}>
+      {estado.replace('_', ' ')}
     </span>
   );
 }
@@ -65,7 +55,6 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
   const [orders, setOrders] = useState<OrderWithBilling[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [emitiendo, setEmitiendo] = useState<string | null>(null);
   const [hasSriConfig, setHasSriConfig] = useState(false);
 
@@ -74,11 +63,10 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
     setLoading(true);
     try {
       const supabase = createClient();
-
       const [{ data: ordersData }, { data: facturas }, { data: sriConfig }] = await Promise.all([
         supabase
           .from('orders')
-          .select('id, numero_pedido, cliente_nombre, cliente_telefono, total, created_at, estado, datos_facturacion')
+          .select('id, numero_pedido, cliente_nombre, total, created_at, datos_facturacion')
           .eq('business_id', business.id)
           .eq('requiere_factura', true)
           .order('created_at', { ascending: false })
@@ -89,7 +77,7 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
           .eq('business_id', business.id),
         supabase
           .from('business_sri_config')
-          .select('id, activo')
+          .select('id')
           .eq('business_id', business.id)
           .eq('activo', true)
           .maybeSingle(),
@@ -99,18 +87,12 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
 
       const facturaMap = new Map<string, FacturaElectronica>();
       for (const f of (facturas ?? [])) {
-        // Keep the most recent factura per order
         if (!facturaMap.has(f.order_id) || new Date(f.created_at) > new Date(facturaMap.get(f.order_id)!.created_at)) {
           facturaMap.set(f.order_id, f as FacturaElectronica);
         }
       }
 
-      const merged = (ordersData ?? []).map((o: any) => ({
-        ...o,
-        factura: facturaMap.get(o.id) ?? null,
-      }));
-
-      setOrders(merged as OrderWithBilling[]);
+      setOrders((ordersData ?? []).map((o: any) => ({ ...o, factura: facturaMap.get(o.id) ?? null })) as OrderWithBilling[]);
     } catch (err) {
       console.error(err);
     } finally {
@@ -119,14 +101,6 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
   }, [business?.id]);
 
   useEffect(() => { load(); }, [load]);
-
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedId(id);
-      toast.success('Copiado al portapapeles');
-      setTimeout(() => setCopiedId(null), 2000);
-    });
-  };
 
   const emitirFactura = async (order: OrderWithBilling) => {
     if (!business) return;
@@ -138,21 +112,10 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
         body: JSON.stringify({ orderId: order.id, businessId: business.id }),
       });
       const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.error ?? 'Error emitiendo factura');
-        return;
-      }
-
-      if (data.estado === 'autorizada') {
-        toast.success(`Factura autorizada por SRI — Auth: ${data.numeroAutorizacion}`);
-      } else if (data.estado === 'en_proceso') {
-        toast.success('Factura enviada al SRI, en proceso de autorización');
-      } else {
-        const errMsg = data.errores?.join(', ') ?? 'Error desconocido';
-        toast.error(`Factura rechazada: ${errMsg}`);
-      }
-
+      if (!res.ok) { toast.error(data.error ?? 'Error emitiendo factura'); return; }
+      if (data.estado === 'autorizada') toast.success(`Factura autorizada — ${data.numeroAutorizacion?.slice(-8)}`);
+      else if (data.estado === 'en_proceso') toast.success('Enviada al SRI, en proceso');
+      else toast.error(`Rechazada: ${data.errores?.join(', ')}`);
       await load();
     } catch (err: any) {
       toast.error(err.message ?? 'Error de conexión');
@@ -165,243 +128,169 @@ export default function AdminFacturacionPage({ params }: { params: Promise<{ slu
     return (
       <div className="flex items-center justify-center min-h-[60vh] gap-2 text-slate-400">
         <RefreshCw className="w-5 h-5 animate-spin text-brand-400" />
-        <span className="text-sm">Cargando solicitudes de factura...</span>
+        <span className="text-sm">Cargando facturas...</span>
       </div>
     );
   }
 
-  const filtered = orders.filter((o) => {
-    const q = search.toLowerCase();
-    return (
-      String(o.numero_pedido).includes(q) ||
-      o.cliente_nombre.toLowerCase().includes(q) ||
-      (o.datos_facturacion?.num_doc || '').includes(q) ||
-      (o.datos_facturacion?.razon_social || '').toLowerCase().includes(q)
-    );
-  });
-
-  const tipoDocLabel = (tipo: string) => {
-    if (tipo === 'RUC') return 'RUC';
-    if (tipo === 'CEDULA') return 'Cédula';
-    return 'Pasaporte';
-  };
+  const q = search.toLowerCase();
+  const filtered = orders.filter(o =>
+    String(o.numero_pedido).includes(q) ||
+    (o.factura?.numero_secuencial ?? '').includes(q) ||
+    (o.factura?.receptor_num_doc ?? o.datos_facturacion?.num_doc ?? '').includes(q) ||
+    (o.factura?.receptor_razon_social ?? o.datos_facturacion?.razon_social ?? '').toLowerCase().includes(q) ||
+    o.cliente_nombre.toLowerCase().includes(q)
+  );
 
   const autorizadas = orders.filter(o => o.factura?.estado === 'autorizada').length;
   const pendientes = orders.filter(o => !o.factura || o.factura.estado === 'rechazada').length;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-20">
+    <div className="space-y-5 max-w-5xl mx-auto pb-20">
       {/* Header */}
-      <div className="p-6 rounded-3xl bg-[#0D1322] border border-white/10 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 text-brand-300 text-xs font-mono-tech border border-brand-500/30">
-            <Receipt className="w-3.5 h-3.5" /> Facturación Electrónica SRI
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-500/10 text-brand-300 text-[11px] font-mono-tech border border-brand-500/30 mb-2">
+            <Receipt className="w-3 h-3" /> Facturación Electrónica SRI
           </div>
-          <h1 className="text-2xl font-display font-black text-white tracking-tight mt-2">
-            Facturas Electrónicas
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Emite facturas electrónicas directamente al SRI con un solo clic.
-          </p>
+          <h1 className="text-xl font-display font-black text-white">Facturas Electrónicas</h1>
         </div>
 
         {!hasSriConfig && (
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs text-amber-300 font-display font-bold max-w-xs shrink-0">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Configuración SRI pendiente</span>
-            </div>
-            <p className="text-[11px] text-amber-400/80 font-normal">
-              Ve a Configuración → SRI para subir tu certificado digital y datos del emisor.
-            </p>
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 text-xs text-amber-300 flex items-start gap-2 max-w-xs">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+            <span>Configura tu certificado SRI en <strong>Configuración → SRI</strong> para emitir facturas.</span>
           </div>
         )}
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-1">
-          <span className="text-xs text-slate-400 font-medium">Total solicitudes</span>
-          <p className="text-2xl font-mono-tech font-black text-white">{orders.length}</p>
-        </div>
-        <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-1">
-          <span className="text-xs text-slate-400 font-medium">Autorizadas SRI</span>
-          <p className="text-2xl font-mono-tech font-black text-emerald-400">{autorizadas}</p>
-        </div>
-        <div className="bg-[#0B0F1B] border border-white/10 p-5 rounded-3xl space-y-1">
-          <span className="text-xs text-slate-400 font-medium">Pendientes de emitir</span>
-          <p className="text-2xl font-mono-tech font-black text-amber-400">{pendientes}</p>
-        </div>
+      {/* Stats compactas */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: 'Total', value: orders.length, color: 'text-white' },
+          { label: 'Autorizadas', value: autorizadas, color: 'text-emerald-400' },
+          { label: 'Pendientes', value: pendientes, color: 'text-amber-400' },
+        ].map(s => (
+          <div key={s.label} className="bg-[#0B0F1B] border border-white/10 rounded-2xl p-4">
+            <p className="text-[11px] text-slate-500 font-medium">{s.label}</p>
+            <p className={`text-2xl font-mono-tech font-black ${s.color}`}>{s.value}</p>
+          </div>
+        ))}
       </div>
 
       {/* Buscador */}
-      <div className="relative max-w-md">
+      <div className="relative max-w-sm">
         <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3.5 top-3" />
         <input
           type="text"
-          placeholder="Buscar por pedido, nombre o RUC..."
+          placeholder="Buscar por número, RUC, nombre..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#0B0F1B] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition-colors"
+          onChange={e => setSearch(e.target.value)}
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#0B0F1B] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition-colors"
         />
       </div>
 
-      {/* Lista */}
+      {/* Lista de facturas */}
       {filtered.length === 0 ? (
-        <div className="py-16 text-center text-slate-500 text-sm bg-[#0B0F1B] rounded-3xl border border-white/5">
-          {orders.length === 0
-            ? 'Ningún cliente ha solicitado factura aún.'
-            : 'Sin resultados para tu búsqueda.'}
+        <div className="py-12 text-center text-slate-500 text-sm bg-[#0B0F1B] rounded-2xl border border-white/5">
+          {orders.length === 0 ? 'Ningún cliente ha solicitado factura aún.' : 'Sin resultados.'}
         </div>
       ) : (
-        <div className="space-y-3">
-          {filtered.map((order) => {
+        <div className="bg-[#0B0F1B] border border-white/10 rounded-2xl overflow-hidden">
+          {filtered.map((order, idx) => {
+            const f = order.factura;
             const df = order.datos_facturacion;
-            const factura = order.factura;
-            const fecha = new Date(order.created_at).toLocaleDateString('es-EC', {
-              day: '2-digit', month: 'short', year: 'numeric',
-            });
+            const isLast = idx === filtered.length - 1;
+
+            // Datos a mostrar — preferimos los del registro factura (más definitivos)
+            const numDoc = f?.receptor_num_doc ?? df?.num_doc ?? '—';
+            const razonSocial = f?.receptor_razon_social ?? df?.razon_social ?? order.cliente_nombre;
+            const tipoDoc = f?.receptor_tipo_doc ?? df?.tipo_doc ?? 'CEDULA';
+            const total = f?.total ?? order.total;
+            const fechaEmision = f?.fecha_emision
+              ? new Date(f.fecha_emision).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: '2-digit' })
+              : new Date(order.created_at).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: '2-digit' });
+            const numFactura = f?.numero_secuencial ?? `Pedido #${String(order.numero_pedido).padStart(4, '0')}`;
             const isEmitiendo = emitiendo === order.id;
-            const yaAutorizada = factura?.estado === 'autorizada';
-            const enProceso = factura?.estado === 'en_proceso';
+            const yaAutorizada = f?.estado === 'autorizada';
+            const enProceso = f?.estado === 'en_proceso';
 
             return (
               <div
                 key={order.id}
-                className="bg-[#0B0F1B] border border-white/10 rounded-3xl p-5 space-y-4"
+                className={`flex items-center gap-3 px-4 py-3 hover:bg-white/[0.02] transition-colors ${!isLast ? 'border-b border-white/5' : ''}`}
               >
-                {/* Row superior */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 flex-shrink-0">
-                      <FileText className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono-tech font-black text-brand-400 text-sm">
-                          #{String(order.numero_pedido).padStart(4, '0')}
-                        </span>
-                        <span className="text-white font-display font-bold text-sm">{order.cliente_nombre}</span>
-                        {factura && <FacturaEstadoBadge estado={factura.estado} />}
-                      </div>
-                      <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
-                        <Clock className="w-3 h-3" />
-                        <span>{fecha}</span>
-                        <span>·</span>
-                        <span>{order.cliente_telefono}</span>
-                        {factura?.numero_autorizacion && (
-                          <>
-                            <span>·</span>
-                            <span className="text-emerald-400 font-mono-tech">Auth: {factura.numero_autorizacion.slice(-8)}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono-tech font-black text-white text-lg">{formatCurrency(order.total)}</span>
-                    <span className="px-2.5 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-[10px] font-mono-tech font-bold uppercase">
-                      {order.estado}
-                    </span>
-                  </div>
+                {/* Estado icon */}
+                <div className="shrink-0">
+                  {f ? <EstadoIcon estado={f.estado} /> : <FileText className="w-4 h-4 text-slate-600" />}
                 </div>
 
-                {/* Errores SRI */}
-                {factura?.errores && factura.errores.length > 0 && (
-                  <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-3 space-y-1">
-                    {factura.errores.map((e, i) => (
-                      <p key={i} className="text-xs text-rose-300 flex items-start gap-1.5">
-                        <XCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" /> {e}
-                      </p>
-                    ))}
+                {/* Número de factura */}
+                <div className="w-36 shrink-0">
+                  <p className="text-xs font-mono-tech font-bold text-white leading-tight">{numFactura}</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">{fechaEmision}</p>
+                </div>
+
+                {/* Receptor */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-display font-bold text-white truncate">{razonSocial}</p>
+                  <p className="text-[10px] text-slate-500 font-mono-tech">{tipoDoc} · {numDoc}</p>
+                </div>
+
+                {/* Total */}
+                <div className="w-20 text-right shrink-0">
+                  <p className="text-sm font-mono-tech font-black text-white">{formatCurrency(total)}</p>
+                  {f?.numero_autorizacion && (
+                    <p className="text-[10px] text-emerald-500 font-mono-tech mt-0.5">
+                      ···{f.numero_autorizacion.slice(-6)}
+                    </p>
+                  )}
+                </div>
+
+                {/* Estado badge */}
+                <div className="w-24 text-center shrink-0">
+                  {f ? <EstadoBadge estado={f.estado} /> : (
+                    <span className="text-[10px] text-slate-500 font-mono-tech">SIN EMITIR</span>
+                  )}
+                </div>
+
+                {/* Errores inline */}
+                {f?.errores && f.errores.length > 0 && (
+                  <div className="hidden lg:flex items-center gap-1 text-[10px] text-rose-400 max-w-[180px] truncate">
+                    <XCircle className="w-3 h-3 shrink-0" />
+                    <span className="truncate">{f.errores[0]}</span>
                   </div>
                 )}
 
-                {/* Datos fiscales */}
-                {df ? (
-                  <div className="bg-slate-950/70 border border-white/5 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold block mb-1">
-                        {tipoDocLabel(df.tipo_doc)}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-white text-sm">{df.num_doc}</span>
-                        <button
-                          onClick={() => copyToClipboard(df.num_doc, `${order.id}-doc`)}
-                          className="text-slate-500 hover:text-brand-400 transition-colors"
-                        >
-                          {copiedId === `${order.id}-doc`
-                            ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                            : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold block mb-1">Nombre / Empresa</span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-display font-bold text-white text-xs truncate">{df.razon_social}</span>
-                        <button
-                          onClick={() => copyToClipboard(df.razon_social, `${order.id}-rs`)}
-                          className="text-slate-500 hover:text-brand-400 transition-colors shrink-0"
-                        >
-                          {copiedId === `${order.id}-rs`
-                            ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                            : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold block mb-1">Email</span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-slate-300 text-xs truncate">{df.email}</span>
-                        <button
-                          onClick={() => copyToClipboard(df.email, `${order.id}-email`)}
-                          className="text-slate-500 hover:text-brand-400 transition-colors shrink-0"
-                        >
-                          {copiedId === `${order.id}-email`
-                            ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                            : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    {df.direccion && (
-                      <div className="sm:col-span-2 lg:col-span-3">
-                        <span className="text-[10px] text-slate-500 uppercase font-mono-tech font-bold block mb-1">Dirección</span>
-                        <span className="text-slate-300 text-xs">{df.direccion}</span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-3 text-xs text-rose-300 flex items-center gap-2">
-                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                    El cliente pidió factura pero no completó sus datos de facturación.
-                  </div>
-                )}
-
-                {/* Acción */}
-                <div className="flex justify-end">
-                  {yaAutorizada ? (
-                    <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 font-display font-bold">
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      Factura autorizada por SRI
-                    </div>
+                {/* Acciones */}
+                <div className="shrink-0 flex items-center gap-2">
+                  {yaAutorizada && f?.ride_pdf_url ? (
+                    <a
+                      href={f.ride_pdf_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs text-slate-200 font-display font-bold transition-colors"
+                    >
+                      <Printer className="w-3.5 h-3.5" /> RIDE
+                    </a>
+                  ) : yaAutorizada ? (
+                    <span className="text-[10px] text-emerald-400 font-mono-tech flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" /> Autorizada
+                    </span>
                   ) : enProceso ? (
-                    <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 font-display font-bold">
-                      <Timer className="w-3.5 h-3.5" />
-                      En proceso en SRI
-                    </div>
+                    <span className="text-[10px] text-amber-400 font-mono-tech flex items-center gap-1">
+                      <Timer className="w-3 h-3" /> En proceso
+                    </span>
                   ) : (
                     <button
                       onClick={() => emitirFactura(order)}
                       disabled={isEmitiendo || !hasSriConfig || !df}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-400 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-display font-bold transition-colors shadow-lg shadow-brand-500/20"
+                      title={!df ? 'El cliente no completó sus datos de facturación' : undefined}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-400 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-display font-bold transition-colors"
                     >
                       {isEmitiendo
-                        ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Emitiendo...</>
-                        : <><Zap className="w-3.5 h-3.5" /> {factura?.estado === 'rechazada' ? 'Reintentar' : 'Emitir Factura'}</>
+                        ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Emitiendo</>
+                        : <><Zap className="w-3.5 h-3.5" /> {f?.estado === 'rechazada' ? 'Reintentar' : 'Emitir'}</>
                       }
                     </button>
                   )}
